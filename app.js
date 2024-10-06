@@ -4,7 +4,11 @@ import { ChatOpenAI } from "@langchain/openai";
 import { LLMChain } from "langchain/chains";
 import { BufferMemory } from "langchain/memory";
 import express from 'express';
+import connectDB from "./config/database/db.js"
+import Game from "./router/game.js";
+
 const app = express();
+connectDB();
 
 const apiKey = fs.readFileSync('OpenAiKey.txt', 'utf-8').trim();
 
@@ -59,6 +63,7 @@ function getUserSession(userId) {
 
 
 app.use(express.json());
+app.use("/api/game",Game);
 
 app.post("/play", async (req, res) => {
   const { question,userId } = req.body;

@@ -17,6 +17,7 @@
     "fs": "^0.0.1-security",
     "langchain": "^0.3.2",
     "mongoose": "^8.7.0",
+    "mongoose-sequence": "^6.0.1",
     "openai": "^4.67.1"
   }
 }
