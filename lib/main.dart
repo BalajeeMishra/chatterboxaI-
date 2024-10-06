@@ -3,11 +3,13 @@
 
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'Screens/JabberAIHomePage/JabberAIHomepage.dart';
 
 
 void main() {
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(statusBarColor: Color(0xff755be8)));
   runApp(const MyApp());
 }
 

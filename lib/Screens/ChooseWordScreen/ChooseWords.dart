@@ -1,8 +1,10 @@
 
 
-import 'package:balajiicode/Constants/appbar.dart';
+import 'package:balajiicode/Widget/appbar.dart';
 import 'package:balajiicode/Constants/constantRow.dart';
 import 'package:flutter/material.dart';
+
+import 'PlayTabooScreen.dart';
 
 class ChooseWordScreen extends StatelessWidget{
 
@@ -45,7 +47,7 @@ class ChooseWordScreen extends StatelessWidget{
            const SizedBox(
              height: 10,
            ),
-           sameDistantRow(context: context,playstatus: true,feedbackstatus: false,practicestatus: false),
+          EquiDistantRow(playstatus: true,feedbackstatus: false,practicestatus: false),
           const SizedBox(
             height: 10,
           ),
@@ -64,39 +66,44 @@ class ChooseWordScreen extends StatelessWidget{
                 var data = dataList[index];
                 return Column(
                   children: [
-                    Container(
-                        width: MediaQuery.of(context).size.width *0.9,
-                        decoration: const BoxDecoration(
-                            color: Color(0xffd3e2f5),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0))
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 15.0,vertical: 10.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                               Text(
-                                "${data["title"]}",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w800,
-                                    color: Colors.black,
-                                    fontSize: 20
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Text(
-                                "#${data["subtitle"]}",
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    color: Color(0xff646464),
-                                    fontWeight: FontWeight.w400
-                                ),
-                              )
-                            ],
+                    InkWell(
+                      onTap:(){
+                        Navigator.push(context, MaterialPageRoute(builder:(context)=>PlayTabooScreen()));
+                },
+                      child: Container(
+                          width: MediaQuery.of(context).size.width *0.9,
+                          decoration: const BoxDecoration(
+                              color: Color(0xffd3e2f5),
+                              borderRadius: BorderRadius.all(Radius.circular(10.0))
                           ),
-                        )
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 15.0,vertical: 10.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "${data["title"]}",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.black,
+                                      fontSize: 20
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Text(
+                                  "#${data["subtitle"]}",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color: Color(0xff646464),
+                                      fontWeight: FontWeight.w400
+                                  ),
+                                )
+                              ],
+                            ),
+                          )
+                      ),
                     ),
                     SizedBox(
                       height: 15,

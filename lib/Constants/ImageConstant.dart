@@ -11,6 +11,13 @@ class ImageConstant{
  static String debatechallenge = "assets/images/debate.png";
  static String backButtonIcon = "assets/images/backbutton.png";
  static String girlsImage = "assets/images/girlimage.png";
+static String chatIcon = "assets/images/chat.png";
+static String microphoneIcon = "assets/images/microphone.png";
+ static String pitch1 = "assets/images/pitchone.png";
+ static String pitch2 = "assets/images/pitchtwo.png";
+ static String pitch3 = "assets/images/pitchthree.png";
+ static String IconCancel = "assets/images/Iconcancel.png";
+ static String doneButton = "assets/images/DoneButton.png";
 
 
 }
