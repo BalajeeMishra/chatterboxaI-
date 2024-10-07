@@ -23,6 +23,13 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo>{
     // TODO: implement initState
     super.initState();
     configureTts();
+    startSpeaking();
+  }
+
+  startSpeaking(){
+    Future.delayed(Duration(seconds: 2), () {
+       speakText("Welcome to this Page $data");
+    });
   }
 
 
@@ -35,6 +42,7 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo>{
   }
 
   void speakText(String text) async {
+    print('Speak text called');
     await flutterTts.speak(text);
   }
 
@@ -72,7 +80,7 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo>{
              ),
              InkWell(
                onTap: (){
-                 speakText(data);
+
                },
                child: Image(image: AssetImage(ImageConstant.girlsImage)),
              ),

@@ -73,8 +73,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen>{
           backButtonshow: true,
           centerTile: false,
           onPressed: (){
-            //Navigator.pop(context);
-            Navigator.push(context, MaterialPageRoute(builder: (context)=>PlayTabooScreenTwo()));
+            Navigator.pop(context);
           },
           title: "Taboo"
       ),
@@ -270,6 +269,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen>{
                  setState(() {
                    startListening = false;
                  });
+               Navigator.push(context, MaterialPageRoute(builder: (context)=>PlayTabooScreenTwo()));
              },
              child:  Image(image: AssetImage(ImageConstant.doneButton)),
            )
