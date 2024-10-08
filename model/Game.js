@@ -10,21 +10,14 @@ const gameSchema = new mongoose.Schema({
   gameIcon:{
     type:String
   },
-  contentOfGame:[{
-    mainContent:String,
-      level:{
-        type:String,
-        enum:["easy","medium","hard"]
-      },
-      detailOfContent:[String],
-}],
-
+  description:String,
   order:{
     type:Number
   },
   status:{
     type:String, 
-    enum:["active","inactive"]
+    enum:["active","inactive"],
+    default:"inactive"
   },
 })
 
