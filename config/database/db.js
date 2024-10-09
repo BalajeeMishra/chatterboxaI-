@@ -7,7 +7,9 @@ dotenv.config();
 mongoose.set("strictQuery", true);
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.DBURL);
+    mongoose.connect(process.env.DBURL,{
+      autoIndex: true
+    });
   } catch (err) {
     await sendMail();
     process.exit(1);

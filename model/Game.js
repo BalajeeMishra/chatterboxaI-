@@ -5,7 +5,8 @@ const AutoIncrement = mongooseSequence(mongoose);
 const gameSchema = new mongoose.Schema({
   gameName:{
     type:String, 
-    required:true
+    required:true,
+    unique:true
   },
   gameIcon:{
     type:String
