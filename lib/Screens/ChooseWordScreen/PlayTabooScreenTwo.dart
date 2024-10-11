@@ -51,6 +51,13 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo>{
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    stopSpeaking();
+  }
+
+  @override
   Widget build(BuildContext context) {
       return Scaffold(
        appBar: backCustomAppBar(
