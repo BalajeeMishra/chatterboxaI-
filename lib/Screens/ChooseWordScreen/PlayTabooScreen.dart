@@ -1,27 +1,43 @@
 
+
 import 'package:balajiicode/Constants/ImageConstant.dart';
 import 'package:balajiicode/Constants/constantRow.dart';
+import 'package:balajiicode/Utils/ShowSnackBar.dart';
 import 'package:balajiicode/Widget/text_widget.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:speech_to_text/speech_recognition_result.dart';
+import 'package:lottie/lottie.dart';
 import 'package:speech_to_text/speech_to_text.dart';
-
-
+import 'package:speech_to_text_ultra/speech_to_text_ultra.dart';
+import '../../Model/AllGameModel.dart';
 import '../../Widget/appbar.dart';
 import 'PlayTabooScreenTwo.dart';
+import 'dart:async';
 
 class PlayTabooScreen extends StatefulWidget{
+
+  AllGameModel allGameModel;
+  int index;
+  PlayTabooScreen(this.allGameModel,this.index);
+
   @override
   State<StatefulWidget> createState() => _PlayTabooScreen();
 
 }
 
 class _PlayTabooScreen extends State<PlayTabooScreen>{
-  bool startListening = false;
-  SpeechToText _speechToText = SpeechToText();
-  bool _speechEnabled = false;
-  String _lastWords = '';
+
+
+
+  bool mIsListening = false;
+  String mEntireResponse = '';
+  String mLiveResponse = '';
+
+  bool googleSpeechVisibility = false;
+
+  bool donebuttonClicked = false;
+
 
 
   @override
@@ -29,41 +45,19 @@ class _PlayTabooScreen extends State<PlayTabooScreen>{
     super.initState();
   }
 
-  /// This has to happen only once per app
-  void _initSpeech() async {
-    _speechEnabled = await _speechToText.initialize();
-    if(_speechEnabled){
-      setState(() {
-        startListening = true;
-      });
-      _startListening();
-    }
-  }
 
-  /// Each time to start a speech recognition session
-  void _startListening() async {
-    await _speechToText.listen(
-        localeId: 'en_US', // e.g., 'en_US'
-        onResult: _onSpeechResult
-    );
-    setState(() {});
-  }
-
-  /// Manually stop the active speech recognition session
-  /// Note that there are also timeouts that each platform enforces
-  /// and the SpeechToText plugin supports setting timeouts on the
-  /// listen method.
-  void _stopListening() async {
-    await _speechToText.stop();
-    setState(() {});
-  }
-
-  /// This is the callback that the SpeechToText plugin calls when
-  /// the platform returns recognized words.
-  void _onSpeechResult(SpeechRecognitionResult result) {
+  startListening(){
     setState(() {
-      _lastWords = result.recognizedWords;
+      googleSpeechVisibility = true;
     });
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    mIsListening = false;
+    googleSpeechVisibility = false;
   }
 
   @override
@@ -129,7 +123,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen>{
                                   children: [
                                     Expanded(
                                       child: MyText(
-                                        text: '\"Elevator"',
+                                        text: '\"${ widget.allGameModel.allGame![widget.index].mainContent}"',
                                         color: Colors.black,
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
@@ -154,18 +148,24 @@ class _PlayTabooScreen extends State<PlayTabooScreen>{
 
                                   ],
                                 ),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: MyText(
-                                        text: 'lift,floor,building,up,down',
-                                        color: Colors.black,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    )
-                                  ],
-                                ),
+                                Container(
+                          width:  MediaQuery.of(context).size.width,
+                          height: 50,
+                          child: ListView.builder(
+                              itemCount: widget.allGameModel.allGame![widget.index].detailOfContent!.length,
+                              shrinkWrap: true,
+                              scrollDirection: Axis.horizontal,
+                              itemBuilder: (context,index){
+                                var data = widget.allGameModel.allGame![widget.index].detailOfContent![index];
+                                return MyText(
+                                  text: '${data},',
+                                  color: Colors.black,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                );
+                              }
+                          ),
+                    ),
                                 SizedBox(
                                   height: 5.0,
                                 ),
@@ -187,12 +187,20 @@ class _PlayTabooScreen extends State<PlayTabooScreen>{
                                 Row(
                                   children: [
                                     Expanded(
-                                      child: MyText(
-                                        text: _lastWords,
+                                      child:
+                                mIsListening?
+                                      MyText(
+                                        text: '$mEntireResponse $mLiveResponse',
                                         color: Color(0xff000000),
                                         fontSize: 14,
                                         fontWeight: FontWeight.w400,
-                                      ),
+                                      ):
+                                      MyText(
+                                  text: '$mEntireResponse',
+                                  color: Color(0xff000000),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                ),
                                     ),
 
 
@@ -202,12 +210,32 @@ class _PlayTabooScreen extends State<PlayTabooScreen>{
                               ],
                             ),
                           ),
+
+                          Visibility(
+                            visible: googleSpeechVisibility,
+                            child:
+                            SpeechToTextUltra(
+                              ultraCallback:
+                                  (String liveText, String finalText, bool isListening) {
+                                print("Callback get");
+                                setState(() {
+                                  mLiveResponse = liveText;
+                                  mEntireResponse = finalText;
+                                  mIsListening = isListening;
+                                });
+                                if(!mIsListening && donebuttonClicked){
+                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>PlayTabooScreenTwo()));
+                                }
+                              },
+                            ),
+                          )
+
                         ],
                       ),
                     ),
                   ),
                    Center(
-                   child: startListening?
+                   child: (mIsListening)?
                    listeningWidget():
                    Row(
                      mainAxisAlignment: MainAxisAlignment.center,
@@ -223,7 +251,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen>{
                        ),
                        InkWell(
                          onTap: (){
-                           _initSpeech();
+                             startListening();
                          },
                          child: Column(
                            children: [
@@ -247,32 +275,63 @@ class _PlayTabooScreen extends State<PlayTabooScreen>{
 
   listeningWidget(){
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 15),
+      padding: EdgeInsets.symmetric(horizontal:15),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          InkWell(
-            onTap: (){
-              _stopListening();
-              setState(() {
-                startListening = false;
-              });
-            },
-            child: Image(image: AssetImage(ImageConstant.IconCancel)),
+          Padding(
+            padding: EdgeInsets.only(top: 50.0),
+            child: InkWell(
+              onTap: (){
+                if(mIsListening){
+                 MySnackBar.showSnackBar(context, "Stop Speech By Clicking Pause Button");
+                }else{
+                  setState(() {
+                    googleSpeechVisibility = false;
+                    mIsListening = false;
+                    mEntireResponse = '';
+                    mLiveResponse = '';
+                  });
+                }
+              },
+              child: Image(image: AssetImage(ImageConstant.IconCancel)),
+            ),
           ),
-          Image(image: AssetImage(ImageConstant.pitch1)),
-          Image(image: AssetImage(ImageConstant.pitch2)),
-          Image(image: AssetImage(ImageConstant.pitch3)),
-           InkWell(
-             onTap: (){
-               _stopListening();
-                 setState(() {
-                   startListening = false;
-                 });
-               Navigator.push(context, MaterialPageRoute(builder: (context)=>PlayTabooScreenTwo()));
-             },
-             child:  Image(image: AssetImage(ImageConstant.doneButton)),
-           )
+          SizedBox(
+            width: 10,
+          ),
+
+          mIsListening?
+          Expanded(
+            child:  Lottie.asset('assets/lottiefile/recordaudio.json'),
+          ):
+         Padding(
+           padding: EdgeInsets.only(top: 50.0),
+           child:  Row(
+             children: [
+               Image(image: AssetImage(ImageConstant.pitch1)),
+               Image(image: AssetImage(ImageConstant.pitch2)),
+               Image(image: AssetImage(ImageConstant.pitch3)),
+             ],
+           ),
+         ),
+          SizedBox(
+            width: 10,
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: 50.0),
+            child: InkWell(
+              onTap: (){
+                if(mIsListening){
+                  MySnackBar.showSnackBar(context, "Stop Speech By Clicking Pause Button");
+                  setState(() {
+                    donebuttonClicked = true;
+                  });
+                }
+                },
+              child:  Image(image: AssetImage(ImageConstant.doneButton)),
+            ),
+          )
 
         ],
       ),
