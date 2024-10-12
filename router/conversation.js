@@ -21,7 +21,8 @@ Please follow these instructions carefully:
 User starts a new game: Initialize guess word and set taboo words.
  
 User gives a hint: check the hint very carefully. Process the hint.
-warn them only If a hint contains a taboo word.
+warn them only If a hint contains a taboo word or guess word.
+
 If the hint is valid then congratulate the user, predict the guess word.
 Process the result: Check if the guess matches the original word(from your end). Also write appreciating message to the user dont forget this.
 
@@ -30,7 +31,7 @@ Ask the user to make you predict the same guess-word. Original Taboo words stay 
 
 Repeat until the user guesses gives up.
 
-Following is the response format that I expect from you:
+Following is the example:
 
 User Input:
 
@@ -41,6 +42,9 @@ user hint: An electric facility that is used for moving up and down of a high ri
 Gpt Response: 
 Your hint includes the taboo word “high rise,” so I'll disregard this hint. Can you provide another one without using any taboo words?
 
+Note: In case if guess word will be there in user hint
+GPT response should be: Your hint includes the original word “Elevator” so I'll disregard this hint. Can you provide another one without using any taboo words?
+
 User Response: 
 Fastest way to reach from basement to top of Mall is by using this.
 
@@ -48,13 +52,15 @@ Gpt Response:
 Your hint is clear and doesn't use any taboo words. I guess the word is elevator. Evaluation: You've successfully made me guess the word. Well done!
 
 Round 2:
-Now, give me another hint to make me guess the same word, but don’t use any of the key words you used in Round 1 ("electric," "facility," "moving," "up and down," "mall").
+Now, give me another hint to make me guess the same word, but don’t use any of the key words you used in previous rounds ("electric," "facility," "moving," "up and down," "mall").
+
+Next you need to check the same and ask for next round. 
+
 
 Previous conversation:
 {chat_history}
 
-New human question: {question}
-Response:`;
+New human question: {question}`;
 
 const prompt = PromptTemplate.fromTemplate(template);
 
@@ -89,6 +95,7 @@ router.post("/play", async (req, res) => {
     const userSession = getUserSession(userId);
     const response = await userSession.chain.invoke({ question });
     userdatalog = await UserDataLog.findOne({userId,session});
+    console.log(userdatalog,"userdatalog")
      if(userdatalog){
       userdatalog.userResponse = [...userdatalog.userResponse,question]
       userdatalog.aiResponse =[...userdatalog.aiResponse,response.text]
@@ -100,17 +107,14 @@ router.post("/play", async (req, res) => {
       userId,
       session
     });
-    await userdatalog.save();
   }
-    return res.status(200).json({userdatalog});
+  await userdatalog.save();
+    return res.status(200).json({response:userdatalog});
   } catch (error) {
     console.log(error,"hello okayy");
     res.status(500).json({ error: "Something went wrong" });
   }
 });
-
-
-
 
 
 export default router;
