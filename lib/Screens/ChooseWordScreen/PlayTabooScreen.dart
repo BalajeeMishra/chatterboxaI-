@@ -8,13 +8,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lottie/lottie.dart';
-import 'package:speech_to_text/speech_to_text.dart';
+import 'package:provider/provider.dart';
 import 'package:speech_to_text_ultra/speech_to_text_ultra.dart';
 import '../../Model/AllGameModel.dart';
+import '../../ViewModel/PlayTabooScreenVM.dart';
 import '../../Widget/appbar.dart';
 import '../TabooGameChatpage/TaboogamechatPage.dart';
-import 'PlayTabooScreenTwo.dart';
-import 'dart:async';
+
 
 class PlayTabooScreen extends StatefulWidget{
 
@@ -225,7 +225,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen>{
                                   mIsListening = isListening;
                                 });
                                 if(!mIsListening && donebuttonClicked){
-                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>PlayTabooScreenTwo()));
+                                  Provider.of<PlayTabooScreenVM>(context,listen: false).chatPageAPI(context,mEntireResponse);
                                 }
                               },
                             ),

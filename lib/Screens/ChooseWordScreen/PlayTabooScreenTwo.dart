@@ -4,11 +4,19 @@ import 'package:flutter/material.dart';
 
 import '../../Constants/ImageConstant.dart';
 import '../../Constants/constantRow.dart';
+import '../../Model/AllGameModel.dart';
 import '../../Widget/appbar.dart';
 import '../../Widget/text_widget.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
+import '../TabooGameChatpage/TaboogamechatPage.dart';
+
 class PlayTabooScreenTwo extends StatefulWidget{
+  AllGameModel allGameModel;
+  int index;
+ String dataGet;
+ PlayTabooScreenTwo(this.allGameModel,this.index,this.dataGet);
+
   @override
   State<StatefulWidget> createState() => _PlayTabooScreenTwo();
 }
@@ -28,7 +36,7 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo>{
 
   startSpeaking(){
     Future.delayed(Duration(seconds: 2), () {
-       speakText("Welcome to this Page $data");
+       speakText("${widget.dataGet}");
     });
   }
 
@@ -68,44 +76,81 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo>{
            },
            title: "Taboo1"
        ),
-       body: SingleChildScrollView(
-         child: Column(
-           children: [
-             SizedBox(
-               height: 10,
-             ),
-             EquiDistantRow(playstatus: true,feedbackstatus: false,practicestatus: false),
-             const SizedBox(
-               height: 10,
-             ),
-             const Divider(
-               height: 1,
-               color: Color(0xffc1c1c1),
-             ),
-             SizedBox(
-               height: 25.0,
-             ),
-             InkWell(
-               onTap: (){
+       body: Column(
+         children: [
+           Expanded(
+             child: Column(
+               children: [
+                 SizedBox(
+                   height: 10,
+                 ),
+                 EquiDistantRow(playstatus: true,feedbackstatus: false,practicestatus: false),
+                 const SizedBox(
+                   height: 10,
+                 ),
+                 const Divider(
+                   height: 1,
+                   color: Color(0xffc1c1c1),
+                 ),
+                 SizedBox(
+                   height: 25.0,
+                 ),
+                 InkWell(
+                   onTap: (){
 
-               },
-               child: Image(image: AssetImage(ImageConstant.girlsImage)),
+                   },
+                   child: Image(image: AssetImage(ImageConstant.girlsImage)),
+                 ),
+                 SizedBox(
+                   height: 15,
+                 ),
+                 Padding(
+                   padding: EdgeInsets.symmetric(horizontal: 10.0),
+                   child:  Row(
+                     children: [
+                       Expanded(
+                         child: Text(widget.dataGet),
+                       )
+                     ],
+                   ),
+                 )
+               ],
              ),
-             SizedBox(
-               height: 15,
+           ),
+           Padding(
+             padding: EdgeInsets.only(bottom: 15),
+             child: Row(
+               mainAxisAlignment: MainAxisAlignment.center,
+               children: [
+                 InkWell(
+                   onTap:(){
+                     Navigator.push(context, MaterialPageRoute(builder: (context)=>TaboogamechatPage(widget.allGameModel,widget.index)));
+                   },
+                   child: Column(
+                     children: [
+                       Image(image: AssetImage(ImageConstant.chatIcon)),
+                       MyText(text: "Write",fontSize: 12,)
+                     ],
+                   ),
+                 ),
+                 SizedBox(
+                   width: 40,
+                 ),
+                 InkWell(
+                   onTap: (){
+
+                   },
+                   child: Column(
+                     children: [
+                       Image(image: AssetImage(ImageConstant.microphoneIcon)),
+                       MyText(text: "Speak",fontSize: 12,)
+                     ],
+                   ),
+                 )
+               ],
              ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10.0),
-              child:  Row(
-                children: [
-                  Expanded(
-                    child: Text(data),
-                  )
-                ],
-              ),
-            )
-           ],
-         ),
+           ),
+         ],
        ),
      );
   }
