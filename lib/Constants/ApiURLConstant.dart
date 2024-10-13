@@ -5,3 +5,4 @@
 
 const homepageAPI = 'api/game/allgame';
 const allgame = "api/game/allgamecontent/";
+const tabooGameChatPage = 'api/play';

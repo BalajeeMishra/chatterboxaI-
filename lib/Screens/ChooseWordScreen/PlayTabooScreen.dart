@@ -12,6 +12,7 @@ import 'package:speech_to_text/speech_to_text.dart';
 import 'package:speech_to_text_ultra/speech_to_text_ultra.dart';
 import '../../Model/AllGameModel.dart';
 import '../../Widget/appbar.dart';
+import '../TabooGameChatpage/TaboogamechatPage.dart';
 import 'PlayTabooScreenTwo.dart';
 import 'dart:async';
 
@@ -240,11 +241,16 @@ class _PlayTabooScreen extends State<PlayTabooScreen>{
                    Row(
                      mainAxisAlignment: MainAxisAlignment.center,
                      children: [
-                       Column(
-                         children: [
-                           Image(image: AssetImage(ImageConstant.chatIcon)),
-                           MyText(text: "Write",fontSize: 12,)
-                         ],
+                       InkWell(
+                         onTap:(){
+                           Navigator.push(context, MaterialPageRoute(builder: (context)=>TaboogamechatPage(widget.allGameModel,widget.index)));
+    },
+                         child: Column(
+                           children: [
+                             Image(image: AssetImage(ImageConstant.chatIcon)),
+                             MyText(text: "Write",fontSize: 12,)
+                           ],
+                         ),
                        ),
                        SizedBox(
                          width: 40,
