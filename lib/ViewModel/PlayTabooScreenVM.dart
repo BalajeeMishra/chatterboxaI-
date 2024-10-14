@@ -79,6 +79,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
           };
           dynamicDta.add(data);
           apiHitStatus = true;
+          tabooGameChatPageModel = response.data!;
           notifyListeners();
 
           print(response.data!.response!.aiResponse!.last);
