@@ -3,10 +3,12 @@ import express from 'express';
 import connectDB from "./config/database/db.js"
 import Game from "./router/game.js";
 import ConverSation from "./router/conversation.js"
+import cors from "cors";
 
 const app = express();
 connectDB();
 app.use(express.json());
+app.use(cors());
 app.use("/api/game",Game);
 app.use("/api",ConverSation);
 app.get("/",async(_,res)=>res.send("Server is running"));

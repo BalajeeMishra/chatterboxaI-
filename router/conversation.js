@@ -52,7 +52,8 @@ Gpt Response:
 Your hint is clear and doesn't use any taboo words. I guess the word is elevator. Evaluation: You've successfully made me guess the word. Well done!
 
 Round 2:
-Now, give me another hint to make me guess the same word, but don’t use any of the key words you used in previous rounds ("electric," "facility," "moving," "up and down," "mall").
+Now, give me another hint to make me guess the same word, but don’t use any of the key words you used in previous rounds ("electric," "facility," "moving," "up and down," "mall"). Show user the list of taboo words for this round. It should be initial taboo words together with keyword used in this round.
+for example [ Floor,building,apartment,skyscraper,high rise,electric,facility,moving, up and down, mall]
 
 Next you need to check the same and ask for next round. 
 
