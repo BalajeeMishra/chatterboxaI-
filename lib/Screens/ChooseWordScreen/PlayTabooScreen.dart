@@ -247,6 +247,9 @@ class _PlayTabooScreen extends State<PlayTabooScreen>{
                      children: [
                        InkWell(
                          onTap:(){
+                           setState(() {
+                             donebuttonClicked = false;
+                           });
                            Navigator.push(context, MaterialPageRoute(builder: (context)=>TaboogamechatPage(widget.allGameModel,widget.index)));
     },
                          child: Column(
@@ -301,6 +304,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen>{
                     mIsListening = false;
                     mEntireResponse = '';
                     mLiveResponse = '';
+                    donebuttonClicked = false;
                   });
                 }
               },
