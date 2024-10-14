@@ -80,7 +80,7 @@ class _TaboogamechatPage extends State<TaboogamechatPage>{
                                        borderRadius: BorderRadius.all(Radius.circular(10.0))
                                    ),
                                    child: Padding(
-                                     padding: const EdgeInsets.symmetric(horizontal: 15.0,vertical: 10.0),
+                                     padding: const EdgeInsets.symmetric(horizontal: 10.0,vertical: 10.0),
                                      child: Column(
                                        children: [
                                          Row(
