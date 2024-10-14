@@ -56,7 +56,7 @@ Now, give me another hint to make me guess the same word, but don’t use any of
 
 Next you need to check the same and ask for next round. 
 
-
+Note: If user ask anything other than this ask him to play the game.You are here to assist with game.
 Previous conversation:
 {chat_history}
 
@@ -95,7 +95,6 @@ router.post("/play", async (req, res) => {
     const userSession = getUserSession(userId);
     const response = await userSession.chain.invoke({ question });
     userdatalog = await UserDataLog.findOne({userId,session});
-    console.log(userdatalog,"userdatalog")
      if(userdatalog){
       userdatalog.userResponse = [...userdatalog.userResponse,question]
       userdatalog.aiResponse =[...userdatalog.aiResponse,response.text]
@@ -111,7 +110,6 @@ router.post("/play", async (req, res) => {
   await userdatalog.save();
     return res.status(200).json({response:userdatalog});
   } catch (error) {
-    console.log(error,"hello okayy");
     res.status(500).json({ error: "Something went wrong" });
   }
 });
