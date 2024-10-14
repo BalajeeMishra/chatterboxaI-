@@ -1,10 +1,12 @@
 
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../Constants/ImageConstant.dart';
 import '../../Constants/constantRow.dart';
 import '../../Model/AllGameModel.dart';
+import '../../ViewModel/PlayTabooScreenVM.dart';
 import '../../Widget/appbar.dart';
 import '../../Widget/text_widget.dart';
 import 'package:flutter_tts/flutter_tts.dart';
@@ -31,7 +33,8 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo>{
     // TODO: implement initState
     super.initState();
     configureTts();
-    startSpeaking();
+    Provider.of<PlayTabooScreenVM>(context,listen: false).setInitailData();
+    Provider.of<PlayTabooScreenVM>(context,listen: false).chatPageAPI(context,widget.dataGet);
   }
 
   startSpeaking(){
@@ -104,15 +107,25 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo>{
                  SizedBox(
                    height: 15,
                  ),
-                 Padding(
-                   padding: EdgeInsets.symmetric(horizontal: 10.0),
-                   child:  Row(
-                     children: [
-                       Expanded(
-                         child: Text(widget.dataGet),
-                       )
-                     ],
-                   ),
+                 Consumer<PlayTabooScreenVM>(
+                   builder: (context,vm,child){
+                     return vm.tabooGameChatPageModel.response == null?
+                     SizedBox():
+                       Padding(
+                       padding: EdgeInsets.symmetric(horizontal: 10.0),
+                       child:  Row(
+                         children: [
+                           Expanded(
+                             child: (
+                       vm.tabooGameChatPageModel.response!.aiResponse!.last == null
+                        || vm.tabooGameChatPageModel.response!.aiResponse!.last == ""
+                       )?Text(""):
+                             Text(vm.tabooGameChatPageModel.response!.aiResponse!.last),
+                           )
+                         ],
+                       ),
+                     );
+                   },
                  )
                ],
              ),
@@ -138,7 +151,7 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo>{
                  ),
                  InkWell(
                    onTap: (){
-
+                     Navigator.pop(context);
                    },
                    child: Column(
                      children: [

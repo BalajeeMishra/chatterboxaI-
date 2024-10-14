@@ -14,6 +14,7 @@ import '../../Model/AllGameModel.dart';
 import '../../ViewModel/PlayTabooScreenVM.dart';
 import '../../Widget/appbar.dart';
 import '../TabooGameChatpage/TaboogamechatPage.dart';
+import 'PlayTabooScreenTwo.dart';
 
 
 class PlayTabooScreen extends StatefulWidget{
@@ -57,8 +58,10 @@ class _PlayTabooScreen extends State<PlayTabooScreen>{
   void dispose() {
     // TODO: implement dispose
     super.dispose();
-    mIsListening = false;
     googleSpeechVisibility = false;
+    mLiveResponse = "";
+    mEntireResponse = "";
+    mIsListening = false;
   }
 
   @override
@@ -225,7 +228,8 @@ class _PlayTabooScreen extends State<PlayTabooScreen>{
                                   mIsListening = isListening;
                                 });
                                 if(!mIsListening && donebuttonClicked){
-                                  Provider.of<PlayTabooScreenVM>(context,listen: false).chatPageAPI(context,mEntireResponse);
+                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>PlayTabooScreenTwo(widget.allGameModel,widget.index,mEntireResponse)));
+                                  //Provider.of<PlayTabooScreenVM>(context,listen: false).chatPageAPI(context,mEntireResponse);
                                 }
                               },
                             ),

@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
 import '../Constants/constant_text.dart';
 import '../Model/TabooGameChatPageModel.dart';
@@ -23,6 +24,10 @@ class PlayTabooScreenVM extends ChangeNotifier{
   TabooGameChatPageModel tabooGameChatPageModel = TabooGameChatPageModel();
   bool apiHitStatus = false;
 
+  setInitailData(){
+    tabooGameChatPageModel = TabooGameChatPageModel();
+  }
+
 
   Future<void> chatPageAPI(BuildContext context,String dataGet) async {
     EasyLoading.show(status: ConstText.get_LoaderMessage);
@@ -36,8 +41,11 @@ class PlayTabooScreenVM extends ChangeNotifier{
       print("Response ::: ${response.data}");
       switch (response.status) {
         case ApiResponseStatus.success:
+          tabooGameChatPageModel = response.data!;
+          notifyListeners();
           //Navigator.push(context, MaterialPageRoute(builder: (context)=>PlayTabooScreenTwo(response.data!.response!.aiResponse!.last)));
           EasyLoading.dismiss();
+          speakText(response.data!.response!.aiResponse!.last);
           break;
         case ApiResponseStatus.badRequest:
           EasyLoading.dismiss();
@@ -65,6 +73,23 @@ class PlayTabooScreenVM extends ChangeNotifier{
       EasyLoading.dismiss();
       MySnackBar.showSnackBar(context, e.toString());
     }
+  }
+
+
+
+
+
+  FlutterTts flutterTts = FlutterTts();
+
+  Future<void> configureTts() async {
+    await flutterTts.setLanguage('en-US');
+    await flutterTts.setSpeechRate(0.4);
+    await flutterTts.setVolume(1.0);
+  }
+
+  void speakText(String text) async {
+    print('Speak text called');
+    await flutterTts.speak(text);
   }
 
 }

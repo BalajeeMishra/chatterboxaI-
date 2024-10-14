@@ -62,7 +62,7 @@ class TabooGameChatPageVM  extends ChangeNotifier{
     var dataToAdd = dynamicDta.length>0? "${controller.text}":"$dataToPass ${controller.text}";
     var dataAdd =  {
       "server":0,
-      "data": dataToAdd,
+      "data": controller.text,
     };
     dynamicDta.add(dataAdd);
     notifyListeners();
