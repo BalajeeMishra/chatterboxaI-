@@ -1,8 +1,7 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-
+import '../Model/AllGameModel.dart';
 import '../Constants/constant_text.dart';
 import '../Model/TabooGameChatPageModel.dart';
 import '../Repository/TaboogameChatPageRepository.dart';
@@ -10,43 +9,91 @@ import '../Screens/ChooseWordScreen/PlayTabooScreenTwo.dart';
 import '../Services/ApiResponseStatus.dart';
 import '../Utils/ShowSnackBar.dart';
 
-class PlayTabooScreenVM extends ChangeNotifier{
-
+class PlayTabooScreenVM extends ChangeNotifier {
   /// Calling Repository =====================================
-  TabooGameChatPageRepository _tabooGameChatPageRepository = TabooGameChatPageRepository();
+  TabooGameChatPageRepository _tabooGameChatPageRepository =
+      TabooGameChatPageRepository();
 
   BuildContext context;
 
   /// Onload Events Declear Here ======================================
   PlayTabooScreenVM(this.context);
+  TextEditingController controller = TextEditingController();
 
   /// Creating Variables =======================================>
   TabooGameChatPageModel tabooGameChatPageModel = TabooGameChatPageModel();
   bool apiHitStatus = false;
+  List<Map<String, dynamic>> dynamicDta = [];
 
-  setInitailData(){
+  var dataToPass;
+
+  // setInitailData(){
+  //   tabooGameChatPageModel = TabooGameChatPageModel();
+  // }
+
+  seInitialValue(AllGameModel allGameModel, int index) {
+    String data = "";
+    dynamicDta = [];
+    for (var i = 0;
+        i < allGameModel.allGame![index].detailOfContent!.length;
+        i++) {
+      data = (data.length > 0)
+          ? data + "," + allGameModel.allGame![index].detailOfContent![i]
+          : data + " " + allGameModel.allGame![index].detailOfContent![i];
+    }
+    dataToPass =
+        "Guess word is ${allGameModel.allGame![index].mainContent} and taboo words are [${data}] and user hint is an";
+    apiHitStatus = false;
     tabooGameChatPageModel = TabooGameChatPageModel();
   }
 
+  Future<void> chatPageAPI(BuildContext context, String dataGet) async {
+    if (dataGet == "" || dataGet == null) {
+      MySnackBar.showSnackBar(context, "Please speak first!");
+      return;
+    }
 
-  Future<void> chatPageAPI(BuildContext context,String dataGet) async {
+    var dataToAdd = dynamicDta.length > 0 ? "$dataGet" : "$dataToPass $dataGet";
+
+    var dataAdd = {
+      "server": 0,
+      "data": dataGet,
+    };
+
+    dynamicDta.add(dataAdd);
+    notifyListeners();
+
     EasyLoading.show(status: ConstText.get_LoaderMessage);
     try {
-      var data = {
-        "question": dataGet,
-        "userId":"123",
-        "session":"1"
-      };
-      ApiResponse<TabooGameChatPageModel> response = await _tabooGameChatPageRepository.tabooGameChatPageApiCallFunction(data);
+      var data = {"question": dataToAdd, "userId": "123", "session": "1"};
+      ApiResponse<TabooGameChatPageModel> response =
+          await _tabooGameChatPageRepository
+              .tabooGameChatPageApiCallFunction(data);
       print("Response ::: ${response.data}");
       switch (response.status) {
         case ApiResponseStatus.success:
-          tabooGameChatPageModel = response.data!;
+          dataGet = "";
+          var data = {
+            "server": 1,
+            "data": response.data!.response!.aiResponse!.last.characters
+          };
+          dynamicDta.add(data);
+          apiHitStatus = true;
           notifyListeners();
-          //Navigator.push(context, MaterialPageRoute(builder: (context)=>PlayTabooScreenTwo(response.data!.response!.aiResponse!.last)));
+
+          print(response.data!.response!.aiResponse!.last);
+          print("hello");
+          print(response.data!.response!.aiResponse!.last.characters);
+          print("world");
           EasyLoading.dismiss();
           speakText(response.data!.response!.aiResponse!.last);
+          // Navigator.push(context, MaterialPageRoute(builder: (context)=>PlayTabooScreenTwo(response.data!.response!.aiResponse!.last)));
           break;
+          // tabooGameChatPageModel = response.data!;
+          // notifyListeners();
+          // EasyLoading.dismiss();
+
+          // break;
         case ApiResponseStatus.badRequest:
           EasyLoading.dismiss();
           print("${response.error!.responseMsg.toString()}");
@@ -75,10 +122,6 @@ class PlayTabooScreenVM extends ChangeNotifier{
     }
   }
 
-
-
-
-
   FlutterTts flutterTts = FlutterTts();
 
   Future<void> configureTts() async {
@@ -89,7 +132,7 @@ class PlayTabooScreenVM extends ChangeNotifier{
 
   void speakText(String text) async {
     print('Speak text called');
+    print(text);
     await flutterTts.speak(text);
   }
-
 }

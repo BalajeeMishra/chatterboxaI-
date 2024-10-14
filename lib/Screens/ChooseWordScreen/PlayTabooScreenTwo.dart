@@ -10,7 +10,7 @@ import '../../ViewModel/PlayTabooScreenVM.dart';
 import '../../Widget/appbar.dart';
 import '../../Widget/text_widget.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-
+import '../../Model/AllGameModel.dart';
 import '../TabooGameChatpage/TaboogamechatPage.dart';
 
 class PlayTabooScreenTwo extends StatefulWidget{
@@ -33,7 +33,7 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo>{
     // TODO: implement initState
     super.initState();
     configureTts();
-    Provider.of<PlayTabooScreenVM>(context,listen: false).setInitailData();
+    Provider.of<PlayTabooScreenVM>(context,listen: false).seInitialValue(widget.allGameModel,widget.index);
     Provider.of<PlayTabooScreenVM>(context,listen: false).chatPageAPI(context,widget.dataGet);
   }
 
