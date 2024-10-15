@@ -87,8 +87,7 @@ function getUserSession(session) {
 
 router.post("/play", async (req, res) => {
   const { question,userId,session } = req.body;
-  console.log(question,userId,session);
-  console.log(typeof session);
+ 
   let userdatalog;
   // const usedTabooWord = tabooWords.find((word) => question.includes(word));
   // if (usedTabooWord) {
