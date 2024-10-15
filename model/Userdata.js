@@ -8,7 +8,7 @@ const userDataLogSchema = new mongoose.Schema({
     },
     userResponse:[String], 
     aiResponse:[String],
-    session:Number
+    session:String
 });
 
 // Create the user model
