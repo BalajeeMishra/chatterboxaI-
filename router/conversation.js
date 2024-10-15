@@ -66,12 +66,12 @@ New human question: {question}`;
 const prompt = PromptTemplate.fromTemplate(template);
 
 const userSessions = {};
-function getUserSession(userId) {
-    if (!userSessions[userId]) {
+function getUserSession(session) {
+    if (!userSessions[session]) {
         // Initialize a new session for the user with persistent memory
         const memory = new BufferMemory({ memoryKey: "chat_history" });
         
-        userSessions[userId] = {
+        userSessions[session] = {
             memory,
             chain: new LLMChain({
                 llm,
@@ -81,7 +81,7 @@ function getUserSession(userId) {
             })
         };
     }
-    return userSessions[userId];
+    return userSessions[session];
 }
 
 
@@ -93,7 +93,7 @@ router.post("/play", async (req, res) => {
   //   return res.json({ message: `You used a taboo word: ${usedTabooWord}` });
   // }
   try {
-    const userSession = getUserSession(userId);
+    const userSession = getUserSession(session);
     const response = await userSession.chain.invoke({ question });
     userdatalog = await UserDataLog.findOne({userId,session});
      if(userdatalog){
