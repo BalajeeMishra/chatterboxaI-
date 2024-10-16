@@ -31,7 +31,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
   //   tabooGameChatPageModel = TabooGameChatPageModel();
   // }
 
-  seInitialValue(AllGameModel allGameModel, int index) {
+  seInitialValue(AllGameModel allGameModel, int index, String sessionId) {
     String data = "";
     dynamicDta = [];
     for (var i = 0;
@@ -47,7 +47,13 @@ class PlayTabooScreenVM extends ChangeNotifier {
     tabooGameChatPageModel = TabooGameChatPageModel();
   }
 
-  Future<void> chatPageAPI(BuildContext context, String dataGet) async {
+  void clearAiResponse() {
+    tabooGameChatPageModel.response?.aiResponse?.last = "";
+    notifyListeners(); // Notify listeners to update the UI
+  }
+
+  Future<void> chatPageAPI(
+      BuildContext context, String dataGet, String sessionId) async {
     if (dataGet == "" || dataGet == null) {
       MySnackBar.showSnackBar(context, "Please speak first!");
       return;
@@ -65,7 +71,10 @@ class PlayTabooScreenVM extends ChangeNotifier {
 
     EasyLoading.show(status: ConstText.get_LoaderMessage);
     try {
-      var data = {"question": dataToAdd, "userId": "123", "session": "1"};
+      print(sessionId);
+      var data = {"question": dataToAdd, "userId": "123", "session": sessionId};
+      print(data);
+      print("balajee mishra");
       ApiResponse<TabooGameChatPageModel> response =
           await _tabooGameChatPageRepository
               .tabooGameChatPageApiCallFunction(data);
@@ -82,19 +91,15 @@ class PlayTabooScreenVM extends ChangeNotifier {
           tabooGameChatPageModel = response.data!;
           notifyListeners();
 
-          print(response.data!.response!.aiResponse!.last);
-          print("hello");
-          print(response.data!.response!.aiResponse!.last.characters);
-          print("world");
           EasyLoading.dismiss();
           speakText(response.data!.response!.aiResponse!.last);
           // Navigator.push(context, MaterialPageRoute(builder: (context)=>PlayTabooScreenTwo(response.data!.response!.aiResponse!.last)));
           break;
-          // tabooGameChatPageModel = response.data!;
-          // notifyListeners();
-          // EasyLoading.dismiss();
+        // tabooGameChatPageModel = response.data!;
+        // notifyListeners();
+        // EasyLoading.dismiss();
 
-          // break;
+        // break;
         case ApiResponseStatus.badRequest:
           EasyLoading.dismiss();
           print("${response.error!.responseMsg.toString()}");
@@ -118,6 +123,8 @@ class PlayTabooScreenVM extends ChangeNotifier {
           break;
       }
     } catch (e) {
+      print(e);
+      print("hellooo");
       EasyLoading.dismiss();
       MySnackBar.showSnackBar(context, e.toString());
     }

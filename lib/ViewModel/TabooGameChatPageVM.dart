@@ -54,7 +54,7 @@ class TabooGameChatPageVM  extends ChangeNotifier{
 
 
 
-  Future<void> chatPageAPI(BuildContext context) async {
+  Future<void> chatPageAPI(BuildContext context,String sessionId) async {
     if(controller.text == "" || controller.text == null){
       MySnackBar.showSnackBar(context, "Please Enter Your Response");
       return;
@@ -71,7 +71,7 @@ class TabooGameChatPageVM  extends ChangeNotifier{
       var data = {
         "question": dataToAdd,
         "userId":"123",
-        "session":"1"
+        "session":sessionId
       };
       ApiResponse<TabooGameChatPageModel> response = await _tabooGameChatPageRepository.tabooGameChatPageApiCallFunction(data);
       print("Response ::: ${response.data}");

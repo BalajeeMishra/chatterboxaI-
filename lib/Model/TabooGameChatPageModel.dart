@@ -24,7 +24,7 @@ class Response {
   String? userId;
   List<String>? userResponse;
   List<String>? aiResponse;
-  int? session;
+  String? session;
   String? sId;
   int? iV;
 

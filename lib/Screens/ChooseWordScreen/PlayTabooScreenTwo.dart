@@ -11,20 +11,65 @@ import 'package:flutter_tts/flutter_tts.dart';
 import '../../Model/AllGameModel.dart';
 import '../TabooGameChatpage/TaboogamechatPage.dart';
 import "./PlayTabooScreen.dart";
+import 'package:speech_to_text/speech_recognition_result.dart';
+import 'package:speech_to_text/speech_to_text.dart';
+import 'package:lottie/lottie.dart';
+import 'package:uuid/uuid.dart';
 
 class PlayTabooScreenTwo extends StatefulWidget {
   AllGameModel allGameModel;
   int index;
   String dataGet;
-  PlayTabooScreenTwo(this.allGameModel, this.index, this.dataGet);
+  String sessionId;
+  PlayTabooScreenTwo(
+      this.allGameModel, this.index, this.dataGet, this.sessionId);
 
   @override
   State<StatefulWidget> createState() => _PlayTabooScreenTwo();
 }
 
 class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo> {
-  String data =
-      "After performing these steps, your project should compile successfully. If the issue persists, consider looking for any other plugins or modules that might have version conflicts, or consult the plugin's issue tracker for any related discussions.";
+  // String data =
+  //     "After performing these steps, your project should compile successfully. If the issue persists, consider looking for any other plugins or modules that might have version conflicts, or consult the plugin's issue tracker for any related discussions.";
+
+  bool startListening = false;
+  SpeechToText _speechToText = SpeechToText();
+  bool _speechEnabled = false;
+  String _lastWords = '';
+  bool donebuttonClicked = false;
+  String sessionId = "";
+
+  /// This has to happen only once per app
+  void _initSpeech() async {
+    _speechEnabled = await _speechToText.initialize();
+    if (_speechEnabled) {
+      setState(() {
+        startListening = true;
+      });
+      _startListening();
+    }
+  }
+
+  // Each time to start a speech recognition session
+  void _startListening() async {
+    await _speechToText.listen(
+        localeId: 'en_US', // e.g., 'en_US'
+        onResult: _onSpeechResult);
+    setState(() {});
+  }
+
+  void _stopListening() async {
+    await _speechToText.stop();
+    setState(() {
+      startListening = false;
+    });
+  }
+
+  void _onSpeechResult(SpeechRecognitionResult result) {
+    setState(() {
+      _lastWords = result.recognizedWords;
+    });
+  }
 
   @override
   void initState() {
@@ -32,9 +77,15 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo> {
     super.initState();
     configureTts();
     Provider.of<PlayTabooScreenVM>(context, listen: false)
-        .seInitialValue(widget.allGameModel, widget.index);
+        .seInitialValue(widget.allGameModel, widget.index, widget.sessionId);
     Provider.of<PlayTabooScreenVM>(context, listen: false)
-        .chatPageAPI(context, widget.dataGet);
+        .chatPageAPI(context, widget.dataGet, widget.sessionId);
+  }
+
+  void submitNext(String ques) {
+    configureTts();
+    Provider.of<PlayTabooScreenVM>(context, listen: false)
+        .chatPageAPI(context, ques, widget.sessionId);
   }
 
   startSpeaking() {
@@ -52,12 +103,16 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo> {
   }
 
   void speakText(String text) async {
-    print('Speak text called');
     await flutterTts.speak(text);
   }
 
-  void stopSpeaking() async {
+  // void stopSpeaking() async {
+  //   await flutterTts.stop();
+  // }
+
+  Future<void> stopSpeaking() async {
     await flutterTts.stop();
+    // if (result == 1) setState(() => ttsState = TtsState.stopped);
   }
 
   @override
@@ -115,15 +170,25 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo> {
                             child: Row(
                               children: [
                                 Expanded(
-                                  child: (vm.tabooGameChatPageModel.response!
-                                                  .aiResponse!.last ==
-                                              null ||
-                                          vm.tabooGameChatPageModel.response!
-                                                  .aiResponse!.last ==
-                                              "")
-                                      ? Text("")
-                                      : Text(vm.tabooGameChatPageModel.response!
-                                          .aiResponse!.last),
+                                  child: startListening
+                                      ? MyText(
+                                          text: _lastWords,
+                                          color: Color(0xff000000),
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400,
+                                        )
+                                      : (vm.tabooGameChatPageModel.response!
+                                                      .aiResponse!.last ==
+                                                  null ||
+                                              vm
+                                                      .tabooGameChatPageModel
+                                                      .response!
+                                                      .aiResponse!
+                                                      .last ==
+                                                  "")
+                                          ? Text("")
+                                          : Text(vm.tabooGameChatPageModel
+                                              .response!.aiResponse!.last),
                                 )
                               ],
                             ),
@@ -133,58 +198,117 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo> {
               ],
             ),
           ),
+          Center(
+            child: startListening
+                ? listeningWidget()
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          sessionId = Uuid().v4();
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => TaboogamechatPage(
+                                      widget.allGameModel,
+                                      widget.index,
+                                      sessionId)));
+                        },
+                        child: Column(
+                          children: [
+                            Image(image: AssetImage(ImageConstant.chatIcon)),
+                            MyText(
+                              text: "Write",
+                              fontSize: 12,
+                            )
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        width: 40,
+                      ),
+                      InkWell(
+                        onTap: () async {
+                          Provider.of<PlayTabooScreenVM>(context, listen: false)
+                              .clearAiResponse();
+                          _initSpeech();
+                          await stopSpeaking();
+                        },
+                        child: Column(
+                          children: [
+                            Image(
+                                image:
+                                    AssetImage(ImageConstant.microphoneIcon)),
+                            MyText(
+                              text: "Speak",
+                              fontSize: 12,
+                            )
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  listeningWidget() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 15),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
           Padding(
-            padding: EdgeInsets.only(bottom: 15),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                InkWell(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => TaboogamechatPage(
-                                widget.allGameModel, widget.index)));
-                  },
-                  child: Column(
-                    children: [
-                      Image(image: AssetImage(ImageConstant.chatIcon)),
-                      MyText(
-                        text: "Write",
-                        fontSize: 12,
-                      )
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  width: 40,
-                ),
-                InkWell(
-                  onTap: () {
-                    // print("popped it okayyyy");
-                    // return Navigator.pop(context);
-                    Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => PlayTabooScreen(
-                                  widget.allGameModel,
-                                  widget.index,
-                                )));
-                    
-                  },
-                  child: Column(
-                    children: [
-                      Image(image: AssetImage(ImageConstant.microphoneIcon)),
-                      MyText(
-                        text: "Speak",
-                        fontSize: 12,
-                      )
-                    ],
-                  ),
-                )
-              ],
+            padding: EdgeInsets.only(top: 50.0),
+            child: InkWell(
+              onTap: () {
+                _stopListening();
+                setState(() {
+                  _lastWords = "";
+                });
+              },
+              child: Image(image: AssetImage(ImageConstant.IconCancel)),
             ),
           ),
+          SizedBox(
+            width: 10,
+          ),
+          startListening
+              ? Expanded(
+                  child: Lottie.asset('assets/lottiefile/recordaudio.json'),
+                )
+              : Padding(
+                  padding: EdgeInsets.only(top: 50.0),
+                  child: Row(
+                    children: [
+                      Image(image: AssetImage(ImageConstant.pitch1)),
+                      Image(image: AssetImage(ImageConstant.pitch2)),
+                      Image(image: AssetImage(ImageConstant.pitch3)),
+                    ],
+                  ),
+                ),
+          SizedBox(
+            width: 10,
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: 50.0),
+            child: InkWell(
+              onTap: () {
+                _stopListening();
+                if (_lastWords.isNotEmpty) {
+                  submitNext(_lastWords);
+                }
+                setState(() {
+                  startListening = false;
+                  _lastWords = "";
+                });
+              },
+              child: Image(image: AssetImage(ImageConstant.doneButton)),
+            ),
+          )
         ],
       ),
     );

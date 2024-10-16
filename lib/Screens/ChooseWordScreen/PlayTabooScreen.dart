@@ -5,6 +5,8 @@ import 'package:balajiicode/Widget/text_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:speech_to_text/speech_recognition_result.dart';
+import 'package:speech_to_text/speech_to_text.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:speech_to_text_ultra/speech_to_text_ultra.dart';
@@ -13,10 +15,12 @@ import '../../ViewModel/PlayTabooScreenVM.dart';
 import '../../Widget/appbar.dart';
 import '../TabooGameChatpage/TaboogamechatPage.dart';
 import 'PlayTabooScreenTwo.dart';
+import 'package:uuid/uuid.dart';
 
 class PlayTabooScreen extends StatefulWidget {
   AllGameModel allGameModel;
   int index;
+
   PlayTabooScreen(this.allGameModel, this.index);
 
   @override
@@ -24,33 +28,54 @@ class PlayTabooScreen extends StatefulWidget {
 }
 
 class _PlayTabooScreen extends State<PlayTabooScreen> {
-  bool mIsListening = false;
-  String mEntireResponse = '';
-  String mLiveResponse = '';
-
-  bool googleSpeechVisibility = false;
-
-  bool donebuttonClicked = false;
+  bool startListening = false;
+  SpeechToText _speechToText = SpeechToText();
+  bool _speechEnabled = false;
+  String _lastWords = '';
+  String ques = "";
+  String sessionId = "";
 
   @override
   void initState() {
     super.initState();
   }
 
-  startListening() {
+  /// This has to happen only once per app
+  void _initSpeech() async {
+    _speechEnabled = await _speechToText.initialize();
+    if (_speechEnabled) {
+      setState(() {
+        startListening = true;
+      });
+      _startListening();
+    }
+  }
+
+  // Each time to start a speech recognition session
+  void _startListening() async {
+   await _speechToText.listen(
+        localeId: 'en_US', // e.g., 'en_US'
+        onResult: _onSpeechResult);
+    // setState(() {});
+  }
+
+  void _stopListening() async {
+    await _speechToText.stop();
     setState(() {
-      googleSpeechVisibility = true;
+      startListening = false;
+    });
+  }
+
+  void _onSpeechResult(SpeechRecognitionResult result) {
+    setState(() {
+      print(result);
+      print("hello");
+      _lastWords = result.recognizedWords;
     });
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
-    
-    googleSpeechVisibility = false;
-    mLiveResponse = "";
-    mEntireResponse = "";
-    mIsListening = false;
     super.dispose();
   }
 
@@ -183,91 +208,38 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                               Row(
                                 children: [
                                   Expanded(
-                                    child: mIsListening
-                                        ? MyText(
-                                            text:
-                                                '$mEntireResponse $mLiveResponse',
-                                            color: Color(0xff000000),
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400,
-                                          )
-                                        : MyText(
-                                            text: '$mEntireResponse',
-                                            color: Color(0xff000000),
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400,
-                                          ),
+                                    child: MyText(
+                                      text: _lastWords,
+                                      color: Color(0xff000000),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w400,
+                                    ),
                                   ),
                                 ],
                               ),
                             ],
                           ),
                         ),
-                        Visibility(
-                          visible: googleSpeechVisibility,
-                          child: SpeechToTextUltra(
-                            ultraCallback: (String liveText, String finalText,
-                                bool isListening) {
-                              print("Callback get");
-                              print(liveText);
-                              print(finalText);//// ye aa rha haiiii 
-                              print(mLiveResponse);
-                              print(mEntireResponse);
-                              print(mIsListening);
-                              print("balajee");
-                              setState(() {
-                                mLiveResponse = liveText;
-                                mEntireResponse = finalText;
-                                mIsListening = isListening;
-                              });
-                              if (!mIsListening && donebuttonClicked) {
-                                setState(() {
-    mLiveResponse = "";
-    finalText = "";
-  });
-                                print("check after this okayyy");
-                                Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                PlayTabooScreenTwo(
-                                                    widget.allGameModel,
-                                                    widget.index,
-                                                    mEntireResponse)))
-                                    .then((value) => setState(() {
-                                          mLiveResponse = "";
-                                          mEntireResponse = "";
-                                          mIsListening = false;
-                                          liveText = "";
-                                          finalText = "";
-                                          isListening = false;
-                                        }));
-                                //Provider.of<PlayTabooScreenVM>(context,listen: false).chatPageAPI(context,mEntireResponse);
-                              }
-                            },
-                          ),
-                        )
                       ],
                     ),
                   ),
                 ),
                 Center(
-                  child: (mIsListening)
+                  child: startListening
                       ? listeningWidget()
                       : Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             InkWell(
                               onTap: () {
-                                setState(() {
-                                  donebuttonClicked = false;
-                                });
+                                sessionId = Uuid().v4();
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => TaboogamechatPage(
                                             widget.allGameModel,
-                                            widget.index)));
+                                            widget.index,
+                                            sessionId)));
                               },
                               child: Column(
                                 children: [
@@ -286,7 +258,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                             ),
                             InkWell(
                               onTap: () {
-                                startListening();
+                                _initSpeech();
                               },
                               child: Column(
                                 children: [
@@ -321,18 +293,11 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
             padding: EdgeInsets.only(top: 50.0),
             child: InkWell(
               onTap: () {
-                if (mIsListening) {
-                  MySnackBar.showSnackBar(
-                      context, "Stop Speech By Clicking Pause Button");
-                } else {
-                  setState(() {
-                    googleSpeechVisibility = false;
-                    mIsListening = false;
-                    mEntireResponse = '';
-                    mLiveResponse = '';
-                    donebuttonClicked = false;
-                  });
-                }
+                _stopListening();
+                setState(() {
+                  _lastWords = "";
+                  startListening = false;
+                });
               },
               child: Image(image: AssetImage(ImageConstant.IconCancel)),
             ),
@@ -340,7 +305,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
           SizedBox(
             width: 10,
           ),
-          mIsListening
+          startListening
               ? Expanded(
                   child: Lottie.asset('assets/lottiefile/recordaudio.json'),
                 )
@@ -361,12 +326,23 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
             padding: EdgeInsets.only(top: 50.0),
             child: InkWell(
               onTap: () {
-                if (mIsListening) {
-                  MySnackBar.showSnackBar(
-                      context, "Stop Speech By Clicking Pause Button");
-                  setState(() {
-                    donebuttonClicked = true;
-                  });
+                _stopListening();
+
+                ques = _lastWords;
+                setState(() {
+                  _lastWords = "";
+                });
+                if (ques.isNotEmpty) {
+                  sessionId = Uuid().v4();
+
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => PlayTabooScreenTwo(
+                              widget.allGameModel,
+                              widget.index,
+                              ques,
+                              sessionId)));
                 }
               },
               child: Image(image: AssetImage(ImageConstant.doneButton)),
