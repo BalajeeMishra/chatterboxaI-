@@ -8,7 +8,12 @@ import cors from "cors";
 const app = express();
 connectDB();
 app.use(express.json());
-app.use(cors());
+const corsOptions = {
+  origin: '*', // Allow all origins, or specify a particular domain
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow specific methods
+  allowedHeaders: ['Content-Type', 'Authorization'], // Specify allowed headers
+};
+app.use(cors(corsOptions));
 app.use("/api/game",Game);
 app.use("/api",ConverSation);
 app.get("/",async(_,res)=>res.send("Server is running"));
