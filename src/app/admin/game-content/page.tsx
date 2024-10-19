@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 
 export default function GameContent() {
   const [data, setData] = React.useState<Game[]>([]);
+  const [editgameId, setEditgameId] = useState<string>("");
   const [editmainContent, seteditMainContent] = useState<string>("");
   const [editlevel, seteditLevel] = useState<"easy" | "medium" | "hard">(
     "medium"
@@ -22,6 +23,8 @@ export default function GameContent() {
           editmainContent={editmainContent}
           editlevel={editlevel}
           editdetailOfContent={editdetailOfContent}
+          editgameId={editgameId}
+          setEditgameId={setEditgameId}
           seteditMainContent={seteditMainContent}
           seteditLevel={seteditLevel}
           seteditDetailOfContent={seteditDetailOfContent}
@@ -31,6 +34,7 @@ export default function GameContent() {
         <GameContentTable
           seteditMainContent={seteditMainContent}
           seteditLevel={seteditLevel}
+          setEditgameId={setEditgameId}
           seteditDetailOfContent={seteditDetailOfContent}
           data={data}
           setData={setData}

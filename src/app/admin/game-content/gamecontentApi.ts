@@ -18,24 +18,16 @@ export const fetchGameContent = async (
   gameId: string
 ): Promise<GameContent[]> => {
   try {
-  
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/game/allgamecontent/${gameId}`
     );
 
-    // Log the response to debug
-    console.log(response);
-
-    // Check if the response is successful
-    if (!response.ok) {
-      throw new Error(`An error occurred: ${response.statusText}`);
-    }
 
     // Parse the response as JSON
     const data: AllGameContentResponse = await response.json();
-
+console.log(data)
     // Return the game content
-    return data.allGame;
+    return data?.allGame || [];
   } catch (error) {
     console.error(`Failed to fetch game content for gameId ${gameId}:`, error);
     throw error;

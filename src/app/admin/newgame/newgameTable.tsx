@@ -15,7 +15,7 @@ import {
 import { ChevronDown, MoreHorizontal } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/table";
 import { fetchAllGames } from "./gamesApi";
 import { GameDialog } from "./icondialouge";
+import axios from "axios";
 
 // Define the game data structure without id
 interface Game {
@@ -52,7 +53,7 @@ export const columns: ColumnDef<Game>[] = [
   {
     accessorKey: "_id",
     header: "ID",
-    cell: ({ row }) => <div>{String(row.getValue("_id"))?.slice(-6)}</div>,
+    cell: ({ row }) => <div>{String(row.getValue("_id"))}</div>,
   },
   {
     accessorKey: "gameName",
@@ -62,10 +63,7 @@ export const columns: ColumnDef<Game>[] = [
   {
     accessorKey: "gameIcon",
     header: "Game Icon",
-    cell: ({ row }) => (
-   
-      <GameDialog imageSrc={row.getValue("gameIcon")}/>
-    ),
+    cell: ({ row }) => <GameDialog imageSrc={row.getValue("gameIcon")} />,
   },
   {
     accessorKey: "description",
@@ -90,15 +88,21 @@ interface NewGameTableProps {
   setEditDescription: React.Dispatch<React.SetStateAction<string>>;
   data: any; // The array of Game objects
   setData: any; // Function to update the state
+  setEditId: any;
+  editorder: any;
+  setEditorder: any;
 }
 
 export const NewGameTable: React.FC<NewGameTableProps> = ({
   data,
+  setEditId,
   setData,
   setEditGameName,
   setEditGameIcon,
   setEditStatus,
   setEditDescription,
+  
+  setEditorder,
 }) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] =
@@ -145,34 +149,146 @@ export const NewGameTable: React.FC<NewGameTableProps> = ({
     setEditGameName(game.gameName);
     setEditStatus(game.status);
     setEditDescription(game.description);
+    setEditId(game._id);
+    setEditorder(game.order);
   };
   const deleteGame = async (gameid: string): Promise<void> => {
     try {
-      // Make the DELETE request
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/game/deletegame${gameid}`,
-        {
-          method: "DELETE", // Specify the HTTP method
-          headers: {
-            "Content-Type": "application/json", // Set content type headers if needed
-          },
-        }
-      );
-      // Log the response for debugging purposes
-      console.log("Delete Response:", response);
+      // Log the game ID for debugging
+      console.log("Deleting game with ID:", gameid);
+
+      // Construct the DELETE request URL
+      const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/game/deletegame/${gameid}`;
+
+      // Make the DELETE request using Axios
+      await axios.delete(apiUrl, {
+        headers: {
+          "Content-Type": "application/json", // Ensure proper content type
+        },
+      });
+
+      // Fetch updated list of games after deletion
       const gamesData = await fetchAllGames();
-      console.log(gamesData);
+
+      // Update the UI or state with the new games data
       setData(gamesData);
-      // Check if the response is not successful (status code >= 400)
-      if (!response.ok) {
-        throw new Error(`Failed to delete the game: ${response.statusText}`);
-      }
-      // If delete was successful, you can log or return success feedback
-      alert(`Game with id ${gameid} deleted successfully.`);
+
+      // Notify the user that the game was deleted successfully
+      alert(`Game with ID ${gameid} deleted successfully.`);
     } catch (error) {
-      // Log and handle the error
-      console.error(`Error deleting game with id ${gameid}:`, error);
-      throw error; // Rethrow the error to be handled by the calling function if necessary
+      // Handle and log any errors
+      if (axios.isAxiosError(error)) {
+        console.error(
+          `Failed to delete game with ID ${gameid}: ${
+            error.response?.data || error.message
+          }`
+        );
+      } else {
+        console.error("Unexpected error occurred");
+      }
+
+      // Rethrow the error if further handling is needed by the calling function
+      throw error;
+    }
+  };
+  // const changeStatus = async (gameid: string): Promise<void> => {
+  //   try {
+  //     // Log the game ID and API URL for debugging
+  //     const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/game/changestatus/${gameid}`;
+  //     console.log("API URL:", apiUrl);
+  //     console.log("Changing status of game with ID:", gameid);
+
+  //     // Make the PATCH request using Axios
+  //     const response = await axios.patch(
+  //       apiUrl,
+  //       {
+  //         status: "inactive", // Pass the status in the request body
+  //       },
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json", // Ensure proper content type
+  //         },
+  //       }
+  //     );
+
+  //     // Log the response from the server for debugging
+  //     console.log("Response from server:", response);
+
+  //     // Fetch updated list of games after status change
+  //     const gamesData = await fetchAllGames();
+
+  //     // Update the UI or state with the new games data
+  //     setData(gamesData);
+
+  //     // Notify the user that the game's status was changed successfully
+  //     alert(`Game with ID ${gameid} status changed to inactive successfully.`);
+  //   } catch (error) {
+  //     // Handle and log any errors
+  //     if (axios.isAxiosError(error)) {
+  //       console.error(
+  //         `Failed to change status of game with ID ${gameid}: ${
+  //           error.response?.data || error.message
+  //         }`
+  //       );
+  //     } else {
+  //       console.error("Unexpected error occurred:", error);
+  //     }
+
+  //     // Optionally, you can provide feedback to the user
+  //     alert("Failed to change game status. Please try again.");
+
+  //     // Rethrow the error if further handling is needed by the calling function
+  //     throw error;
+  //   }
+  // };
+  const changeStatus = async (gameid: string): Promise<void> => {
+    try {
+      // Log the game ID for debugging
+      console.log("Changing status of game with ID:", gameid);
+
+      // Construct the PATCH request URL
+      const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/game/changestatus/${gameid}`;
+      console.log("API URL:", apiUrl);
+
+      // Make the PATCH request using fetch
+      const response = await fetch(apiUrl, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json", // Ensure proper content type
+        },
+        body: JSON.stringify({
+          status: "inactive", // Pass the status in the request body
+        }),
+      });
+
+      // Check if the response is ok (status code 200-299)
+      if (!response.ok) {
+        // Handle error responses
+        const errorMessage = await response.text(); // Get the error message from the response
+        throw new Error(`Failed to change status: ${errorMessage}`);
+      }
+
+      // If the response is successful, log the response
+      const data = await response.json(); // Assuming the response is in JSON format
+      console.log("Response from server:", data);
+
+      // Fetch updated list of games after status change
+      const gamesData = await fetchAllGames();
+
+      // Update the UI or state with the new games data
+      setData(gamesData);
+
+      // Notify the user that the game's status was changed successfully
+      alert(`Game with ID ${gameid} status changed to inactive successfully.`);
+    } catch (error) {
+      // Handle and log any errors
+      console.error("Error changing game status:", error);
+
+      // Optionally, provide feedback to the user
+      alert("Failed to change game status. Please try again.");
+
+      // Rethrow the error if further handling is needed by the calling function
+      throw error;
     }
   };
 
@@ -275,6 +391,12 @@ export const NewGameTable: React.FC<NewGameTableProps> = ({
                           onClick={() => handleEdit(row.original)}
                         >
                           Edit data
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={() => changeStatus(row.original._id)}
+                        >
+                          Change Status
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { fetchAllGames, Game } from "./gamesApi";
+import axios from "axios";
 interface AddgameFormProps {
   editgameName: string;
   setEditGameName: React.Dispatch<React.SetStateAction<string>>;
@@ -12,17 +13,25 @@ interface AddgameFormProps {
   editdescription: string;
   setEditDescription: React.Dispatch<React.SetStateAction<string>>;
   setData: React.Dispatch<React.SetStateAction<Game[]>>;
+  editorder: any;
+  setEditorder: any;
+  editId: string;
+  setEditId: any;
 }
 const AddgameForm: React.FC<AddgameFormProps> = ({
   setData,
   editgameName,
   editgameIcon,
   editstatus,
+  editId,
+  setEditId,
   setEditGameName,
   setEditGameIcon,
   setEditStatus,
   editdescription,
   setEditDescription,
+  editorder,
+  setEditorder,
 }) => {
   const [gameName, setGameName] = useState<string>(editgameName || "");
   const [gameIcon, setGameIcon] = useState<string>(editgameIcon || "");
@@ -31,8 +40,8 @@ const AddgameForm: React.FC<AddgameFormProps> = ({
   );
   const [description, setDescription] = useState<string>(editdescription || "");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  useEffect(() => {
 
+  useEffect(() => {
     setGameName(editgameName);
     setGameIcon(editgameIcon);
     setStatus(editstatus);
@@ -70,74 +79,48 @@ const AddgameForm: React.FC<AddgameFormProps> = ({
       return;
     }
 
-    // API call
+    const url =
+      editgameName && editgameIcon && editdescription && editstatus && editId
+        ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/game/editgame/${editId}`
+        : `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/game/new-game`;
 
     try {
-      let response;
-      response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/game/new-game`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            gameName,
-            gameIcon,
-            status,
-            description,
-          }),
-        }
-      );
+      // Use PUT for editing and POST for creating a new game
+      const method = editId ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          gameName,
+          gameIcon,
+          status,
+          description,
+          ...(editId ? { order: editorder } : {}),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status} ${response.statusText}`);
+      }
+
       const data = await response.json();
       console.log("Game added successfully:", data);
-      // if (editgameName || editgameIcon || editdescription || editstatus) {
-      //   response = await fetch(
-      //     `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/game/editgame/670592d31ced4336d6bba9a1`,
-      //     {
-      //       method: "POST",
-      //       headers: {
-      //         "Content-Type": "application/json",
-      //       },
-      //       body: JSON.stringify({
-      //         gameName,
-      //         gameIcon,
-      //         status,
-      //         description,
-      //       }),
-      //     }
-      //   );
-      //   console.log(response);
-      // } else {
-      //   response = await fetch(
-      //     `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/game/new-game`,
-      //     {
-      //       method: "POST",
-      //       headers: {
-      //         "Content-Type": "application/json",
-      //       },
-      //       body: JSON.stringify({
-      //         gameName,
-      //         gameIcon,
-      //         status,
-      //         description,
-      //       }),
-      //     }
-      //   );
-      //   console.log(response);
-      // }
-      // console.log(await response.json());
-      // if (!response.ok) {
-      //   throw new Error("Failed to add game.");
-      // }
+      alert("Game added successfully");
 
-      // alert("Game added successfully!");
+      // Fetch updated game list
+      const NewgamesContent = await fetchAllGames();
+      console.log(NewgamesContent);
+      setData(NewgamesContent);
 
       // Reset form fields
       setGameName("");
       setGameIcon("");
       setDescription("");
       setStatus("active");
+      setEditId("");
     } catch (error) {
       console.error("Error adding game:", error);
       alert("Failed to add game. Please try again.");
@@ -210,25 +193,43 @@ const AddgameForm: React.FC<AddgameFormProps> = ({
           </div>
         </div>
 
-        {/* Description */}
-        <div className="mb-4">
-          <label
-            htmlFor="description"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Description
-          </label>
-          <textarea
-            id="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-          />
-          {errors.description && (
-            <div className="text-red-600 text-sm">{errors.description}</div>
+        <div className="flex  gap-3">
+          {editId && (
+            <div className="mb-4 flex-1">
+              <label
+                htmlFor="editorder"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Order
+              </label>
+              <input
+                type="text"
+                id="editorder"
+                value={editorder}
+                onChange={(e) => setEditorder(e.target.value)}
+                className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+              />
+            </div>
           )}
+          {/* Description */}
+          <div className="mb-4 flex-1">
+            <label
+              htmlFor="description"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Description
+            </label>
+            <textarea
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+            />
+            {errors.description && (
+              <div className="text-red-600 text-sm">{errors.description}</div>
+            )}
+          </div>
         </div>
-
         {/* Submit Button */}
         <button
           type="submit"

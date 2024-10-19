@@ -15,7 +15,6 @@ import {
 import { ChevronDown, MoreHorizontal } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -35,7 +34,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { fetchGameContent } from "./gamecontentApi";
-import { deleteGameContent } from "./deletegamecontent";
+import { Games } from "./addgamecontent";
+import { fetchAllGames } from "../newgame/gamesApi";
 
 // Define the game data structure
 export interface Game {
@@ -51,7 +51,7 @@ export const columns: ColumnDef<Game>[] = [
   {
     accessorKey: "_id",
     header: "ID",
-    cell: ({ row }) => <div>{String(row.getValue("_id"))?.slice(-6)}</div>,
+    cell: ({ row }) => <div>{String(row.getValue("_id"))}</div>,
   },
   {
     accessorKey: "gameId",
@@ -85,6 +85,7 @@ interface NewGameContentFormProps {
   seteditDetailOfContent: React.Dispatch<React.SetStateAction<string[]>>;
   data: Game[]; // The array of Game objects
   setData: React.Dispatch<React.SetStateAction<Game[]>>; // Function to update the state
+  setEditgameId: any;
 }
 
 export const GameContentTable: React.FC<NewGameContentFormProps> = ({
@@ -93,19 +94,37 @@ export const GameContentTable: React.FC<NewGameContentFormProps> = ({
   seteditMainContent,
   seteditLevel,
   seteditDetailOfContent,
+  setEditgameId,
 }) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-
+  const [newgameData, setNewgameData] = React.useState<Games[]>([]);
+  const [selectgameId, setSelectgameId] = React.useState<string>(
+    "670592d31ced4336d6bba9a1"
+  );
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
-
   React.useEffect(() => {
     const loadGames = async () => {
       try {
-        const gamesContent = await fetchGameContent("670592d31ced4336d6bba9a1");
+        const gamesData = await fetchAllGames();
+        console.log(gamesData);
+        setNewgameData(gamesData);
+        setSelectgameId(gamesData[0]._id);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    loadGames();
+  }, []);
+
+  React.useEffect(() => {
+    const loadGames = async () => {
+      console.log(selectgameId);
+      try {
+        const gamesContent = await fetchGameContent(selectgameId);
         console.log(gamesContent);
         setData(gamesContent);
       } catch (err) {
@@ -117,13 +136,48 @@ export const GameContentTable: React.FC<NewGameContentFormProps> = ({
     };
 
     loadGames();
-  }, []);
+  }, [selectgameId]);
+
+  // Function to delete the content of a specific game by contentId
+  const deleteGameContent = async (contentid: string) => {
+    try {
+      // Making the DELETE request
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/game/delete-game-content/${contentid}`,
+        {
+          method: "DELETE", // Correct HTTP method for deletion
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      // Log the response for debugging
+      console.log("Delete Response:", response.json());
+      alert("Game Deleted successfully");
+      // Check if the response is successful before proceeding
+
+      // If delete was successful, fetch updated game content
+      const updatedContent = await fetchGameContent("670592d31ced4336d6bba9a1");
+      setData(updatedContent);
+      console.log(updatedContent);
+      // Return the updated content or handle it as needed
+      // return updatedContent;
+    } catch (error) {
+      console.error(
+        `Failed to delete game content with contentId ${contentid}:`,
+        error
+      );
+      throw error; // Rethrow the error to be handled by the calling function
+    }
+  };
 
   // Function to handle the Edit action
   const handleEdit = (game: Game) => {
     seteditMainContent(game.mainContent);
     seteditLevel(game.level as "easy" | "medium" | "hard");
     seteditDetailOfContent(game.detailOfContent);
+    setEditgameId(game._id);
   };
 
   const table = useReactTable({
@@ -148,7 +202,7 @@ export const GameContentTable: React.FC<NewGameContentFormProps> = ({
 
   return (
     <div className="w-full">
-      <div className="flex items-center py-4">
+      <div className="flex items-center justify-between py-4">
         <Input
           placeholder="Filter by content..."
           value={
@@ -159,33 +213,46 @@ export const GameContentTable: React.FC<NewGameContentFormProps> = ({
           }
           className="max-w-sm"
         />
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="bg-white">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex items-center gap-2">
+          <select
+            id="selectgameId"
+            value={selectgameId}
+            onChange={(e) => setSelectgameId(e.target.value)}
+            className=" block w-full p-2 border border-gray-300 rounded-md"
+          >
+            {newgameData?.map((game) => (
+              <option key={game._id} value={game._id}>
+                {game.gameName}
+              </option>
+            ))}
+          </select>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="ml-auto">
+                Columns <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="bg-white">
+              {table
+                .getAllColumns()
+                .filter((column) => column.getCanHide())
+                .map((column) => {
+                  return (
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      className="capitalize"
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(value) =>
+                        column.toggleVisibility(!!value)
+                      }
+                    >
+                      {column.id}
+                    </DropdownMenuCheckboxItem>
+                  );
+                })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
       <div className="rounded-md border">
         <Table>

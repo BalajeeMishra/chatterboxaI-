@@ -3,7 +3,11 @@
 import React, { useEffect, useState } from "react";
 import { Game } from "./gamecontent";
 import { fetchGameContent } from "./gamecontentApi";
+import { fetchAllGames } from "../newgame/gamesApi";
+import axios from "axios";
 interface NewGameContentFormProps {
+  editgameId: string;
+  setEditgameId: any;
   editmainContent: string;
   editlevel: "easy" | "medium" | "hard";
   editdetailOfContent: string[];
@@ -15,12 +19,22 @@ interface NewGameContentFormProps {
   data: Game[]; // Receive data array from parent
   setData: React.Dispatch<React.SetStateAction<Game[]>>;
 }
-
+export interface Games {
+  _id: string;
+  gameName: string;
+  gameIcon: string;
+  description: string;
+  status: string;
+  order: number;
+  __v: number;
+}
 const NewGameContentForm: React.FC<NewGameContentFormProps> = ({
   setData,
   editmainContent,
   editlevel,
   editdetailOfContent,
+  editgameId,
+  setEditgameId,
   seteditMainContent,
   seteditLevel,
   seteditDetailOfContent,
@@ -29,30 +43,47 @@ const NewGameContentForm: React.FC<NewGameContentFormProps> = ({
   const [level, setLevel] = useState<"easy" | "medium" | "hard">(
     editlevel || "medium"
   );
+  const [newgameId, setNewgameId] = useState<string>("");
+  const [selectgameId, setSelectgameId] = useState<string>("");
   const [newDetail, setNewDetail] = useState<string>("");
   const [detailOfContent, setDetailOfContent] = useState<string[]>(
     editdetailOfContent || []
   );
+  const [newgameData, setNewgameData] = useState<Games[]>([]);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  console.log(editgameId, selectgameId);
   useEffect(() => {
     setMainContent(editmainContent);
     setLevel(editlevel);
     setDetailOfContent(editdetailOfContent);
-  }, [editmainContent, editlevel, editdetailOfContent]);
-
-  React.useEffect(() => {
+    setSelectgameId(editgameId);
+  }, [editmainContent, editlevel, editdetailOfContent, editgameId]);
+  useEffect(() => {
     const loadGames = async () => {
       try {
-        const gamesContent = await fetchGameContent("670592d31ced4336d6bba9a1");
-        console.log(gamesContent);
+        const gamesData = await fetchAllGames();
+        setNewgameData(gamesData);
+
+        // If editgameId is empty, wait for user to select game
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    loadGames();
+  }, []);
+
+  useEffect(() => {
+    const loadGameContent = async () => {
+      try {
+        const gamesContent = await fetchGameContent(selectgameId || "");
         setData(gamesContent);
       } catch (err) {
-        console.log(err);
+        console.error(err);
       }
     };
 
-    loadGames();
-  }, [mainContent, level, detailOfContent]);
+    if (selectgameId) loadGameContent();
+  }, [selectgameId, setData]);
   const handleAddDetail = () => {
     if (newDetail && !detailOfContent.includes(newDetail)) {
       setDetailOfContent((prev) => [...prev, newDetail]);
@@ -66,75 +97,73 @@ const NewGameContentForm: React.FC<NewGameContentFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+  
     // Reset errors
     setErrors({});
-
+  
     // Validation
     const newErrors: { [key: string]: string } = {};
     if (!mainContent) newErrors.mainContent = "Main content is required.";
     if (!level) newErrors.level = "Level is required.";
     if (detailOfContent.length === 0)
       newErrors.detailOfContent = "At least one detail is required.";
-
+  
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-
-    // API call
+  
+    let url = "";
+    let method = "POST"; // Default method for adding new content
+  
+    if (editgameId) {
+      // If we are editing existing content, use PUT method
+      url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/game/edit-game-content/${editgameId}`;
+      method = "PUT"; // Change method to PUT for editing
+    } else if (newgameId) {
+      // If we are adding new game content, use POST method
+      url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/game/new-game-content/${newgameId}`;
+    } else {
+      alert("Fill all details.");
+      return;
+    }
+  
     try {
-      let response;
-      if (editmainContent && editlevel && editdetailOfContent) {
-        response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/game/edit-game-content/6705981260225677f46e9b95`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              mainContent,
-              level,
-              detailOfContent,
-            }),
-          }
-        );
-      } else {
-        response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/game/new-game-content/670592d31ced4336d6bba9a1`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              mainContent,
-              level,
-              detailOfContent,
-            }),
-          }
-        );
-      }
+      const response = await axios({
+        url,
+        method, // Use PUT for edit and POST for new
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: {
+          mainContent,
+          level,
+          detailOfContent,
+        },
+      });
+  
       console.log(response);
-      if (!response.ok) {
-        throw new Error("Failed to add game content.");
-      }
-
-      alert("Game content added successfully!");
-
+      const data = response.data;
+      console.log("Game content saved successfully:", data);
+      alert("Game content saved successfully");
+  
       // Reset form fields
       setMainContent("");
       setLevel("medium");
       setDetailOfContent([]);
-      seteditMainContent(""), 
+      seteditMainContent("");
       seteditLevel("medium");
       seteditDetailOfContent([]);
+      setEditgameId("");
     } catch (error) {
-      console.error("Error adding game content:", error);
-      alert("Failed to add game content. Please try again.");
+      console.error("Error saving game content:", error);
+      alert("Failed to save game content. Please try again.");
     }
   };
+  
+
+  
+  console.log(newgameData);
   return (
     <div className="max-w-5xl p-4 bg-white shadow-md rounded-lg">
       <h1 className="text-2xl font-bold mb-4">Add New Game Content</h1>
@@ -232,16 +261,44 @@ const NewGameContentForm: React.FC<NewGameContentFormProps> = ({
               ))}
             </div>
           </div>
-
-          {/* Submit Button */}
-          <div className="flex justify-end items-end">
-            <button
-              type="submit"
-              className=" w-60 py-2 px-4 h-10 bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-            >
-              Add Game Content
-            </button>
-          </div>
+          {!editgameId ? (
+            <div className="mb-4">
+              <label
+                htmlFor="level"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Game Name
+              </label>
+              {newgameData.length > 0 ? (
+                <select
+                  id="selectgameId"
+                  value={newgameId}
+                  onChange={(e) => setNewgameId(e.target.value)}
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                >
+                  <option value="">select game</option>
+                  {newgameData.map((game) => (
+                    <option key={game._id} value={game._id}>
+                      {game.gameName}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <p>No games available</p>
+              )}
+            </div>
+          ) : (
+            ""
+          )}
+        </div>
+        {/* Submit Button */}
+        <div className="flex justify-end items-end">
+          <button
+            type="submit"
+            className=" w-60 py-2 px-4 h-10 bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+          >
+            Add Game Content
+          </button>
         </div>
       </form>
     </div>
