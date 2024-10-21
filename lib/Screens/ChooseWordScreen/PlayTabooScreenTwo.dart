@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 import '../../Constants/ImageConstant.dart';
 import '../../Constants/constantRow.dart';
 import '../../Model/AllGameModel.dart';
+import '../../Utils/app_colors.dart';
+import '../../Utils/app_images.dart';
 import '../../ViewModel/PlayTabooScreenVM.dart';
 import '../../Widget/appbar.dart';
 import '../../Widget/text_widget.dart';
@@ -280,16 +282,20 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo> {
                       icon: Icon(Icons.fast_rewind),
                       onPressed: () => _onDecreaseRatePressed(), // Decrease speech rate
                     ),
-                    InkWell(
-                      // onTap: () {},
-                      child: Image(image: AssetImage(ImageConstant.girlsImage)),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(27),
+                      child: Image.asset(
+                          fit: BoxFit.cover,
+                          height: 195,
+                          width: 246,
+                          ic_transparent_girlImage2),
                     ),
                     IconButton(
                       icon: Icon(Icons.fast_forward),
                       onPressed: () => _onIncreaseRatePressed(), // Increase speech rate
                     ),
                   ],
-                ).paddingOnly(left: 36, right: 36),
+                ).paddingOnly(left: 10, right: 10),
                 SizedBox(
                   height: 15,
                 ),
@@ -393,41 +399,76 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Padding(
-            padding: EdgeInsets.only(top: 50.0),
-            child: InkWell(
-              onTap: () {
-                _stopListening();
-                setState(() {
-                  _lastWords = "";
-                });
-              },
-              child: Image(image: AssetImage(ImageConstant.IconCancel)),
+          GestureDetector(
+            onTap: () {
+              _stopListening();
+              setState(() {
+                _lastWords = "";
+                startListening = false;
+              });
+            },
+            child: Container(
+              padding: EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                color: Colors.black,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                size: 24,
+                Icons.close,
+                color: Colors.white,
+              ),
+            ),
+          ).paddingTop(50),
+          SizedBox(
+            width: 10,
+          ),
+          Expanded(
+            child: startListening
+                ? Padding(
+              padding: EdgeInsets.symmetric(vertical: 10.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Lottie.asset(
+                    'assets/lottiefile/recordaudio.json',
+                    height: 120,
+                    fit: BoxFit.contain,
+                  ),
+                  // Lottie.asset(
+                  //   'assets/lottiefile/recordaudio.json',
+                  //   height: 60,
+                  //   fit: BoxFit.contain,
+                  // ),
+                ],
+              ),
+            )
+                : Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image(
+                  image: AssetImage(ImageConstant.pitch1),
+                  height: 50,
+                ),
+                SizedBox(width: 5),
+                Image(
+                  image: AssetImage(ImageConstant.pitch2),
+                  height: 50,
+                ),
+                SizedBox(width: 5),
+                Image(
+                  image: AssetImage(ImageConstant.pitch3),
+                  height: 50,
+                ),
+              ],
             ),
           ),
           SizedBox(
             width: 10,
           ),
-          startListening
-              ? Expanded(
-                  child: Lottie.asset('assets/lottiefile/recordaudio.json'),
-                )
-              : Padding(
-                  padding: EdgeInsets.only(top: 50.0),
-                  child: Row(
-                    children: [
-                      Image(image: AssetImage(ImageConstant.pitch1)),
-                      Image(image: AssetImage(ImageConstant.pitch2)),
-                      Image(image: AssetImage(ImageConstant.pitch3)),
-                    ],
-                  ),
-                ),
-          SizedBox(
-            width: 10,
-          ),
           Padding(
             padding: EdgeInsets.only(top: 50.0),
-            child: InkWell(
+            child: GestureDetector(
               onTap: () {
                 _stopListening();
                 if (_lastWords.isNotEmpty) {
@@ -438,11 +479,21 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo> {
                   _lastWords = "";
                 });
               },
-              child: Image(image: AssetImage(ImageConstant.doneButton)),
-            ),
+              child:  Container(
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: primaryColor,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  size: 24,
+                  Icons.send,
+                  color: Colors.white,
+                ),
+              ),),
           )
         ],
-      ),
+      ).paddingSymmetric(horizontal: 30),
     );
   }
 }

@@ -1,17 +1,17 @@
-
-
-
 import 'package:balajiicode/Model/HomePageModel.dart';
 import 'package:balajiicode/Utils/ShowSnackBar.dart';
+import 'package:balajiicode/Utils/app_colors.dart';
+import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
+import 'package:balajiicode/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 import '../Repository/JabberHomeAIRepository.dart';
 import '../Services/ApiResponseStatus.dart';
 import '../Constants/constant_text.dart';
+import '../extensions/loader_widget.dart';
 
-class JabberHomeAIvm extends ChangeNotifier{
-
+class JabberHomeAIvm extends ChangeNotifier {
   /// Calling Repository =====================================
   JabberHomeAIRepository _jabberHomeAIRepository = JabberHomeAIRepository();
 
@@ -24,15 +24,17 @@ class JabberHomeAIvm extends ChangeNotifier{
   HomePageModel homePageModel = HomePageModel();
   bool apiHitStatus = false;
 
-  seInitialValue(){
+  seInitialValue() {
     apiHitStatus = false;
     homePageModel = HomePageModel();
   }
 
   Future<void> homepageAPI(BuildContext context) async {
-    EasyLoading.show(status: ConstText.get_LoaderMessage);
+    appStore.setLoading(true);
+    // EasyLoading.show(status: ConstText.get_LoaderMessage);
     try {
-      ApiResponse<HomePageModel> response = await _jabberHomeAIRepository.homePageApiCallFunction();
+      ApiResponse<HomePageModel> response =
+          await _jabberHomeAIRepository.homePageApiCallFunction();
       print("Response ::: ${response.data}");
       switch (response.status) {
         case ApiResponseStatus.success:
@@ -65,10 +67,13 @@ class JabberHomeAIvm extends ChangeNotifier{
           break;
       }
     } catch (e) {
-      EasyLoading.dismiss();
+      appStore.setLoading(false);
+
+      // EasyLoading.dismiss();
       MySnackBar.showSnackBar(context, e.toString());
     }
+    appStore.setLoading(false);
+
   }
 
 }
-

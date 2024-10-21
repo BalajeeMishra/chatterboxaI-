@@ -1,4 +1,5 @@
 
+import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
@@ -8,6 +9,8 @@ import '../Model/TabooGameChatPageModel.dart';
 import '../Repository/TaboogameChatPageRepository.dart';
 import '../Services/ApiResponseStatus.dart';
 import '../Utils/ShowSnackBar.dart';
+import '../extensions/loader_widget.dart';
+import '../main.dart';
 
 class TabooGameChatPageVM  extends ChangeNotifier{
 
@@ -66,7 +69,10 @@ class TabooGameChatPageVM  extends ChangeNotifier{
     };
     dynamicDta.add(dataAdd);
     notifyListeners();
-    EasyLoading.show(status: ConstText.get_LoaderMessage);
+    // Loader().center();
+    appStore.setLoading(true);
+
+    // EasyLoading.show(status: ConstText.get_LoaderMessage);
     try {
       var data = {
         "question": dataToAdd,
@@ -86,31 +92,45 @@ class TabooGameChatPageVM  extends ChangeNotifier{
           apiHitStatus = true;
           notifyListeners();
           EasyLoading.dismiss();
+          appStore.setLoading(false);
+
           break;
         case ApiResponseStatus.badRequest:
           EasyLoading.dismiss();
+          appStore.setLoading(false);
+
           print("${response.error!.responseMsg.toString()}");
           MySnackBar.showSnackBar(context, response.error!.responseMsg!);
           break;
         case ApiResponseStatus.unauthorized:
           EasyLoading.dismiss();
+          appStore.setLoading(false);
+
           MySnackBar.showSnackBar(context, response.error!.responseMsg!);
           break;
         case ApiResponseStatus.notFound:
           EasyLoading.dismiss();
+          appStore.setLoading(false);
+
           MySnackBar.showSnackBar(context, response.error!.responseMsg!);
           break;
         case ApiResponseStatus.serverError:
           EasyLoading.dismiss();
+          appStore.setLoading(false);
+
           MySnackBar.showSnackBar(context, response.error!.responseMsg!);
           break;
         default:
           EasyLoading.dismiss();
+          appStore.setLoading(false);
+
           // Handle other cases if needed
           break;
       }
     } catch (e) {
       EasyLoading.dismiss();
+      appStore.setLoading(false);
+
       MySnackBar.showSnackBar(context, e.toString());
     }
   }

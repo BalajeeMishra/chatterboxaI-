@@ -24,6 +24,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
   GlobalKey<FormState> mFormKey = GlobalKey<FormState>();
   TextEditingController mNameCont = TextEditingController();
   TextEditingController mAgeCont = TextEditingController();
+  List languageList = [
+
+    'Hindi',
+    'English',
+    'Bengali',
+    'Kannada',
+    'Malayalam',
+    'Marathi',
+    'Nepali',
+    'Punjabi',
+    'Tamil',
+    'Telugu',
+    'Urdu',
+    'Gujarati'
+  ];
+  String selectedLanguage ='Hindi';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,7 +50,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             alignment: Alignment.topCenter,
             children: [
               Container(
-                height: context.height() *0.4,
+                height: context.height() *0.28,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
@@ -47,7 +63,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               Positioned(
-                top: 100,
+                top: context.height() *0.07,
                 child: Column(
                   children: [
                     CircleAvatar(
@@ -72,7 +88,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ],
           ),
-          60.height,
+          26.height,
           Row(
             children: [
               Text('First Name',
@@ -109,6 +125,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
             decoration:
                 defaultInputDecoration(context, label: 'Enter your age'),
           ).paddingSymmetric(horizontal: 16, vertical: 4),
+          16.height,
+          Row(
+            children: [
+              Text('Native Language',
+                  style: secondaryTextStyle(color: textPrimaryColorGlobal)),
+              2.width,
+              Text('*', style: secondaryTextStyle(color: redColor))
+            ],
+          ).paddingSymmetric(horizontal: 16, vertical: 4),
+          4.height,
+          DropdownButtonFormField(
+
+            items: languageList
+                .map((value) => DropdownMenuItem<String>(
+              child: Text(value, style: primaryTextStyle()),
+              value: value,
+            ))
+                .toList(),
+            isExpanded: false,
+            isDense: true,
+            borderRadius: radius(),
+            decoration: defaultInputDecoration(context),
+            value: selectedLanguage,
+            onChanged: (String? value) {
+              // selectedLanguage = value.validate();
+              setState(() {
+              });
+            },
+          ).paddingSymmetric(horizontal: 16, vertical: 4),
+
         ],
       ),
       floatingActionButton: AppButton(

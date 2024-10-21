@@ -1,3 +1,6 @@
+import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
+import 'package:balajiicode/extensions/loader_widget.dart';
+import 'package:balajiicode/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_tts/flutter_tts.dart';
@@ -68,8 +71,9 @@ class PlayTabooScreenVM extends ChangeNotifier {
 
     dynamicDta.add(dataAdd);
     notifyListeners();
-
-    EasyLoading.show(status: ConstText.get_LoaderMessage);
+    appStore.setLoading(true);
+    // Loader().center();
+    // EasyLoading.show(status: ConstText.get_LoaderMessage);
     try {
       print(sessionId);
       var data = {"question": dataToAdd, "userId": "123", "session": sessionId};
@@ -101,33 +105,44 @@ class PlayTabooScreenVM extends ChangeNotifier {
 
         // break;
         case ApiResponseStatus.badRequest:
+          appStore.setLoading(false);
+
           EasyLoading.dismiss();
           print("${response.error!.responseMsg.toString()}");
           MySnackBar.showSnackBar(context, response.error!.responseMsg!);
           break;
         case ApiResponseStatus.unauthorized:
-          EasyLoading.dismiss();
+          EasyLoading.dismiss();      appStore.setLoading(false);
+
           MySnackBar.showSnackBar(context, response.error!.responseMsg!);
           break;
         case ApiResponseStatus.notFound:
-          EasyLoading.dismiss();
+          EasyLoading.dismiss();      appStore.setLoading(false);
+
           MySnackBar.showSnackBar(context, response.error!.responseMsg!);
           break;
         case ApiResponseStatus.serverError:
-          EasyLoading.dismiss();
+          EasyLoading.dismiss();      appStore.setLoading(false);
+
           MySnackBar.showSnackBar(context, response.error!.responseMsg!);
           break;
         default:
+          appStore.setLoading(false);
+
           EasyLoading.dismiss();
           // Handle other cases if needed
           break;
       }
     } catch (e) {
+      appStore.setLoading(false);
+
       print(e);
       print("hellooo");
       EasyLoading.dismiss();
       MySnackBar.showSnackBar(context, e.toString());
     }
+    appStore.setLoading(false);
+
   }
 
   FlutterTts flutterTts = FlutterTts();
