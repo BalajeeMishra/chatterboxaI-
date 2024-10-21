@@ -97,25 +97,25 @@ const NewGameContentForm: React.FC<NewGameContentFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  
+
     // Reset errors
     setErrors({});
-  
+
     // Validation
     const newErrors: { [key: string]: string } = {};
     if (!mainContent) newErrors.mainContent = "Main content is required.";
     if (!level) newErrors.level = "Level is required.";
     if (detailOfContent.length === 0)
       newErrors.detailOfContent = "At least one detail is required.";
-  
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-  
+
     let url = "";
     let method = "POST"; // Default method for adding new content
-  
+
     if (editgameId) {
       // If we are editing existing content, use PUT method
       url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/game/edit-game-content/${editgameId}`;
@@ -127,7 +127,7 @@ const NewGameContentForm: React.FC<NewGameContentFormProps> = ({
       alert("Fill all details.");
       return;
     }
-  
+
     try {
       const response = await axios({
         url,
@@ -141,12 +141,12 @@ const NewGameContentForm: React.FC<NewGameContentFormProps> = ({
           detailOfContent,
         },
       });
-  
+
       console.log(response);
       const data = response.data;
       console.log("Game content saved successfully:", data);
       alert("Game content saved successfully");
-  
+
       // Reset form fields
       setMainContent("");
       setLevel("medium");
@@ -160,9 +160,7 @@ const NewGameContentForm: React.FC<NewGameContentFormProps> = ({
       alert("Failed to save game content. Please try again.");
     }
   };
-  
 
-  
   console.log(newgameData);
   return (
     <div className="max-w-5xl p-4 bg-white shadow-md rounded-lg">
@@ -243,7 +241,7 @@ const NewGameContentForm: React.FC<NewGameContentFormProps> = ({
             )}
 
             {/* Displaying added details */}
-            <div className="mt-2">
+            <div className="mt-2 max-h-40 px-4 overflow-scroll">
               {detailOfContent.map((detail) => (
                 <div
                   key={detail}
