@@ -241,57 +241,102 @@ export const NewGameTable: React.FC<NewGameTableProps> = ({
   //     throw error;
   //   }
   // };
-  const changeStatus = async (gameid: string): Promise<void> => {
+  // const changeStatus = async (gameid: string): Promise<void> => {
+  //   try {
+  //     // Log the game ID for debugging
+  //     console.log("Changing status of game with ID:", gameid);
+
+  //     // Construct the PATCH request URL
+  //     const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/game/changestatus/${gameid}`;
+  //     console.log("API URL:", apiUrl);
+
+  //     // Make the PATCH request using fetch
+  //     const response = await fetch(apiUrl, {
+  //       method: "PATCH",
+  //       headers: {
+  //         "Content-Type": "application/json", // Ensure proper content type
+  //       },
+  //       body: JSON.stringify({
+  //         status: "inactive", // Pass the status in the request body
+  //       }),
+  //     });
+
+  //     // Check if the response is ok (status code 200-299)
+  //     if (!response.ok) {
+  //       // Handle error responses
+  //       const errorMessage = await response.text(); // Get the error message from the response
+  //       throw new Error(`Failed to change status: ${errorMessage}`);
+  //     }
+
+  //     // If the response is successful, log the response
+  //     const data = await response.json(); // Assuming the response is in JSON format
+  //     console.log("Response from server:", data);
+
+  //     // Fetch updated list of games after status change
+  //     const gamesData = await fetchAllGames();
+
+  //     // Update the UI or state with the new games data
+  //     setData(gamesData);
+
+  //     // Notify the user that the game's status was changed successfully
+  //     alert(`Game with ID ${gameid} status changed to inactive successfully.`);
+  //   } catch (error) {
+  //     // Handle and log any errors
+  //     console.error("Error changing game status:", error);
+
+  //     // Optionally, provide feedback to the user
+  //     alert("Failed to change game status. Please try again.");
+
+  //     // Rethrow the error if further handling is needed by the calling function
+  //     throw error;
+  //   }
+  // };
+  
+  const changeStatus = async (gameid: string)=> {
     try {
       // Log the game ID for debugging
       console.log("Changing status of game with ID:", gameid);
-
+  
       // Construct the PATCH request URL
       const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/game/changestatus/${gameid}`;
       console.log("API URL:", apiUrl);
-
-      // Make the PATCH request using fetch
-      const response = await fetch(apiUrl, {
-        method: "PATCH",
+  
+      // Make the PATCH request using axios
+      const response = await axios.patch(apiUrl, {
+        status: "inactive",  // The body data being sent
+      }, {
         headers: {
-          "Content-Type": "application/json", // Ensure proper content type
+          "Content-Type": "application/json",  // Ensure proper content type
+          // "Authorization": `Bearer ${yourToken}`, // Uncomment if you need authentication
         },
-        body: JSON.stringify({
-          status: "inactive", // Pass the status in the request body
-        }),
       });
-
-      // Check if the response is ok (status code 200-299)
-      if (!response.ok) {
-        // Handle error responses
-        const errorMessage = await response.text(); // Get the error message from the response
-        throw new Error(`Failed to change status: ${errorMessage}`);
-      }
-
-      // If the response is successful, log the response
-      const data = await response.json(); // Assuming the response is in JSON format
-      console.log("Response from server:", data);
-
-      // Fetch updated list of games after status change
+  
+      // Log the response data
+      console.log("Response from server:", response.data);
+  
+      // Fetch updated list of games after status change (Assuming fetchAllGames is another function)
       const gamesData = await fetchAllGames();
-
+  
       // Update the UI or state with the new games data
       setData(gamesData);
-
+  
       // Notify the user that the game's status was changed successfully
       alert(`Game with ID ${gameid} status changed to inactive successfully.`);
+  
     } catch (error) {
       // Handle and log any errors
-      console.error("Error changing game status:", error);
-
-      // Optionally, provide feedback to the user
-      alert("Failed to change game status. Please try again.");
-
-      // Rethrow the error if further handling is needed by the calling function
-      throw error;
+      if (axios.isAxiosError(error)) {
+        // Axios error, handle it accordingly
+        console.error("Axios error:", error);
+        alert(`Failed to change game status: ${error.response?.data?.message || error.message}`);
+      } else {
+        // Non-Axios error
+        console.error("Unexpected error:", error);
+        alert("Failed to change game status. Please try again.");
+      }
     }
   };
-
+  
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
 
