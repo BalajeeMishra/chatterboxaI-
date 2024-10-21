@@ -2,6 +2,9 @@ import 'package:balajiicode/Constants/ImageConstant.dart';
 import 'package:balajiicode/Constants/constantRow.dart';
 import 'package:balajiicode/Utils/ShowSnackBar.dart';
 import 'package:balajiicode/Widget/text_widget.dart';
+import 'package:balajiicode/extensions/app_text_field.dart';
+import 'package:balajiicode/extensions/extension_util/int_extensions.dart';
+import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -11,8 +14,11 @@ import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:speech_to_text_ultra/speech_to_text_ultra.dart';
 import '../../Model/AllGameModel.dart';
+import '../../Utils/app_colors.dart';
+import '../../Utils/app_images.dart';
 import '../../ViewModel/PlayTabooScreenVM.dart';
 import '../../Widget/appbar.dart';
+import '../../main.dart';
 import '../TabooGameChatpage/TaboogamechatPage.dart';
 import 'PlayTabooScreenTwo.dart';
 import 'package:uuid/uuid.dart';
@@ -38,6 +44,8 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   @override
   void initState() {
     super.initState();
+    appStore.setLoading(false);
+
   }
 
   /// This has to happen only once per app
@@ -53,7 +61,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
   // Each time to start a speech recognition session
   void _startListening() async {
-   await _speechToText.listen(
+    await _speechToText.listen(
         localeId: 'en_US', // e.g., 'en_US'
         onResult: _onSpeechResult);
     // setState(() {});
@@ -116,9 +124,16 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                           color: Color(0xffc1c1c1),
                         ),
                         SizedBox(
-                          height: 25.0,
+                          height: 16.0,
                         ),
-                        Image(image: AssetImage(ImageConstant.girlsImage)),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(27),
+                          child: Image.asset(
+                              fit: BoxFit.cover,
+                              height: 195,
+                              width: 246,
+                              ic_transparent_girlImage2),
+                        ),
                         SizedBox(
                           height: 15,
                         ),
@@ -230,7 +245,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                       : Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            InkWell(
+                            GestureDetector(
                               onTap: () {
                                 sessionId = Uuid().v4();
                                 Navigator.push(
@@ -243,9 +258,10 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                               },
                               child: Column(
                                 children: [
-                                  Image(
-                                      image:
-                                          AssetImage(ImageConstant.chatIcon)),
+                                  Icon(
+                                    Icons.chat,
+                                    size: 36,
+                                  ),
                                   MyText(
                                     text: "Write",
                                     fontSize: 12,
@@ -256,15 +272,16 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                             SizedBox(
                               width: 40,
                             ),
-                            InkWell(
+                            GestureDetector(
                               onTap: () {
                                 _initSpeech();
                               },
                               child: Column(
                                 children: [
-                                  Image(
-                                      image: AssetImage(
-                                          ImageConstant.microphoneIcon)),
+                                  Icon(
+                                    Icons.keyboard_voice,
+                                    size: 36,
+                                  ),
                                   MyText(
                                     text: "Speak",
                                     fontSize: 12,
@@ -284,14 +301,16 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   }
 
   listeningWidget() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 15),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Padding(
-            padding: EdgeInsets.only(top: 50.0),
-            child: InkWell(
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 15),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment:
+              CrossAxisAlignment.center,
+          children: [
+            GestureDetector(
               onTap: () {
                 _stopListening();
                 setState(() {
@@ -299,32 +318,64 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                   startListening = false;
                 });
               },
-              child: Image(image: AssetImage(ImageConstant.IconCancel)),
-            ),
-          ),
-          SizedBox(
-            width: 10,
-          ),
-          startListening
-              ? Expanded(
-                  child: Lottie.asset('assets/lottiefile/recordaudio.json'),
-                )
-              : Padding(
-                  padding: EdgeInsets.only(top: 50.0),
-                  child: Row(
-                    children: [
-                      Image(image: AssetImage(ImageConstant.pitch1)),
-                      Image(image: AssetImage(ImageConstant.pitch2)),
-                      Image(image: AssetImage(ImageConstant.pitch3)),
-                    ],
-                  ),
+              child: Container(
+                padding: EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  shape: BoxShape.circle,
                 ),
-          SizedBox(
-            width: 10,
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: 50.0),
-            child: InkWell(
+                child: Icon(
+                  size: 24,
+                  Icons.close,
+                  color: Colors.white,
+                ),
+              ),
+            ).paddingTop(50),
+            SizedBox(width: 10),
+
+            Expanded(
+              child: startListening
+                  ? Padding(
+                      padding: EdgeInsets.symmetric(vertical: 10.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Lottie.asset(
+                            'assets/lottiefile/recordaudio.json',
+                            height: 120,
+                            fit: BoxFit.contain,
+                          ),
+                          // Lottie.asset(
+                          //   'assets/lottiefile/recordaudio.json',
+                          //   height: 60,
+                          //   fit: BoxFit.contain,
+                          // ),
+                        ],
+                      ),
+                    )
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image(
+                          image: AssetImage(ImageConstant.pitch1),
+                          height: 50,
+                        ),
+                        SizedBox(width: 5),
+                        Image(
+                          image: AssetImage(ImageConstant.pitch2),
+                          height: 50,
+                        ),
+                        SizedBox(width: 5),
+                        Image(
+                          image: AssetImage(ImageConstant.pitch3),
+                          height: 50,
+                        ),
+                      ],
+                    ),
+            ),
+            SizedBox(width: 10),
+
+            GestureDetector(
               onTap: () {
                 _stopListening();
 
@@ -336,19 +387,29 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                   sessionId = Uuid().v4();
 
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => PlayTabooScreenTwo(
-                              widget.allGameModel,
-                              widget.index,
-                              ques,
-                              sessionId)));
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PlayTabooScreenTwo(
+                          widget.allGameModel, widget.index, ques, sessionId),
+                    ),
+                  );
                 }
               },
-              child: Image(image: AssetImage(ImageConstant.doneButton)),
-            ),
-          )
-        ],
+              child: Container(
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: primaryColor,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  size: 24,
+                  Icons.send,
+                  color: Colors.white,
+                ),
+              ),
+            ).paddingTop(46),
+          ],
+        ).paddingSymmetric(horizontal: 30),
       ),
     );
   }

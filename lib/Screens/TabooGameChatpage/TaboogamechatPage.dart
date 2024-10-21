@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:balajiicode/Widget/text_widget.dart';
+import 'package:balajiicode/extensions/text_styles.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -9,6 +10,7 @@ import 'package:provider/provider.dart';
 import '../../Constants/ImageConstant.dart';
 import '../../Constants/constantRow.dart';
 import '../../Model/AllGameModel.dart';
+import '../../Utils/app_colors.dart';
 import '../../ViewModel/TabooGameChatPageVM.dart';
 import '../../Widget/appbar.dart';
 import 'package:uuid/uuid.dart';
@@ -275,41 +277,56 @@ class _TaboogamechatPage extends State<TaboogamechatPage> {
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Padding(
-                  padding:
-                      EdgeInsets.only(left: 15.0, right: 15.0, bottom: 10.0),
+                  padding: EdgeInsets.only(left: 15.0, right: 15.0, bottom: 10.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(child: Consumer<TabooGameChatPageVM>(
-                        builder: (context, vm, child) {
-                          return TextFormField(
-                            controller: vm.controller,
-                            decoration: InputDecoration(
-                              hintText: "Enter Your Answer",
-                              border: const OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(15.0)),
+                      // Expandable TextFormField
+                      Expanded(
+                        child: Consumer<TabooGameChatPageVM>(
+                          builder: (context, vm, child) {
+                            return TextField(
+                              controller: vm.controller,
+                              maxLines: null,
+                              decoration: InputDecoration(
+                                hintText: "Enter Your Answer",
+                                hintStyle: secondaryTextStyle(color: Colors.grey),
+                                border: const OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.deepPurple.shade300),
+                                ),
                               ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Colors.deepPurple.shade300),
-                              ),
-                            ),
-                          );
-                        },
-                      )),
-                      SizedBox(
-                        width: 10,
+                            );
+                          },
+                        ),
                       ),
-                      InkWell(
+                      SizedBox(width: 10),
+                      // Send Button
+                      GestureDetector(
                         onTap: () {
-                          Provider.of<TabooGameChatPageVM>(context,
-                                  listen: false)
-                              .chatPageAPI(context,widget.sessionId);
+                          FocusScope.of(context).unfocus();
+
+                          Provider.of<TabooGameChatPageVM>(context, listen: false)
+                              .chatPageAPI(context, widget.sessionId);
+
+                          Provider.of<TabooGameChatPageVM>(context, listen: false)
+                              .controller
+                              .clear();
                         },
-                        child:
-                            Image(image: AssetImage(ImageConstant.doneButton)),
-                      ),
+                        child: Container(
+                          padding: EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: primaryColor,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            size: 24,
+                            Icons.send,
+                            color: Colors.white,
+                          ),
+                      ),),
                     ],
                   ),
                 ),
