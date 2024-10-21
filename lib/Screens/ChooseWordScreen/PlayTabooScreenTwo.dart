@@ -107,6 +107,10 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo> {
     await flutterTts.setLanguage('en-US');
     await flutterTts.setVolume(1.0);
     await flutterTts.setSpeechRate(speechRate);
+    // Get and set available voices
+  List<dynamic> voices = await flutterTts.getVoices;
+  print(voices);
+  print("hello world okayyy");
   }
 
 
