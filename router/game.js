@@ -13,7 +13,6 @@ router.post("/new-game",async(req,res,next)=>{
     description,
     status
   });
-  console.log("hi gautabbds")
   await game.save(); 
   return res.status(200).json({message:"Game Created Successfully"})
   } catch(err){
