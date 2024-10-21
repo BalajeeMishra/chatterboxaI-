@@ -42,7 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
               alignment: Alignment.topCenter,
               children: [
                 Container(
-                  height: 260,
+                  height: context.height() *0.4,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
@@ -80,7 +80,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ],
             ),
-            60.height,
+            40.height,
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -126,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
             ).paddingSymmetric(horizontal: 16, vertical: 4),
-            60.height,
+            40.height,
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

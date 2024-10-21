@@ -1,3 +1,4 @@
+import 'package:balajiicode/extensions/extension_util/context_extensions.dart';
 import 'package:balajiicode/extensions/extension_util/int_extensions.dart';
 import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
 import 'package:balajiicode/extensions/widgets.dart';
@@ -33,7 +34,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             alignment: Alignment.topCenter,
             children: [
               Container(
-                height: 260,
+                height: context.height() *0.4,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [

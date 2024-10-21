@@ -87,95 +87,98 @@ class _JabberAIHomepage extends State<JabberAIHomepage>{
          centerTile: true,
          backButtonshow: false
        ),
-       body:  Padding(
-         padding: EdgeInsets.symmetric(vertical: 10.0),
-         child: Consumer<JabberHomeAIvm>(
-           builder: (context,vm,child){
-             return vm.apiHitStatus ?
-             vm.homePageModel.allGame == null?
-             Center(
-               child: MyText(
-                 text: 'No Game Found',
-                 fontSize: 16,
-                 fontWeight: FontWeight.bold,
-                 color: Colors.black,
-               ),
-             ):
-               ListView.builder(
-                 itemCount: vm.homePageModel.allGame!.length,
-                 scrollDirection: Axis.vertical,
-                 shrinkWrap: true,
-                 itemBuilder: (context,index){
-                   var data = vm.homePageModel.allGame![index];
-                   return Padding(
-                       padding:  const EdgeInsets.symmetric(horizontal: 20.0),
-                       child:Column(
-                         children: [
-                           InkWell(
-                             onTap: (){
-                               Navigator.of(context).push(MaterialPageRoute(builder: (context) => ChooseWordScreen(data.sId!)));
-                             },
-                             child:Container(
-                                 decoration: const BoxDecoration(
-                                     color: Color(0xffd3e2f5),
-                                     borderRadius: BorderRadius.all(Radius.circular(10.0))
-                                 ),
-                                 child: Padding(
-                                   padding: const EdgeInsets.symmetric(horizontal: 15.0,vertical: 10.0),
-                                   child:  Row(
-                                     children: [
-                                       Expanded(
-                                         flex: 2,
-                                         child: Column(
-                                           crossAxisAlignment: CrossAxisAlignment.start,
-                                           children: [
-                                             Text(
-                                               "${data.gameName}",
-                                               style: TextStyle(
-                                                   fontWeight: FontWeight.w800,
-                                                   color: Colors.black,
-                                                   fontSize: 20
-                                               ),
-                                             ),
-                                             SizedBox(
-                                               height: 10,
-                                             ),
-                                             Text(
-                                               "${data.description}",
-                                               style: TextStyle(
-                                                   fontSize: 14,
-                                                   color: Color(0xff000000),
-                                                   fontWeight: FontWeight.w400
-                                               ),
-                                             )
-                                           ],
-                                         ),
-                                       ),
-                                      Container(
-                                        height: 100,
-                                        width: 100,
-                                        child:  WebViewWidget(
-                                            controller: WebViewHelper.getWebView(
-                                                url: data.gameIcon!,
-                                                onPageFinished: (url) {})
+       body:  SingleChildScrollView(
+         child: Padding(
+           padding: EdgeInsets.symmetric(vertical: 10.0),
+           child: Consumer<JabberHomeAIvm>(
+             builder: (context,vm,child){
+               return vm.apiHitStatus ?
+               vm.homePageModel.allGame == null?
+               Center(
+                 child: MyText(
+                   text: 'No Game Found',
+                   fontSize: 16,
+                   fontWeight: FontWeight.bold,
+                   color: Colors.black,
+                 ),
+               ):
+                 ListView.builder(
 
-                                        ),
-                                      )
-                                     ],
+                   itemCount: vm.homePageModel.allGame!.length,
+                   scrollDirection: Axis.vertical,
+                   shrinkWrap: true,
+                   itemBuilder: (context,index){
+                     var data = vm.homePageModel.allGame![index];
+                     return Padding(
+                         padding:  const EdgeInsets.symmetric(horizontal: 20.0),
+                         child:Column(
+                           children: [
+                             InkWell(
+                               onTap: (){
+                                 Navigator.of(context).push(MaterialPageRoute(builder: (context) => ChooseWordScreen(data.sId!)));
+                               },
+                               child:Container(
+                                   decoration: const BoxDecoration(
+                                       color: Color(0xffd3e2f5),
+                                       borderRadius: BorderRadius.all(Radius.circular(10.0))
                                    ),
-                                 )
+                                   child: Padding(
+                                     padding: const EdgeInsets.symmetric(horizontal: 15.0,vertical: 10.0),
+                                     child:  Row(
+                                       children: [
+                                         Expanded(
+                                           flex: 2,
+                                           child: Column(
+                                             crossAxisAlignment: CrossAxisAlignment.start,
+                                             children: [
+                                               Text(
+                                                 "${data.gameName}",
+                                                 style: TextStyle(
+                                                     fontWeight: FontWeight.w800,
+                                                     color: Colors.black,
+                                                     fontSize: 20
+                                                 ),
+                                               ),
+                                               SizedBox(
+                                                 height: 10,
+                                               ),
+                                               Text(
+                                                 "${data.description}",
+                                                 style: TextStyle(
+                                                     fontSize: 14,
+                                                     color: Color(0xff000000),
+                                                     fontWeight: FontWeight.w400
+                                                 ),
+                                               )
+                                             ],
+                                           ),
+                                         ),
+                                        Container(
+                                          height: 100,
+                                          width: 100,
+                                          child:  WebViewWidget(
+                                              controller: WebViewHelper.getWebView(
+                                                  url: data.gameIcon!,
+                                                  onPageFinished: (url) {})
+
+                                          ),
+                                        )
+                                       ],
+                                     ),
+                                   )
+                               ),
                              ),
-                           ),
-                           const SizedBox(
-                             height: 15.0,
-                           )
-                         ],
-                       )
-                   );
-                 }
-             ):
-                SizedBox();
-           },
+                             const SizedBox(
+                               height: 15.0,
+                             )
+                           ],
+                         )
+                     );
+                   }
+               ):
+                  SizedBox();
+             },
+           ),
          ),
        ),
      );

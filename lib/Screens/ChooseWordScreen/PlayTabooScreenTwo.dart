@@ -1,3 +1,5 @@
+import 'package:balajiicode/extensions/app_text_field.dart';
+import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -39,7 +41,32 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo> {
   bool donebuttonClicked = false;
   String sessionId = "";
 
-  /// This has to happen only once per app
+  double speechRate = 0.4;
+  FlutterTts flutterTts = FlutterTts();
+  bool isSpeaking = false; // Flag to track if speech is active
+
+  @override
+  void initState() {
+    super.initState();
+    print("hello");
+    // TODO: implement initState
+    super.initState();
+    configureTts();
+    flutterTts.setStartHandler(() {
+      print("TTS Started");
+    });
+    flutterTts.setCompletionHandler(() {
+      print("TTS Completed");
+    });
+    Provider.of<PlayTabooScreenVM>(context, listen: false)
+        .seInitialValue(widget.allGameModel, widget.index, widget.sessionId);
+    Provider.of<PlayTabooScreenVM>(context, listen: false)
+        .chatPageAPI(context, widget.dataGet, widget.sessionId);
+    configureTts();
+    _initSpeech();
+  }
+
+  /// Initialize speech recognition
   void _initSpeech() async {
     _speechEnabled = await _speechToText.initialize();
     if (_speechEnabled) {
@@ -50,7 +77,7 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo> {
     }
   }
 
-  // Each time to start a speech recognition session
+  /// Start speech listening
   void _startListening() async {
     await _speechToText.listen(
         localeId: 'en_US', // e.g., 'en_US'
@@ -58,6 +85,7 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo> {
     setState(() {});
   }
 
+  /// Stop listening to speech
   void _stopListening() async {
     await _speechToText.stop();
     setState(() {
@@ -65,59 +93,150 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo> {
     });
   }
 
+  /// Process speech result
   void _onSpeechResult(SpeechRecognitionResult result) {
     setState(() {
       _lastWords = result.recognizedWords;
     });
-  }
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    configureTts();
-    Provider.of<PlayTabooScreenVM>(context, listen: false)
-        .seInitialValue(widget.allGameModel, widget.index, widget.sessionId);
-    Provider.of<PlayTabooScreenVM>(context, listen: false)
-        .chatPageAPI(context, widget.dataGet, widget.sessionId);
+    // Optionally speak the recognized words immediately or on another trigger
+    // speakText(_lastWords);
   }
-
-  void submitNext(String ques) {
-    configureTts();
-    Provider.of<PlayTabooScreenVM>(context, listen: false)
-        .chatPageAPI(context, ques, widget.sessionId);
-  }
-
-  startSpeaking() {
-    Future.delayed(Duration(seconds: 2), () {
-      speakText("${widget.dataGet}");
-    });
-  }
-
-  FlutterTts flutterTts = FlutterTts();
 
   Future<void> configureTts() async {
     await flutterTts.setLanguage('en-US');
-    await flutterTts.setSpeechRate(0.4);
     await flutterTts.setVolume(1.0);
+    await flutterTts.setSpeechRate(speechRate);
   }
 
-  void speakText(String text) async {
-    await flutterTts.speak(text);
+
+  /// Speak text with TTS
+  Future<void> speakText(String text) async {
+    if (text.isNotEmpty) {
+      _lastWords = text; // Update the last words
+      await flutterTts.speak(text); // Speak the text
+      print("Speaking: $text"); // Log what is being spoken
+    } else {
+      print("No text provided to speak.");
+    }
   }
 
-  // void stopSpeaking() async {
-  //   await flutterTts.stop();
+
+  // Future<void> speakText(String text) async {
+  //   if (isSpeaking) {
+  //     await flutterTts.stop(); // Stop ongoing speech
+  //   }
+  //   isSpeaking = true;
+  //   await flutterTts.setSpeechRate(speechRate); // Set the new speech rate
+  //   await flutterTts.speak(text); // Start speaking
+  //   isSpeaking = false;
   // }
 
+  /// Stop speaking
   Future<void> stopSpeaking() async {
     await flutterTts.stop();
-    // if (result == 1) setState(() => ttsState = TtsState.stopped);
   }
+
+  /// Submit and call next function
+  submitNext(String ques) async {
+    isSpeaking = true;
+    await flutterTts.setSpeechRate(speechRate);
+    await flutterTts.speak(ques);
+    isSpeaking = false;
+  }
+
+  // void adjustTtsSpeechRate(double change) {
+  //   setState(() {
+  //     speechRate += change;
+  //     if (speechRate < 0.1) speechRate = 0.1;
+  //     if (speechRate > 2.0) speechRate = 2.0;
+  //   });
+  //   flutterTts.setSpeechRate(speechRate);
+  // }
+  // Future<void> adjustSpeechRate(double change) async {
+  //   print("Adjusting Speech Rate by: $change");
+  //   setState(() {
+  //     speechRate += change;
+  //   });
+  //
+  //   print("New Speech Rate: $speechRate");
+  //
+  //   await flutterTts.setSpeechRate(speechRate);
+  //   // Log if speaking
+  //   if (_lastWords.isNotEmpty) {
+  //     print("Re-speaking last words with new rate");
+  //     await speakText(_lastWords);
+  //   }
+  // }
+
+  Future<void> adjustSpeechRate(double change) async {
+    // Print the change for debugging purposes
+    print("Adjusting Speech Rate by: $change");
+
+    // Update the state with the new speech rate
+    setState(() {
+      speechRate += change;
+      // Clamp the speech rate to prevent it from going out of bounds
+      speechRate = speechRate.clamp(0.1, 1.0); // Example clamp between 0.1 and 1.0
+    });
+
+    // Log the new speech rate
+    print("New Speech Rate: $speechRate");
+
+    // Set the new speech rate for the TTS
+    await flutterTts.setSpeechRate(speechRate);
+
+    // Check if there's new text to speak
+    if (_lastWords.isNotEmpty) {
+      print("Last words before adjustment: $_lastWords");
+      // Only re-speak the last words if it's appropriate
+      await speakText(_lastWords);
+    } else {
+      print("No text to speak after rate adjustment.");
+    }
+  }
+
+
+  _onIncreaseRatePressed() {
+    adjustSpeechRate(0.1);
+  }
+
+   _onDecreaseRatePressed() {
+    adjustSpeechRate(-0.1);
+  }
+
+  // increaseSpeechRate() async {
+  //   if (speechRate < 2.0) {
+  //     // Increase speech rate
+  //     setState(() {
+  //       speechRate += 0.1; // Increase speech rate
+  //     });
+  //
+  //     await flutterTts.setSpeechRate(speechRate); // Just update the speech rate
+  //
+  //     print("Increased Speech Rate: $speechRate");
+  //   }
+  // }
+  //
+  // decreaseSpeechRate() async {
+  //   if (speechRate > 0.1) {
+  //     // Decrease speech rate
+  //     setState(() {
+  //       speechRate -= 0.1; // Decrease speech rate
+  //     });
+  //
+  //     await flutterTts.setSpeechRate(speechRate); // Just update the speech rate
+  //
+  //     print("Decreased Speech Rate: $speechRate");
+  //   }
+  // }
+
+  // void testTtsWithNewRate() async {
+  //   await flutterTts.speak("This is a test of the speech rate.");
+  // }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     stopSpeaking();
   }
@@ -154,10 +273,23 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo> {
                 SizedBox(
                   height: 25.0,
                 ),
-                InkWell(
-                  onTap: () {},
-                  child: Image(image: AssetImage(ImageConstant.girlsImage)),
-                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.fast_rewind),
+                      onPressed: () => _onDecreaseRatePressed(), // Decrease speech rate
+                    ),
+                    InkWell(
+                      // onTap: () {},
+                      child: Image(image: AssetImage(ImageConstant.girlsImage)),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.fast_forward),
+                      onPressed: () => _onIncreaseRatePressed(), // Increase speech rate
+                    ),
+                  ],
+                ).paddingOnly(left: 36, right: 36),
                 SizedBox(
                   height: 15,
                 ),

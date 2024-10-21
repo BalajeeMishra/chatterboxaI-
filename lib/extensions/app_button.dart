@@ -1,3 +1,4 @@
+import 'package:balajiicode/extensions/extension_util/context_extensions.dart';
 import 'package:flutter/material.dart';
 import '../../extensions/text_styles.dart';
 import 'colors.dart';
@@ -112,8 +113,8 @@ class _AppButtonState extends State<AppButton>
     return Padding(
       padding: widget.margin ?? EdgeInsets.zero,
       child: Container(
-        width: 358,
-        height: 52,
+        width: context.width() * 0.8,
+        height: context.height() * 0.07,
         // width: widget.width,
         // height: widget.height,
         decoration: BoxDecoration(

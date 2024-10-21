@@ -52,7 +52,7 @@ class _OtpScreenState extends State<OtpScreen> {
             alignment: Alignment.topCenter,
             children: [
               Container(
-                height: 260,
+                height: context.height() *0.4,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
@@ -103,7 +103,7 @@ class _OtpScreenState extends State<OtpScreen> {
                             // ''
                             // '${widget.phoneNumber!}',
                         style: secondaryTextStyle()),
-                    30.height,
+                    20.height,
                     // PinFieldAutoFill(
                     //   codeLength: 6,
                     //   onCodeChanged: (code) {
@@ -115,7 +115,7 @@ class _OtpScreenState extends State<OtpScreen> {
                     otpInputField(),
 
 
-                    30.height,
+                    20.height,
                     StatefulBuilder(builder: (context, setState) {
                       return Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -149,7 +149,7 @@ class _OtpScreenState extends State<OtpScreen> {
                         ],
                       );
                     }),
-                    30.height,
+                    // 30.height,
                   ],
                 ).paddingSymmetric(horizontal: 16),
               ),
