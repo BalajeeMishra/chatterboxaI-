@@ -7,26 +7,28 @@ import cors from "cors";
 
 const app = express();
 connectDB();
-app.use(express.json());
+
 const corsOptions = {
   origin: '*', // Allow all origins, or specify a particular domain
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow specific methods
+  methods: ['GET', 'POST', 'PUT','PATCH' ,'DELETE', 'OPTIONS'], // Allow specific methods
   allowedHeaders: ['Content-Type', 'Authorization'], // Specify allowed headers
 };
+
 app.use(cors(corsOptions));
-app.use("/api/game",Game);
-app.use("/api",ConverSation);
-app.get("/",async(_,res)=>res.send("Server is running"));
-app.use(async(err, req, res, next) => {
-  if(!err?.status){
+app.use(express.json());
+app.use("/api/game", Game);
+app.use("/api", ConverSation);
+app.get("/", async (_, res) => res.send("Server is running"));
+app.use(async (err, req, res, next) => {
+  if (!err?.status) {
     err.status = 404;
   }
-  if(err.name == "MongoServerError"){
+  if (err.name == "MongoServerError") {
     return res.status(err.status).json({ message: "Field already exist." });
   }
   return res.status(err.status).json({ message: err.message });
 });
 
-app.listen(3000,()=>console.log("Server started"))
+app.listen(8000, () => console.log("Server started"))
 
 
