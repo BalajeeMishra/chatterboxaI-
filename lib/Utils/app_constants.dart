@@ -28,16 +28,6 @@ const USERNAME = "USERNAME";
 const statusSuccess = 'User registered successfully';
 
 
-// const FIREBASEAPIKEY = 'AIzaSyDFVHqwuGaFbkv40re2qQVKGYmlOf_j4E0';
-//
-// const FIREBASEAPPID = '1:939744031131:android:8c716b7ad7e7e3bee5f13e';
-//
-// const FIREBASEMESSAGINGSENDERID ='939744031131';
-//
-// const FIREBASEPROJECTID ='medivahan';
-
-
-
 
 
 
