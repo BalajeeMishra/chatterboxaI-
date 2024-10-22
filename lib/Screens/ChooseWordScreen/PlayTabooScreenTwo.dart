@@ -1,6 +1,9 @@
+import 'package:balajiicode/components/loader_widget_new.dart';
 import 'package:balajiicode/extensions/app_text_field.dart';
 import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
+import 'package:balajiicode/extensions/system_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 
 import '../../Constants/ImageConstant.dart';
@@ -51,21 +54,34 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo> {
   void initState() {
     super.initState();
     print("hello");
-    // TODO: implement initState
-    super.initState();
     configureTts();
     flutterTts.setStartHandler(() {
       print("TTS Started");
+      setState(() {
+        isSpeaking = true;  // Mark as speaking when TTS starts
+      });
     });
+
     flutterTts.setCompletionHandler(() {
       print("TTS Completed");
+      setState(() {
+        isSpeaking = false;  // Mark as not speaking when TTS completes
+      });
     });
+
+    flutterTts.setErrorHandler((msg) {
+      print("TTS Error: $msg");
+      setState(() {
+        isSpeaking = false;  // Reset speaking flag if an error occurs
+      });
+    });
+
     Provider.of<PlayTabooScreenVM>(context, listen: false)
         .seInitialValue(widget.allGameModel, widget.index, widget.sessionId);
     Provider.of<PlayTabooScreenVM>(context, listen: false)
         .chatPageAPI(context, widget.dataGet, widget.sessionId);
     configureTts();
-    _initSpeech();
+    // _initSpeech();
   }
 
   /// Initialize speech recognition
@@ -170,16 +186,13 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo> {
   //     await speakText(_lastWords);
   //   }
   // }
-
+// Adjust speech rate with a range and clamp
   Future<void> adjustSpeechRate(double change) async {
-    // Print the change for debugging purposes
-    print("Adjusting Speech Rate by: $change");
-
     // Update the state with the new speech rate
     setState(() {
       speechRate += change;
       // Clamp the speech rate to prevent it from going out of bounds
-      speechRate = speechRate.clamp(0.1, 1.0); // Example clamp between 0.1 and 1.0
+      speechRate = speechRate.clamp(0.1, 2.0); // Adjust range as necessary
     });
 
     // Log the new speech rate
@@ -189,23 +202,36 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo> {
     await flutterTts.setSpeechRate(speechRate);
 
     // Check if there's new text to speak
-    if (_lastWords.isNotEmpty) {
-      print("Last words before adjustment: $_lastWords");
-      // Only re-speak the last words if it's appropriate
+    if (_lastWords.isNotEmpty && !isSpeaking) {
+      // Speak only if no speech is ongoing (no interruption)
+      print("Re-speaking the last words with new rate: $_lastWords");
       await speakText(_lastWords);
+    } else if (isSpeaking) {
+      print("Speech rate updated for ongoing speech, no interruption.");
+      // Here you just update the rate for upcoming text without stopping
     } else {
       print("No text to speak after rate adjustment.");
     }
   }
 
 
-  _onIncreaseRatePressed() {
+// Increase and Decrease Speech Rate handlers
+   _onIncreaseRatePressed() {
     adjustSpeechRate(0.1);
   }
 
    _onDecreaseRatePressed() {
     adjustSpeechRate(-0.1);
   }
+
+
+  // _onIncreaseRatePressed() {
+  //   adjustSpeechRate(0.1);
+  // }
+  //
+  //  _onDecreaseRatePressed() {
+  //   adjustSpeechRate(-0.1);
+  // }
 
   // increaseSpeechRate() async {
   //   if (speechRate < 2.0) {
@@ -245,152 +271,162 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: backCustomAppBar(
-          backButtonshow: true,
-          centerTile: false,
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          title: "Taboo1"),
-      body: Column(
-        children: [
-          Expanded(
-            child: Column(
-              children: [
-                SizedBox(
-                  height: 10,
-                ),
-                EquiDistantRow(
-                    playstatus: true,
-                    feedbackstatus: false,
-                    practicestatus: false),
-                const SizedBox(
-                  height: 10,
-                ),
-                const Divider(
-                  height: 1,
-                  color: Color(0xffc1c1c1),
-                ),
-                SizedBox(
-                  height: 25.0,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.fast_rewind),
-                      onPressed: () => _onDecreaseRatePressed(), // Decrease speech rate
-                    ),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(27),
-                      child: Image.asset(
-                          fit: BoxFit.cover,
-                          height: 195,
-                          width: 246,
-                          ic_transparent_girlImage2),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.fast_forward),
-                      onPressed: () => _onIncreaseRatePressed(), // Increase speech rate
-                    ),
-                  ],
-                ).paddingOnly(left: 10, right: 10),
-                SizedBox(
-                  height: 15,
-                ),
-                Consumer<PlayTabooScreenVM>(
-                  builder: (context, vm, child) {
-                    return vm.tabooGameChatPageModel.response == null
-                        ? SizedBox()
-                        : Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 10.0),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: startListening
-                                      ? MyText(
-                                          text: _lastWords,
-                                          color: Color(0xff000000),
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w400,
-                                        )
-                                      : (vm.tabooGameChatPageModel.response!
-                                                      .aiResponse!.last ==
-                                                  null ||
-                                              vm
-                                                      .tabooGameChatPageModel
-                                                      .response!
-                                                      .aiResponse!
-                                                      .last ==
-                                                  "")
-                                          ? Text("")
-                                          : Text(vm.tabooGameChatPageModel
-                                              .response!.aiResponse!.last),
-                                )
-                              ],
-                            ),
-                          );
-                  },
-                )
-              ],
-            ),
-          ),
-          Center(
-            child: startListening
-                ? listeningWidget()
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      InkWell(
-                        onTap: () {
-                          sessionId = Uuid().v4();
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => TaboogamechatPage(
-                                      widget.allGameModel,
-                                      widget.index,
-                                      sessionId)));
-                        },
-                        child: Column(
-                          children: [
-                            Image(image: AssetImage(ImageConstant.chatIcon)),
-                            MyText(
-                              text: "Write",
-                              fontSize: 12,
-                            )
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        width: 40,
-                      ),
-                      InkWell(
-                        onTap: () async {
-                          Provider.of<PlayTabooScreenVM>(context, listen: false)
-                              .clearAiResponse();
-                          _initSpeech();
-                          await stopSpeaking();
-                        },
-                        child: Column(
-                          children: [
-                            Image(
-                                image:
-                                    AssetImage(ImageConstant.microphoneIcon)),
-                            MyText(
-                              text: "Speak",
-                              fontSize: 12,
-                            )
-                          ],
-                        ),
-                      )
-                    ],
+    return    WillPopScope(
+      onWillPop: () async {
+        finish(context,true);
+
+        return true;
+      },
+      child: Scaffold(
+        appBar: backCustomAppBar(
+            backButtonshow: true,
+            centerTile: false,
+            onPressed: () {
+              finish(context,true);
+
+
+            },
+            title: "Taboo1"),
+        body: Column(
+          children: [
+            Expanded(
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 10,
                   ),
-          ),
-        ],
+                  EquiDistantRow(
+                      playstatus: true,
+                      feedbackstatus: false,
+                      practicestatus: false),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const Divider(
+                    height: 1,
+                    color: Color(0xffc1c1c1),
+                  ),
+                  SizedBox(
+                    height: 25.0,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.fast_rewind),
+                        onPressed: () => _onDecreaseRatePressed(), // Decrease speech rate
+                      ),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(27),
+                        child: Image.asset(
+                            fit: BoxFit.cover,
+                            height: 195,
+                            width: 246,
+                            ic_transparent_girlImage2),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.fast_forward),
+                        onPressed: () => _onIncreaseRatePressed(), // Increase speech rate
+                      ),
+                    ],
+                  ).paddingOnly(left: 10, right: 10),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  Consumer<PlayTabooScreenVM>(
+                    builder: (context, vm, child) {
+                      return vm.tabooGameChatPageModel.response == null
+                          ? LoadingWidget(message: 'Correcting Speech recognition mistakes')
+                          : Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: startListening
+                                  ? MyText(
+                                text: _lastWords,
+                                color: Color(0xff000000),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                              )
+                                  : (vm.tabooGameChatPageModel.response!
+                                  .aiResponse!.last ==
+                                  null ||
+                                  vm
+                                      .tabooGameChatPageModel
+                                      .response!
+                                      .aiResponse!
+                                      .last ==
+                                      "")
+                                  ? Text("")
+                                  : Text(vm.tabooGameChatPageModel
+                                  .response!.aiResponse!.last),
+                            )
+                          ],
+                        ),
+                      );
+                    },
+                  )
+                ],
+              ),
+            ),
+            Center(
+              child: startListening
+                  ? listeningWidget()
+                  : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  InkWell(
+                    onTap: () {
+                      sessionId = Uuid().v4();
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => TaboogamechatPage(
+                                  widget.allGameModel,
+                                  widget.index,
+                                  sessionId)));
+                    },
+                    child: Column(
+                      children: [
+                        Image(image: AssetImage(ImageConstant.chatIcon)),
+                        MyText(
+                          text: "Write",
+                          fontSize: 12,
+                        )
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    width: 40,
+                  ),
+                  InkWell(
+                    onTap: () async {
+                      Provider.of<PlayTabooScreenVM>(context, listen: false)
+                          .clearAiResponse();
+                      _initSpeech();
+                      await stopSpeaking();
+                    },
+                    child: Column(
+                      children: [
+                        Image(
+                            image:
+                            AssetImage(ImageConstant.microphoneIcon)),
+                        MyText(
+                          text: "Speak",
+                          fontSize: 12,
+                        )
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
+
   }
 
   listeningWidget() {
