@@ -23,6 +23,9 @@ abstract class AppStoreBase with Store {
   String selectedLanguageCode = '';
 
   @observable
+  String lastWords = '';
+
+  @observable
   int signUpIndex = 0;
 
   @observable
@@ -67,6 +70,11 @@ abstract class AppStoreBase with Store {
   Future<void> setInterstitialId(String val) async {
     interstitialId = val;
   }
+  @action
+  Future<void> setLastWords(String val) async {
+    lastWords = val;
+  }
+
 
   @action
   Future<void> setInterstitialIdIos(String val) async {

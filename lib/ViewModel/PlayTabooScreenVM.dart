@@ -154,8 +154,10 @@ class PlayTabooScreenVM extends ChangeNotifier {
   }
 
   void speakText(String text) async {
-    print('Speak text called');
-    print(text);
+    print('Speak text called at Play TabooVM Screen');
+    appStore.setLastWords(text);
+
+    print("Data is set or not"+appStore.lastWords.toString());
     await flutterTts.speak(text);
   }
 }

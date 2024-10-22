@@ -8,6 +8,7 @@ import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:lottie/lottie.dart';
@@ -18,6 +19,7 @@ import '../../Utils/app_colors.dart';
 import '../../Utils/app_images.dart';
 import '../../ViewModel/PlayTabooScreenVM.dart';
 import '../../Widget/appbar.dart';
+import '../../components/loader_widget_new.dart';
 import '../../main.dart';
 import '../TabooGameChatpage/TaboogamechatPage.dart';
 import 'PlayTabooScreenTwo.dart';
@@ -40,15 +42,18 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   String _lastWords = '';
   String ques = "";
   String sessionId = "";
+  bool isLoading = false;
+  bool receivedValue = false;
 
   @override
   void initState() {
     super.initState();
     appStore.setLoading(false);
+    startListening = false;
 
+    // _initSpeech(); // Initialize speech recognition in initState
   }
 
-  /// This has to happen only once per app
   void _initSpeech() async {
     _speechEnabled = await _speechToText.initialize();
     if (_speechEnabled) {
@@ -56,40 +61,101 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
         startListening = true;
       });
       _startListening();
+    }else{
+      startListening = false;
+
     }
   }
 
-  // Each time to start a speech recognition session
   void _startListening() async {
     await _speechToText.listen(
-        localeId: 'en_US', // e.g., 'en_US'
-        onResult: _onSpeechResult);
-    // setState(() {});
+      localeId: 'en_US',
+      onResult: _onSpeechResult,
+    );
   }
 
   void _stopListening() async {
     await _speechToText.stop();
-    setState(() {
-      startListening = false;
-    });
+
+    if (mounted) {
+      setState(() {
+        startListening = false;
+      });
+    }
   }
 
   void _onSpeechResult(SpeechRecognitionResult result) {
     setState(() {
-      print(result);
-      print("hello");
       _lastWords = result.recognizedWords;
+
+      if (_lastWords.isNotEmpty) {
+        ques = _lastWords;
+        sessionId = Uuid().v4();
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PlayTabooScreenTwo(
+              widget.allGameModel,
+              widget.index,
+              ques,
+              sessionId,
+            ),
+          ),
+        );
+      }
     });
   }
 
   @override
   void dispose() {
+    _stopListening();
     super.dispose();
+  }
+
+  void _navigateToSecondScreen() async {
+    // setState(() {
+    //   isLoading = true; // Start loading
+    // });
+
+    await Future.delayed(Duration(seconds: 2));
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LoadingWidget(message: "Thinking about your response..."),
+      ),
+    );
+
+    await Future.delayed(Duration(seconds: 2));
+
+
+
+    final bool? res = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PlayTabooScreenTwo(
+            widget.allGameModel,
+            widget.index,
+            ques,
+            sessionId,
+          ),
+        ));
+
+
+
+    if (res == true) {
+      setState(() {
+        startListening = false;
+        print("Result is ==> $res");
+      });
+    } else {
+      print("No result returned from PlayTabooScreenTwo.");
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return  Scaffold(
       appBar: backCustomAppBar(
           backButtonshow: true,
           centerTile: false,
@@ -102,203 +168,205 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
         children: [
           Expanded(
               child: Padding(
-            padding: EdgeInsets.only(bottom: 15.0),
-            child: Column(
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          height: 10,
-                        ),
-                        EquiDistantRow(
-                            playstatus: true,
-                            feedbackstatus: false,
-                            practicestatus: false),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        const Divider(
-                          height: 1,
-                          color: Color(0xffc1c1c1),
-                        ),
-                        SizedBox(
-                          height: 16.0,
-                        ),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(27),
-                          child: Image.asset(
-                              fit: BoxFit.cover,
-                              height: 195,
-                              width: 246,
-                              ic_transparent_girlImage2),
-                        ),
-                        SizedBox(
-                          height: 15,
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 20.0),
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: MyText(
-                                      text: "Your Word:",
-                                      color: Color(0xff000000),
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: MyText(
-                                      text:
-                                          '\"${widget.allGameModel.allGame![widget.index].mainContent}"',
-                                      color: Colors.black,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  )
-                                ],
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: MyText(
-                                      text: "Taboo Words:",
-                                      color: Color(0xff000000),
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Container(
-                                width: MediaQuery.of(context).size.width,
-                                height: 50,
-                                child: ListView.builder(
-                                    itemCount: widget
-                                        .allGameModel
-                                        .allGame![widget.index]
-                                        .detailOfContent!
-                                        .length,
-                                    shrinkWrap: true,
-                                    scrollDirection: Axis.horizontal,
-                                    itemBuilder: (context, index) {
-                                      var data = widget
-                                          .allGameModel
-                                          .allGame![widget.index]
-                                          .detailOfContent![index];
-                                      return MyText(
-                                        text: '${data},',
-                                        color: Colors.black,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      );
-                                    }),
-                              ),
-                              SizedBox(
-                                height: 5.0,
-                              ),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: MyText(
-                                      text: "Go ahead and give your clue!",
-                                      color: Color(0xff000000),
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: MyText(
-                                      text: _lastWords,
-                                      color: Color(0xff000000),
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Center(
-                  child: startListening
-                      ? listeningWidget()
-                      : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                padding: EdgeInsets.only(bottom: 15.0),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
                           children: [
-                            GestureDetector(
-                              onTap: () {
-                                sessionId = Uuid().v4();
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => TaboogamechatPage(
-                                            widget.allGameModel,
-                                            widget.index,
-                                            sessionId)));
-                              },
-                              child: Column(
-                                children: [
-                                  Icon(
-                                    Icons.chat,
-                                    size: 36,
-                                  ),
-                                  MyText(
-                                    text: "Write",
-                                    fontSize: 12,
-                                  )
-                                ],
-                              ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            EquiDistantRow(
+                                playstatus: true,
+                                feedbackstatus: false,
+                                practicestatus: false),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            const Divider(
+                              height: 1,
+                              color: Color(0xffc1c1c1),
                             ),
                             SizedBox(
-                              width: 40,
+                              height: 16.0,
                             ),
-                            GestureDetector(
-                              onTap: () {
-                                _initSpeech();
-                              },
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(27),
+                              child: Image.asset(
+                                  fit: BoxFit.cover,
+                                  height: 195,
+                                  width: 246,
+                                  ic_transparent_girlImage2),
+                            ),
+                            SizedBox(
+                              height: 15,
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(left: 20.0),
                               child: Column(
                                 children: [
-                                  Icon(
-                                    Icons.keyboard_voice,
-                                    size: 36,
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: MyText(
+                                          text: "Your Word:",
+                                          color: Color(0xff000000),
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  MyText(
-                                    text: "Speak",
-                                    fontSize: 12,
-                                  )
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: MyText(
+                                          text:
+                                          '\"${widget.allGameModel.allGame![widget.index].mainContent}"',
+                                          color: Colors.black,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: MyText(
+                                          text: "Taboo Words:",
+                                          color: Color(0xff000000),
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Container(
+                                    width: MediaQuery.of(context).size.width,
+                                    height: 50,
+                                    child: ListView.builder(
+                                        itemCount: widget
+                                            .allGameModel
+                                            .allGame![widget.index]
+                                            .detailOfContent!
+                                            .length,
+                                        shrinkWrap: true,
+                                        scrollDirection: Axis.horizontal,
+                                        itemBuilder: (context, index) {
+                                          var data = widget
+                                              .allGameModel
+                                              .allGame![widget.index]
+                                              .detailOfContent![index];
+                                          return MyText(
+                                            text: '${data},',
+                                            color: Colors.black,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          );
+                                        }),
+                                  ),
+                                  SizedBox(
+                                    height: 5.0,
+                                  ),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: MyText(
+                                          text: "Go ahead and give your clue!",
+                                          color: Color(0xff000000),
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: MyText(
+                                          text: _lastWords,
+                                          color: Color(0xff000000),
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ],
                               ),
-                            )
+                            ),
                           ],
                         ),
-                )
-              ],
-            ),
-          )),
+                      ),
+                    ),
+                    Center(
+                      child: startListening
+                          ? listeningWidget()
+                          : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              sessionId = Uuid().v4();
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => TaboogamechatPage(
+                                          widget.allGameModel,
+                                          widget.index,
+                                          sessionId)));
+                            },
+                            child: Column(
+                              children: [
+                                Icon(
+                                  Icons.chat,
+                                  size: 36,
+                                ),
+                                MyText(
+                                  text: "Write",
+                                  fontSize: 12,
+                                )
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            width: 40,
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              _initSpeech();
+                            },
+                            child: Column(
+                              children: [
+                                Icon(
+                                  Icons.keyboard_voice,
+                                  size: 36,
+                                ),
+                                MyText(
+                                  text: "Speak",
+                                  fontSize: 12,
+                                )
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              )),
         ],
       ),
     );
+
   }
+
 
   listeningWidget() {
     return Align(
@@ -386,13 +454,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                 if (ques.isNotEmpty) {
                   sessionId = Uuid().v4();
 
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PlayTabooScreenTwo(
-                          widget.allGameModel, widget.index, ques, sessionId),
-                    ),
-                  );
+                  _navigateToSecondScreen();
                 }
               },
               child: Container(

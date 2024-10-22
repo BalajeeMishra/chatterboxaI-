@@ -114,7 +114,7 @@ class _AppButtonState extends State<AppButton>
       padding: widget.margin ?? EdgeInsets.zero,
       child: Container(
         width: context.width() * 0.8,
-        height: context.height() * 0.07,
+        height: context.height() * 0.08,
         // width: widget.width,
         // height: widget.height,
         decoration: BoxDecoration(
