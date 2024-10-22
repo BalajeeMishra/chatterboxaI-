@@ -2,6 +2,7 @@ import 'package:balajiicode/components/loader_widget_new.dart';
 import 'package:balajiicode/extensions/app_text_field.dart';
 import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
 import 'package:balajiicode/extensions/system_utils.dart';
+import 'package:balajiicode/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
@@ -50,6 +51,9 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo> {
   FlutterTts flutterTts = FlutterTts();
   bool isSpeaking = false; // Flag to track if speech is active
   String message = 'Correcting Speech recognition mistakes';
+  int _lastSpokenIndex = 0;
+  String _fullText =
+      'This is a sample text to demonstrate speech rate adjustment. You can increase or decrease the rate while speaking.';
 
   @override
   void initState() {
@@ -59,12 +63,13 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo> {
         message = 'Thinking your respond';
       });
     });
+
     print("hello");
     configureTts();
     flutterTts.setStartHandler(() {
       print("TTS Started");
       setState(() {
-        isSpeaking = true; // Mark as speaking when TTS starts
+        isSpeaking = true;
       });
     });
 
@@ -87,6 +92,9 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo> {
     Provider.of<PlayTabooScreenVM>(context, listen: false)
         .chatPageAPI(context, widget.dataGet, widget.sessionId);
     configureTts();
+
+    _lastWords = appStore.lastWords;
+    print("Last words is ==>" + _lastWords.toString());
     // _initSpeech();
   }
 
@@ -121,6 +129,7 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo> {
   void _onSpeechResult(SpeechRecognitionResult result) {
     setState(() {
       _lastWords = result.recognizedWords;
+      print("Last word is something like that"+ _lastWords.toString());
     });
 
     // Optionally speak the recognized words immediately or on another trigger
@@ -134,25 +143,40 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo> {
   }
 
   /// Speak text with TTS
+
   Future<void> speakText(String text) async {
+    print("Speacl Test calling----");
     if (text.isNotEmpty) {
-      _lastWords = text; // Update the last words
-      await flutterTts.speak(text); // Speak the text
-      print("Speaking: $text"); // Log what is being spoken
+      print("TExts is not empty");
+      // Store the text to keep track of what is currently being spoken
+      _lastWords = text;
+
+      print("Text is ==>" + text.toString());
+      print("_lastWords is ==>" + _lastWords.toString());
+
+      // Start speaking the text
+      await flutterTts.speak(text);
+      print("_lastWords  is 2 ==>" + _lastWords.toString());
+      print("Text is 2 ==>" + text.toString());
+
+      isSpeaking = true;
+
+      // Set up a listener for TTS completion
+      flutterTts.setCompletionHandler(() {
+        // Reset speaking state when TTS finishes
+        isSpeaking = false;
+        _lastSpokenIndex = text.length; // Mark entire text as spoken
+      });
+
+      // Optional: You may want to add an error handler as well
+      flutterTts.setErrorHandler((error) {
+        isSpeaking = false; // Reset speaking state on error
+        print("Error in TTS: $error");
+      });
     } else {
       print("No text provided to speak.");
     }
   }
-
-  // Future<void> speakText(String text) async {
-  //   if (isSpeaking) {
-  //     await flutterTts.stop(); // Stop ongoing speech
-  //   }
-  //   isSpeaking = true;
-  //   await flutterTts.setSpeechRate(speechRate); // Set the new speech rate
-  //   await flutterTts.speak(text); // Start speaking
-  //   isSpeaking = false;
-  // }
 
   /// Stop speaking
   Future<void> stopSpeaking() async {
@@ -167,55 +191,52 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo> {
     isSpeaking = false;
   }
 
-  // void adjustTtsSpeechRate(double change) {
-  //   setState(() {
-  //     speechRate += change;
-  //     if (speechRate < 0.1) speechRate = 0.1;
-  //     if (speechRate > 2.0) speechRate = 2.0;
-  //   });
-  //   flutterTts.setSpeechRate(speechRate);
-  // }
-  // Future<void> adjustSpeechRate(double change) async {
-  //   print("Adjusting Speech Rate by: $change");
-  //   setState(() {
-  //     speechRate += change;
-  //   });
-  //
-  //   print("New Speech Rate: $speechRate");
-  //
-  //   await flutterTts.setSpeechRate(speechRate);
-  //   // Log if speaking
-  //   if (_lastWords.isNotEmpty) {
-  //     print("Re-speaking last words with new rate");
-  //     await speakText(_lastWords);
-  //   }
-  // }
-// Adjust speech rate with a range and clamp
   Future<void> adjustSpeechRate(double change) async {
-    // Update the state with the new speech rate
-    setState(() {
-      speechRate += change;
-      // Clamp the speech rate to prevent it from going out of bounds
-      speechRate = speechRate.clamp(0.1, 2.0); // Adjust range as necessary
-    });
+    // Update the speech rate
+    speechRate += change;
+    speechRate = speechRate.clamp(0.1, 2.0); // Ensure rate stays in bounds
 
-    // Log the new speech rate
     print("New Speech Rate: $speechRate");
 
-    // Set the new speech rate for the TTS
+    // Set the new speech rate
     await flutterTts.setSpeechRate(speechRate);
 
-    // Check if there's new text to speak
-    if (_lastWords.isNotEmpty && !isSpeaking) {
-      // Speak only if no speech is ongoing (no interruption)
-      print("Re-speaking the last words with new rate: $_lastWords");
-      await speakText(_lastWords);
-    } else if (isSpeaking) {
-      print("Speech rate updated for ongoing speech, no interruption.");
-      // Here you just update the rate for upcoming text without stopping
+    if (isSpeaking) {
+      print("Updating speech rate during ongoing speech");
+
+      // Stop the ongoing speech temporarily
+      await flutterTts.stop();
+      print("_lastWords ==>" + _lastWords.toString());
+
+      // Get remaining text to speak
+      String remainingText = _getRemainingText();
+
+      // Restart speaking from the remaining text with the updated rate
+      Future.delayed(Duration(milliseconds: 200), () async {
+        if (remainingText.isNotEmpty) {
+          print("Inside  Yes");
+          print("_lastWords ==>" + _lastWords.toString());
+          print("remainingText ==>" + remainingText.toString());
+
+          await flutterTts.setSpeechRate(speechRate); // Update speech rate
+          await speakText(remainingText); // Resume speaking from remaining text
+        }
+      });
     } else {
-      print("No text to speak after rate adjustment.");
+      print("BOOM");
     }
+  }
+
+  String _getRemainingText() {
+    if (_lastSpokenIndex < _lastWords.length) {
+      print("_getRemainingText_lastWords ==>" + _lastWords.toString());
+      print("_getRemainingText_lastWords ==>" + _lastWords.length.toString());
+      print("_getRemainingText_lastWords ==>" + _lastSpokenIndex.toString());
+
+      return _lastWords
+          .substring(_lastSpokenIndex); // Remaining text to be spoken
+    }
+    return ''; // No remaining text
   }
 
 // Increase and Decrease Speech Rate handlers
@@ -226,44 +247,6 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo> {
   _onDecreaseRatePressed() {
     adjustSpeechRate(-0.1);
   }
-
-  // _onIncreaseRatePressed() {
-  //   adjustSpeechRate(0.1);
-  // }
-  //
-  //  _onDecreaseRatePressed() {
-  //   adjustSpeechRate(-0.1);
-  // }
-
-  // increaseSpeechRate() async {
-  //   if (speechRate < 2.0) {
-  //     // Increase speech rate
-  //     setState(() {
-  //       speechRate += 0.1; // Increase speech rate
-  //     });
-  //
-  //     await flutterTts.setSpeechRate(speechRate); // Just update the speech rate
-  //
-  //     print("Increased Speech Rate: $speechRate");
-  //   }
-  // }
-  //
-  // decreaseSpeechRate() async {
-  //   if (speechRate > 0.1) {
-  //     // Decrease speech rate
-  //     setState(() {
-  //       speechRate -= 0.1; // Decrease speech rate
-  //     });
-  //
-  //     await flutterTts.setSpeechRate(speechRate); // Just update the speech rate
-  //
-  //     print("Decreased Speech Rate: $speechRate");
-  //   }
-  // }
-
-  // void testTtsWithNewRate() async {
-  //   await flutterTts.speak("This is a test of the speech rate.");
-  // }
 
   @override
   void dispose() {
@@ -279,7 +262,7 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo> {
 
         return true;
       },
-      child: Scaffold(
+      child:   Scaffold(
         appBar: backCustomAppBar(
             backButtonshow: true,
             centerTile: false,
@@ -339,36 +322,36 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo> {
                     builder: (context, vm, child) {
                       return vm.tabooGameChatPageModel.response == null
                           ? LoadingWidget(
-                              message: message,
-                            )
+                        message: message,
+                      )
                           : Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 10.0),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: startListening
-                                        ? MyText(
-                                            text: _lastWords,
-                                            color: Color(0xff000000),
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400,
-                                          )
-                                        : (vm.tabooGameChatPageModel.response!
-                                                        .aiResponse!.last ==
-                                                    null ||
-                                                vm
-                                                        .tabooGameChatPageModel
-                                                        .response!
-                                                        .aiResponse!
-                                                        .last ==
-                                                    "")
-                                            ? Text("")
-                                            : Text(vm.tabooGameChatPageModel
-                                                .response!.aiResponse!.last),
-                                  )
-                                ],
-                              ),
-                            );
+                        padding: EdgeInsets.symmetric(horizontal: 10.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: startListening
+                                  ? MyText(
+                                text: _lastWords,
+                                color: Color(0xff000000),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                              )
+                                  : (vm.tabooGameChatPageModel.response!
+                                  .aiResponse!.last ==
+                                  null ||
+                                  vm
+                                      .tabooGameChatPageModel
+                                      .response!
+                                      .aiResponse!
+                                      .last ==
+                                      "")
+                                  ? Text("")
+                                  : Text(vm.tabooGameChatPageModel
+                                  .response!.aiResponse!.last),
+                            )
+                          ],
+                        ),
+                      );
                     },
                   )
                 ],
@@ -378,58 +361,59 @@ class _PlayTabooScreenTwo extends State<PlayTabooScreenTwo> {
               child: startListening
                   ? listeningWidget()
                   : Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  InkWell(
+                    onTap: () {
+                      sessionId = Uuid().v4();
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => TaboogamechatPage(
+                                  widget.allGameModel,
+                                  widget.index,
+                                  sessionId)));
+                    },
+                    child: Column(
                       children: [
-                        InkWell(
-                          onTap: () {
-                            sessionId = Uuid().v4();
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => TaboogamechatPage(
-                                        widget.allGameModel,
-                                        widget.index,
-                                        sessionId)));
-                          },
-                          child: Column(
-                            children: [
-                              Image(image: AssetImage(ImageConstant.chatIcon)),
-                              MyText(
-                                text: "Write",
-                                fontSize: 12,
-                              )
-                            ],
-                          ),
-                        ),
-                        SizedBox(
-                          width: 40,
-                        ),
-                        InkWell(
-                          onTap: () async {
-                            Provider.of<PlayTabooScreenVM>(context,
-                                    listen: false)
-                                .clearAiResponse();
-                            _initSpeech();
-                            await stopSpeaking();
-                          },
-                          child: Column(
-                            children: [
-                              Image(
-                                  image:
-                                      AssetImage(ImageConstant.microphoneIcon)),
-                              MyText(
-                                text: "Speak",
-                                fontSize: 12,
-                              )
-                            ],
-                          ),
+                        Image(image: AssetImage(ImageConstant.chatIcon)),
+                        MyText(
+                          text: "Write",
+                          fontSize: 12,
                         )
                       ],
                     ),
+                  ),
+                  SizedBox(
+                    width: 40,
+                  ),
+                  InkWell(
+                    onTap: () async {
+                      Provider.of<PlayTabooScreenVM>(context,
+                          listen: false)
+                          .clearAiResponse();
+                      _initSpeech();
+                      await stopSpeaking();
+                    },
+                    child: Column(
+                      children: [
+                        Image(
+                            image:
+                            AssetImage(ImageConstant.microphoneIcon)),
+                        MyText(
+                          text: "Speak",
+                          fontSize: 12,
+                        )
+                      ],
+                    ),
+                  )
+                ],
+              ),
             ),
           ],
         ),
       ),
+
     );
   }
 
