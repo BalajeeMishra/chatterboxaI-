@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
+    mobileNo:{
+        type:String, 
+        required: true
+    },
     name: {
         type: String,
         required: true
@@ -15,7 +19,7 @@ const userSchema = new mongoose.Schema({
     },
     OTP: {
         type: String,
-        required: true
+        // required: true
     },
     verified: {
         type: Boolean,
@@ -29,7 +33,7 @@ const userSchema = new mongoose.Schema({
     country: {
         type: String,
         required: true
-    }
+    },
 });
 
 // Create the user model
