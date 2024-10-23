@@ -18,9 +18,9 @@ import '../main.dart';
 import 'JabberAIHomePage/JabberAIHomepage.dart';
 
 class ProfileScreen extends StatefulWidget {
-  final String  country;
+  final String country;
   final String mobileNumber;
-  ProfileScreen({required this.country,required this.mobileNumber,super.key});
+  ProfileScreen({required this.country, required this.mobileNumber, super.key});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -31,7 +31,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   TextEditingController mNameCont = TextEditingController();
   TextEditingController mAgeCont = TextEditingController();
   List languageList = [
-
     'Hindi',
     'English',
     'Bengali',
@@ -45,20 +44,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
     'Urdu',
     'Gujarati'
   ];
-  String selectedLanguage ='Hindi';
+  String selectedLanguage = 'Hindi';
 
   @override
   void initState() {
-    print("at Profile Screen Mobile Number Is ==>" + widget.mobileNumber.toString());
+    print("at Profile Screen Mobile Number Is ==>" +
+        widget.mobileNumber.toString());
     print("at Profile Screen Country Name  Is ==>" + widget.country.toString());
     super.initState();
   }
+
   Future<void> save() async {
     hideKeyboard(context);
     Map<String, dynamic> req = {
-      'name':mNameCont.text.trim(),
-      'age':mAgeCont.text.trim(),
-      'nativeLanguage':selectedLanguage,
+      'name': mNameCont.text.trim(),
+      'age': mAgeCont.text.trim(),
+      'nativeLanguage': selectedLanguage,
       'mobileNo': widget.mobileNumber.trim(),
       'country': widget.country.trim(),
     };
@@ -72,7 +73,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if (value.accessToken != null) {
           JabberAIHomepage().launch(context);
           // toast('Register')
-
         } else {
           toast('Contact Admin');
         }
@@ -86,21 +86,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true, // This allows the screen to resize when the keyboard appears
       appBar: appBarWidget('', context: context),
-      body: SingleChildScrollView(
-        child: Form(
-          key: mFormKey,
+      body: Form(
+        key: mFormKey,
+        child: SingleChildScrollView(
+          padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom), // Adjusts the bottom padding for the keyboard
           child: Column(
             children: [
               Stack(
                 alignment: Alignment.topCenter,
                 children: [
                   Container(
-                    height: context.height() *0.28,
+                    height: context.height() * 0.28,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
@@ -113,7 +115,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                   Positioned(
-                    top: context.height() *0.07,
+                    top: context.height() * 0.07,
                     child: Column(
                       children: [
                         CircleAvatar(
@@ -139,72 +141,81 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
               ),
               26.height,
-              Row(
-                children: [
-                  Text('First Name',
-                      style: secondaryTextStyle(color: textPrimaryColorGlobal)),
-                  2.width,
-                  Text('*', style: secondaryTextStyle(color: redColor))
-                ],
-              ).paddingSymmetric(horizontal: 16, vertical: 4),
-              4.height,
-              AppTextField(
-                controller: mNameCont,
-                textFieldType: TextFieldType.NAME,
-                isValidationRequired: true,
-                // focus: mFirstNameFocus,
-                // nextFocus: mLastNameFocus,
-                decoration: defaultInputDecoration(context, label: 'Enter name'),
-              ).paddingSymmetric(horizontal: 16, vertical: 4),
-              16.height,
-              Row(
-                children: [
-                  Text('Age',
-                      style: secondaryTextStyle(color: textPrimaryColorGlobal)),
-                  2.width,
-                  Text('*', style: secondaryTextStyle(color: redColor))
-                ],
-              ).paddingSymmetric(horizontal: 16, vertical: 4),
-              4.height,
-              AppTextField(
-                controller: mAgeCont,
-                textFieldType: TextFieldType.NAME,
-                isValidationRequired: true,
-                // focus: mLastNameFocus,
-                // nextFocus: mDesignationFocus,
-                decoration:
-                    defaultInputDecoration(context, label: 'Enter your age'),
-              ).paddingSymmetric(horizontal: 16, vertical: 4),
-              16.height,
-              Row(
-                children: [
-                  Text('Native Language',
-                      style: secondaryTextStyle(color: textPrimaryColorGlobal)),
-                  2.width,
-                  Text('*', style: secondaryTextStyle(color: redColor))
-                ],
-              ).paddingSymmetric(horizontal: 16, vertical: 4),
-              4.height,
-              DropdownButtonFormField(
-
-                items: languageList
-                    .map((value) => DropdownMenuItem<String>(
-                  child: Text(value, style: primaryTextStyle()),
-                  value: value,
-                ))
-                    .toList(),
-                isExpanded: false,
-                isDense: true,
-                borderRadius: radius(),
-                decoration: defaultInputDecoration(context),
-                value: selectedLanguage,
-                onChanged: (String? value) {
-                  // selectedLanguage = value.validate();
-                  setState(() {
-                  });
+              ListView.builder(
+                physics: NeverScrollableScrollPhysics(), // Disable scrolling in ListView.builder
+                shrinkWrap: true,
+                itemCount: 1,
+                itemBuilder: (context, index) {
+                  return Column(
+                    children: [
+                      Row(
+                        children: [
+                          Text('First Name',
+                              style: secondaryTextStyle(
+                                  color: textPrimaryColorGlobal)),
+                          2.width,
+                          Text('*', style: secondaryTextStyle(color: redColor))
+                        ],
+                      ).paddingSymmetric(horizontal: 16, vertical: 4),
+                      4.height,
+                      AppTextField(
+                        controller: mNameCont,
+                        textFieldType: TextFieldType.NAME,
+                        isValidationRequired: true,
+                        decoration: defaultInputDecoration(context,
+                            label: 'Enter name'),
+                      ).paddingSymmetric(horizontal: 16, vertical: 4),
+                      16.height,
+                      Row(
+                        children: [
+                          Text('Age',
+                              style: secondaryTextStyle(
+                                  color: textPrimaryColorGlobal)),
+                          2.width,
+                          Text('*', style: secondaryTextStyle(color: redColor))
+                        ],
+                      ).paddingSymmetric(horizontal: 16, vertical: 4),
+                      4.height,
+                      AppTextField(
+                        controller: mAgeCont,
+                        textFieldType: TextFieldType.NAME,
+                        isValidationRequired: true,
+                        decoration: defaultInputDecoration(context,
+                            label: 'Enter your age'),
+                      ).paddingSymmetric(horizontal: 16, vertical: 4),
+                      16.height,
+                      Row(
+                        children: [
+                          Text('Native Language',
+                              style: secondaryTextStyle(
+                                  color: textPrimaryColorGlobal)),
+                          2.width,
+                          Text('*', style: secondaryTextStyle(color: redColor))
+                        ],
+                      ).paddingSymmetric(horizontal: 16, vertical: 4),
+                      4.height,
+                      DropdownButtonFormField(
+                        items: languageList
+                            .map((value) => DropdownMenuItem<String>(
+                          child: Text(value, style: primaryTextStyle()),
+                          value: value,
+                        ))
+                            .toList(),
+                        isExpanded: false,
+                        isDense: true,
+                        borderRadius: radius(),
+                        decoration: defaultInputDecoration(context),
+                        value: selectedLanguage,
+                        onChanged: (String? value) {
+                          setState(() {
+                            selectedLanguage = value!;
+                          });
+                        },
+                      ).paddingSymmetric(horizontal: 16, vertical: 4),
+                    ],
+                  );
                 },
-              ).paddingSymmetric(horizontal: 16, vertical: 4),
-
+              ),
             ],
           ),
         ),
@@ -221,4 +232,5 @@ class _ProfileScreenState extends State<ProfileScreen> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
+
 }

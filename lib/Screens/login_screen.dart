@@ -40,6 +40,9 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Form(
         key: mFormKey,
         child: SingleChildScrollView(
+          padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom), // Adjusts the bottom padding for the keyboard
+
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -48,7 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 alignment: Alignment.topCenter,
                 children: [
                   Container(
-                    height: context.height() * 0.4,
+                    height: context.height() * 0.3,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
@@ -61,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   Positioned(
-                    top: 100,
+                    top: context.height() *0.1,
                     child: Column(
                       children: [
                         CircleAvatar(
@@ -87,120 +90,133 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               ),
               40.height,
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            ListView.builder(
+              physics: NeverScrollableScrollPhysics(), // Disable scrolling in ListView.builder
+              shrinkWrap: true,
+
+              itemCount: 1,
+              itemBuilder: (context, index) {
+              return Column(
                 children: [
-                  Text('Select your country',
-                      style: secondaryTextStyle(color: textPrimaryColorGlobal)),
-                  2.width,
-                  Text('*', style: secondaryTextStyle(color: redColor))
-                ],
-              ).paddingSymmetric(horizontal: 16, vertical: 4),
-              4.height,
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.withOpacity(0.5)),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: IntrinsicHeight(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    // mainAxisSize: MainAxisSize.s,
+
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      CountryCodePicker(
-                        showCountryOnly: true,
-                        showFlag: true,
-                        boxDecoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                        ),
-                        showFlagDialog: true,
-                        showOnlyCountryWhenClosed: true,
-                        alignLeft: false,
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        textStyle: TextStyle(
-                            color: Colors.black), // Customize your text style
-                        onChanged: (c) {
-                          selectedCountry = c.name.toString();
-                          print("Selcetd COuntry is ==>" +
-                              selectedCountry.toString());
-                          // Handle the selected country here
-                        },
-                      ),
-                      Icon(Icons.keyboard_arrow_down_outlined,
-                          color: Colors.grey), // Dropdown icon added here
+                      Text('Select your country',
+                          style: secondaryTextStyle(color: textPrimaryColorGlobal)),
+                      2.width,
+                      Text('*', style: secondaryTextStyle(color: redColor))
                     ],
-                  ),
-                ),
-              ).paddingSymmetric(horizontal: 16, vertical: 4),
-              40.height,
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Mobile Number',
-                      style: secondaryTextStyle(color: textPrimaryColorGlobal)),
-                  2.width,
-                  Text('*', style: secondaryTextStyle(color: redColor))
-                ],
-              ).paddingSymmetric(horizontal: 16, vertical: 4),
-              4.height,
-              AppTextField(
-                controller: mMobileCont,
-                textFieldType: TextFieldType.PHONE,
-                // maxLength: 10,
-                isValidationRequired: true,
-                inputFormatters: [
-                  // LengthLimitingTextInputFormatter(10),
-                  FilteringTextInputFormatter.digitsOnly,
-                ],
-                // validator: (value) {
-                //   if (value == null || value.isEmpty) {
-                //     return 'Please enter a Phone number';
-                //   } else if (value.length < 10) {
-                //     return 'Phone number must be 10 digits long';
-                //   }
-                //   return null;
-                // },
-                decoration: defaultInputDecoration(context,
-                    label: 'Enter your mobile number',
-                    mPrefix: IntrinsicHeight(
+                  ).paddingSymmetric(horizontal: 16, vertical: 4),
+                  4.height,
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.withOpacity(0.5)),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: IntrinsicHeight(
                       child: Row(
-                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        // mainAxisSize: MainAxisSize.s,
                         children: [
                           CountryCodePicker(
-                            // initialSelection: getStringAsync(
-                            //     COUNTRY_CODE,
-                            //     defaultValue: countryCode!),
-                            showCountryOnly: false,
-                            showFlag: false,
+                            showCountryOnly: true,
+                            showFlag: true,
                             boxDecoration: BoxDecoration(
-                                borderRadius: radius(defaultRadius),
-                                color: context.scaffoldBackgroundColor),
+                              borderRadius: BorderRadius.circular(8),
+                              color: Theme.of(context).scaffoldBackgroundColor,
+                            ),
                             showFlagDialog: true,
-                            showOnlyCountryWhenClosed: false,
+                            showOnlyCountryWhenClosed: true,
                             alignLeft: false,
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 4),
-                            textStyle: primaryTextStyle(),
-                            onInit: (c) {
-                              // countryCode = c!.dialCode;
-                              // setValue(COUNTRY_CODE, c.code);
-                            },
+                            padding:
+                            EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            textStyle: TextStyle(
+                                color: Colors.black), // Customize your text style
                             onChanged: (c) {
-                              countryCode= c.dialCode.toString();
-                              // countryCode = c.dialCode;
-                              // setValue(COUNTRY_CODE, c.code);
+                              selectedCountry = c.name.toString();
+                              print("Selcetd COuntry is ==>" +
+                                  selectedCountry.toString());
+                              // Handle the selected country here
                             },
                           ),
-                          VerticalDivider(color: Colors.grey.withOpacity(0.5)),
-                          16.width,
+                          Icon(Icons.keyboard_arrow_down_outlined,
+                              color: Colors.grey), // Dropdown icon added here
                         ],
                       ),
-                    )),
-              ).paddingSymmetric(horizontal: 16, vertical: 4),
+                    ),
+                  ).paddingSymmetric(horizontal: 16, vertical: 4),
+                  40.height,
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Mobile Number',
+                          style: secondaryTextStyle(color: textPrimaryColorGlobal)),
+                      2.width,
+                      Text('*', style: secondaryTextStyle(color: redColor))
+                    ],
+                  ).paddingSymmetric(horizontal: 16, vertical: 4),
+                  4.height,
+                  AppTextField(
+                    controller: mMobileCont,
+                    textFieldType: TextFieldType.PHONE,
+                    // maxLength: 10,
+                    isValidationRequired: true,
+                    inputFormatters: [
+                      // LengthLimitingTextInputFormatter(10),
+                      FilteringTextInputFormatter.digitsOnly,
+                    ],
+                    // validator: (value) {
+                    //   if (value == null || value.isEmpty) {
+                    //     return 'Please enter a Phone number';
+                    //   } else if (value.length < 10) {
+                    //     return 'Phone number must be 10 digits long';
+                    //   }
+                    //   return null;
+                    // },
+                    decoration: defaultInputDecoration(context,
+                        label: 'Enter your mobile number',
+                        mPrefix: IntrinsicHeight(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              CountryCodePicker(
+                                // initialSelection: getStringAsync(
+                                //     COUNTRY_CODE,
+                                //     defaultValue: countryCode!),
+                                showCountryOnly: false,
+                                showFlag: false,
+                                boxDecoration: BoxDecoration(
+                                    borderRadius: radius(defaultRadius),
+                                    color: context.scaffoldBackgroundColor),
+                                showFlagDialog: true,
+                                showOnlyCountryWhenClosed: false,
+                                alignLeft: false,
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 4),
+                                textStyle: primaryTextStyle(),
+                                onInit: (c) {
+                                  // countryCode = c!.dialCode;
+                                  // setValue(COUNTRY_CODE, c.code);
+                                },
+                                onChanged: (c) {
+                                  countryCode= c.dialCode.toString();
+                                  // countryCode = c.dialCode;
+                                  // setValue(COUNTRY_CODE, c.code);
+                                },
+                              ),
+                              VerticalDivider(color: Colors.grey.withOpacity(0.5)),
+                              16.width,
+                            ],
+                          ),
+                        )),
+                  ).paddingSymmetric(horizontal: 16, vertical: 4),
+                  // 20.height,
+                ],
+              );
+            },)
             ],
           ),
         ),

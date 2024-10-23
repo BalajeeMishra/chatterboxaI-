@@ -16,9 +16,9 @@ UserStore userStore = UserStore();
 late SharedPreferences sharedPreferences;
 final navigatorKey = GlobalKey<NavigatorState>();
 
-
 Future<void> main() async {
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(statusBarColor: Color(0xff755be8)));
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(statusBarColor: Color(0xff755be8)));
   // sharedPreferences = await SharedPreferences.getInstance();
 
   runApp(const MyApp());
@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: APP_NAME,
         debugShowCheckedModeBanner: false,
-        home: SplashScreen(),
+        home: const SplashScreen(),
         builder: EasyLoading.init(),
       ),
     );
@@ -57,9 +57,3 @@ class MyApp extends StatelessWidget {
     // ..customAnimation = CustomAnimation();
   }
 }
-
-
-      
-         
-                         
-                         
