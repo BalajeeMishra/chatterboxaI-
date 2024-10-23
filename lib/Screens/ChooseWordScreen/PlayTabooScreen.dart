@@ -86,6 +86,10 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     Provider.of<PlayTabooScreenVM>(context, listen: false)
         .chatPageAPI(context, ques, sessionId);
     configureTts();
+     setState(() {
+                  ques = "";
+                 
+                });
     apiCalled = true;
     _lastWords = appStore.lastWords;
     Future.delayed(Duration(seconds: 2), () {
@@ -115,11 +119,12 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   }
 
   /// Stop listening to speech
-  void _stopListening() async {
+  Future<void> _stopListening() async {
     await _speechToText.stop();
     setState(() {
       startListening = false;
     });
+     await Future.delayed(Duration(milliseconds: 100));
   }
 
   /// Process speech result
@@ -485,8 +490,17 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                               width: 40,
                             ),
                             GestureDetector(
-                              onTap: () {
-                                _initSpeech();
+                              onTap: () async{
+
+                               // Clear AI response from the ViewModel
+await Provider.of<PlayTabooScreenVM>(context, listen: false).clearAiResponse();
+
+// Initialize speech-to-text or related functionality
+_initSpeech();
+
+// Await the stopSpeaking function to ensure speech stops before proceeding
+// await stopSpeaking();
+
                               },
                               child: Column(
                                 children: [
@@ -522,12 +536,14 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             GestureDetector(
-              onTap: () {
-                _stopListening();
-                setState(() {
+              onTap: () async{
+                await _stopListening();
+                 setState(() {
                   _lastWords = "";
                   startListening = false;
                 });
+                
+               
               },
               child: Container(
                 padding: EdgeInsets.all(2),
@@ -585,12 +601,13 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
             ),
             SizedBox(width: 10),
             GestureDetector(
-              onTap: () {
-                _stopListening();
+              onTap: () async{
+                await _stopListening();
 
-                ques = _lastWords;
+                
 
                 setState(() {
+                  ques = _lastWords;
                   _lastWords = "";
                 });
                 if (ques.isNotEmpty) {

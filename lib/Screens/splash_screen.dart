@@ -71,7 +71,7 @@ class _SplashScreenState extends State<SplashScreen> {
         ),
       ),
       floatingActionButton: AppButton(
-        text: 'Login',
+        text: 'Sign up',
         color: primaryColor,
         onTap: () {
           LoginScreen().launch(context);

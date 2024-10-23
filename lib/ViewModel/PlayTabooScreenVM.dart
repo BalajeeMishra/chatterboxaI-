@@ -50,9 +50,10 @@ class PlayTabooScreenVM extends ChangeNotifier {
     tabooGameChatPageModel = TabooGameChatPageModel();
   }
 
-  void clearAiResponse() {
+  Future<void> clearAiResponse() async {
     tabooGameChatPageModel.response?.aiResponse?.last = "";
     notifyListeners(); // Notify listeners to update the UI
+    await Future.delayed(Duration(milliseconds: 100));
   }
 
   Future<void> chatPageAPI(
@@ -112,17 +113,20 @@ class PlayTabooScreenVM extends ChangeNotifier {
           MySnackBar.showSnackBar(context, response.error!.responseMsg!);
           break;
         case ApiResponseStatus.unauthorized:
-          EasyLoading.dismiss();      appStore.setLoading(false);
+          EasyLoading.dismiss();
+          appStore.setLoading(false);
 
           MySnackBar.showSnackBar(context, response.error!.responseMsg!);
           break;
         case ApiResponseStatus.notFound:
-          EasyLoading.dismiss();      appStore.setLoading(false);
+          EasyLoading.dismiss();
+          appStore.setLoading(false);
 
           MySnackBar.showSnackBar(context, response.error!.responseMsg!);
           break;
         case ApiResponseStatus.serverError:
-          EasyLoading.dismiss();      appStore.setLoading(false);
+          EasyLoading.dismiss();
+          appStore.setLoading(false);
 
           MySnackBar.showSnackBar(context, response.error!.responseMsg!);
           break;
@@ -142,7 +146,6 @@ class PlayTabooScreenVM extends ChangeNotifier {
       MySnackBar.showSnackBar(context, e.toString());
     }
     appStore.setLoading(false);
-
   }
 
   FlutterTts flutterTts = FlutterTts();
@@ -157,7 +160,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
     print('Speak text called at Play TabooVM Screen');
     appStore.setLastWords(text);
 
-    print("Data is set or not"+appStore.lastWords.toString());
+    print("Data is set or not" + appStore.lastWords.toString());
     await flutterTts.speak(text);
   }
 }
