@@ -66,7 +66,7 @@ class _OtpScreenState extends State<OtpScreen> {
               alignment: Alignment.topCenter,
               children: [
                 Container(
-                  height: context.height() *0.4,
+                  height: context.height() *0.28,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
@@ -79,7 +79,7 @@ class _OtpScreenState extends State<OtpScreen> {
                   ),
                 ),
                 Positioned(
-                  top: 100,
+                  top: context.height() *0.07,
                   child: Column(
                     children: [
                       CircleAvatar(
@@ -163,7 +163,7 @@ class _OtpScreenState extends State<OtpScreen> {
                           ],
                         );
                       }),
-                      // 30.height,
+                      90.height,
                     ],
                   ).paddingSymmetric(horizontal: 16),
                 ),
