@@ -3,9 +3,9 @@ import 'package:http/http.dart';
 
 import '../../extensions/extension_util/int_extensions.dart';
 import '../../extensions/extension_util/string_extensions.dart';
+import '../Model/registerResponse.dart';
 import '../extensions/shared_pref.dart';
 import '../main.dart';
-
 
 import 'network_utils.dart';
 
@@ -54,8 +54,6 @@ import 'network_utils.dart';
 //       method: HttpMethod.POST)));
 // }
 
-
-
 // Future<MediVahanBaseResponse> updateProfileApi(Map req, {int? id}) async {
 //   return MediVahanBaseResponse.fromJson(await handleResponse(
 //       await buildHttpResponse('user/update-details/$id',
@@ -68,10 +66,11 @@ import 'network_utils.dart';
 //           request: req, method: HttpMethod.POST)));
 // }
 
-// Future<PrescriptionCreateResponse> prescriptionUpdateApi(Map req,
-//     {int? id}) async {
-//   return PrescriptionCreateResponse.fromJson(await handleResponse(
-//       await buildHttpResponse('prescription/update/$id',
-//           request: req, method: HttpMethod.PUT)));
-// }
-
+Future<RegisterResponse> registerApi(
+  Map req,
+) async {
+  return RegisterResponse.fromJson(await handleResponse(await buildHttpResponse(
+      'user/register',
+      request: req,
+      method: HttpMethod.POST)));
+}

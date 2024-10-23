@@ -31,7 +31,7 @@ const ENABLE_OTP = true;
 
 
 //region urls
-const mBaseUrl = '$mBackendURL/';
+const mBaseUrl = '$mBackendURL/api/';
 //endregion
 
 

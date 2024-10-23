@@ -14,14 +14,27 @@ import '../extensions/widgets.dart';
 import '../main.dart';
 
 class OtpScreen extends StatefulWidget {
-  const OtpScreen({super.key});
+  final String  country;
+  final String mobileNumber;
+   OtpScreen({required this.country,required this.mobileNumber, super.key});
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
 }
 
 class _OtpScreenState extends State<OtpScreen> {
+
   GlobalKey<OTPTextFieldState> otpTextFieldKey = GlobalKey<OTPTextFieldState>();
+
+
+
+  @override
+  void initState() {
+    print("Mobile NUmber Is ==>" + widget.mobileNumber.toString());
+    print("Country Name  Is ==>" + widget.country.toString());
+
+    super.initState();
+  }
 
 
   Widget otpInputField() {
@@ -171,7 +184,7 @@ class _OtpScreenState extends State<OtpScreen> {
         height: 48,
         color: primaryColor,
         onTap: () {
-          ProfileScreen().launch(context);
+          ProfileScreen(country: widget.country,mobileNumber: widget.mobileNumber,).launch(context);
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
