@@ -1,4 +1,4 @@
-# balajiicode
+# Jabber AI APP Project
 
 A new Flutter project.
 
