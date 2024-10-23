@@ -113,7 +113,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
   void _startListening() async {
     await _speechToText.listen(
-        localeId: 'en_US', // e.g., 'en_US'
+        localeId: 'en_US',
         onResult: _onSpeechResult);
     setState(() {});
   }
@@ -145,6 +145,8 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   /// Speak text with TTS
 
   Future<void> speakText(String text) async {
+    await flutterTts.stop();  // Stop any previous ongoing TTS before speaking
+
     print("Speacl Test calling----");
     if (text.isNotEmpty) {
       print("TExts is not empty");
@@ -198,6 +200,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     if (isSpeaking) {
       print("Updating speech rate during ongoing speech");
 
+
       await flutterTts.stop();
       print("_lastWords ==>" + _lastWords.toString());
 
@@ -214,7 +217,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
         }
       });
     } else {
-      print("BOOM");
     }
   }
 
@@ -613,10 +615,10 @@ _initSpeech();
                 if (ques.isNotEmpty) {
                   sessionId = Uuid().v4();
                   save();
+                  print("Last words captured: $ques");
+
                 }
-                //
-                //   // _navigateToSecondScreen();
-                // }
+
               },
               child: Container(
                 padding: EdgeInsets.all(10),

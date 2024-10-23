@@ -1,12 +1,16 @@
+import 'package:balajiicode/Screens/JabberAIHomePage/JabberAIHomepage.dart';
 import 'package:balajiicode/Screens/login_screen.dart';
 import 'package:balajiicode/Utils/app_common.dart';
+import 'package:balajiicode/Utils/app_constants.dart';
 import 'package:balajiicode/Utils/app_images.dart';
 import 'package:balajiicode/extensions/app_text_field.dart';
 import 'package:balajiicode/extensions/common.dart';
 import 'package:balajiicode/extensions/extension_util/context_extensions.dart';
 import 'package:balajiicode/extensions/extension_util/int_extensions.dart';
 import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
+import 'package:balajiicode/extensions/shared_pref.dart';
 import 'package:balajiicode/extensions/text_styles.dart';
+import 'package:balajiicode/main.dart';
 import 'package:flutter/material.dart';
 
 import '../Utils/app_colors.dart';
@@ -20,6 +24,13 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+
+  @override
+  void initState() {
+    print("Access Token is ==>" + getStringAsync(TOKEN).toString());
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,7 +85,11 @@ class _SplashScreenState extends State<SplashScreen> {
         text: 'Sign up',
         color: primaryColor,
         onTap: () {
-          LoginScreen().launch(context);
+          if (getStringAsync(TOKEN).toString().isNotEmpty) {
+            JabberAIHomepage().launch(context);
+          } else {
+            LoginScreen().launch(context);
+          }
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
