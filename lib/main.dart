@@ -17,9 +17,11 @@ late SharedPreferences sharedPreferences;
 final navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(statusBarColor: Color(0xff755be8)));
-  // sharedPreferences = await SharedPreferences.getInstance();
+  sharedPreferences = await SharedPreferences.getInstance();
 
   runApp(const MyApp());
 }

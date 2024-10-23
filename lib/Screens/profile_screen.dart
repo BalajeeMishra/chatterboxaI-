@@ -71,6 +71,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
         appStore.setLoading(false);
         if (value.accessToken != null) {
+          print("Access Toklen is ==>"  + value.accessToken.toString());
+          userStore.setToken(value.accessToken.toString());
+          // print("Acces Token is ==>" + appStore.accessToken.toString());
           JabberAIHomepage().launch(context);
           // toast('Register')
         } else {

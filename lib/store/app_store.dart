@@ -26,6 +26,9 @@ abstract class AppStoreBase with Store {
   String lastWords = '';
 
   @observable
+  String accessToken = '';
+
+  @observable
   int signUpIndex = 0;
 
   @observable
@@ -73,6 +76,10 @@ abstract class AppStoreBase with Store {
   @action
   Future<void> setLastWords(String val) async {
     lastWords = val;
+  }
+  @action
+  Future<void> setAccessToken(String val) async {
+    accessToken = val;
   }
 
 

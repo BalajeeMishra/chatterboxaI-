@@ -109,7 +109,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
   void _startListening() async {
     await _speechToText.listen(
-        localeId: 'en_US', // e.g., 'en_US'
+        localeId: 'en_US',
         onResult: _onSpeechResult);
     setState(() {});
   }
@@ -192,6 +192,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
     if (isSpeaking) {
       print("Updating speech rate during ongoing speech");
+
 
       await flutterTts.stop();
       print("_lastWords ==>" + _lastWords.toString());
@@ -597,9 +598,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                   sessionId = Uuid().v4();
                   save();
                 }
-                //
-                //   // _navigateToSecondScreen();
-                // }
+
               },
               child: Container(
                 padding: EdgeInsets.all(10),
