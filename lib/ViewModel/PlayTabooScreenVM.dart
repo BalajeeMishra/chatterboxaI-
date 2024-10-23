@@ -95,7 +95,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
           tabooGameChatPageModel = response.data!;
           notifyListeners();
 
-          EasyLoading.dismiss();
+          // EasyLoading.dismiss();
           speakText(response.data!.response!.aiResponse!.last);
           // Navigator.push(context, MaterialPageRoute(builder: (context)=>PlayTabooScreenTwo(response.data!.response!.aiResponse!.last)));
           break;
@@ -107,29 +107,32 @@ class PlayTabooScreenVM extends ChangeNotifier {
         case ApiResponseStatus.badRequest:
           appStore.setLoading(false);
 
-          EasyLoading.dismiss();
+          // EasyLoading.dismiss();
           print("${response.error!.responseMsg.toString()}");
           MySnackBar.showSnackBar(context, response.error!.responseMsg!);
           break;
         case ApiResponseStatus.unauthorized:
-          EasyLoading.dismiss();      appStore.setLoading(false);
+          // EasyLoading.dismiss();
+          appStore.setLoading(false);
 
           MySnackBar.showSnackBar(context, response.error!.responseMsg!);
           break;
         case ApiResponseStatus.notFound:
-          EasyLoading.dismiss();      appStore.setLoading(false);
+          // EasyLoading.dismiss();
+          appStore.setLoading(false);
 
           MySnackBar.showSnackBar(context, response.error!.responseMsg!);
           break;
         case ApiResponseStatus.serverError:
-          EasyLoading.dismiss();      appStore.setLoading(false);
+          // EasyLoading.dismiss();
+          appStore.setLoading(false);
 
           MySnackBar.showSnackBar(context, response.error!.responseMsg!);
           break;
         default:
           appStore.setLoading(false);
 
-          EasyLoading.dismiss();
+          // EasyLoading.dismiss();
           // Handle other cases if needed
           break;
       }
@@ -138,7 +141,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
 
       print(e);
       print("hellooo");
-      EasyLoading.dismiss();
+      // EasyLoading.dismiss();
       MySnackBar.showSnackBar(context, e.toString());
     }
     appStore.setLoading(false);
