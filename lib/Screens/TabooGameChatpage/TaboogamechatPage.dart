@@ -31,7 +31,7 @@ class TaboogamechatPage extends StatefulWidget {
 class _TaboogamechatPage extends State<TaboogamechatPage> {
   String sessionId = "";
   late ScrollController _scrollController;
-  int _previousMessageCount = 0;
+  int _previousMessageCount = 0; // Track the previous message count
 
   @override
   void initState() {
@@ -49,6 +49,7 @@ class _TaboogamechatPage extends State<TaboogamechatPage> {
 
   void _scrollToBottomIfNeeded(int messageCount) {
     if (messageCount > _previousMessageCount) {
+      // Scroll only if new messages are added
       Future.delayed(Duration(milliseconds: 100), () {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
@@ -91,106 +92,204 @@ class _TaboogamechatPage extends State<TaboogamechatPage> {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
-                  child: Expanded(
-                    child: Consumer<TabooGameChatPageVM>(
-                      builder: (context, vm, child) {
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          _scrollToBottomIfNeeded(vm.dynamicDta.length);
-                        });
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(left: 5, right: 50),
+                        child: Consumer<TabooGameChatPageVM>(
+                          builder: (context, vm, child) {
+                            return Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      // color: Color(0xffd3e2f5),
+                                      border: Border.all(
+                                        width: 2,
+                                        color: primaryColor,
+                                      ),
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(10.0),
+                                      ),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10.0,
+                                        vertical: 10.0,
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          Row(
+                                            children: [
+                                              MyText(
+                                                text:
+                                                    "${vm.initialdata.keys.first}:",
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 15,
+                                              ),
+                                              SizedBox(
+                                                width: 2,
+                                              ),
+                                              Expanded(
+                                                child: MyText(
+                                                  text:
+                                                      "${vm.initialdata.values.first}",
+                                                  fontWeight: FontWeight.w400,
+                                                  fontSize: 15,
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              MyText(
+                                                text:
+                                                    "${vm.initialdata.keys.last}:",
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 15,
+                                              ),
+                                              SizedBox(
+                                                width: 4,
+                                              ),
+                                              Flexible(
+                                                child: Text(
+                                                  "${vm.initialdata.values.last}"
+                                                      .replaceAll('\u200b', ""),
+                                                  softWrap: true,
+                                                  style: primaryTextStyle(
+                                                    weight: FontWeight.w400,
+                                                    size: 15,
+                                                  ),
+                                                  maxLines: null,
+                                                  overflow:
+                                                      TextOverflow.visible,
+                                                ).expand(),
+                                              ),
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      ),
 
-                        return                            ListView.builder(
-                                                      controller: _scrollController,
-                                                      itemCount: vm.dynamicDta.length,
-                                                      shrinkWrap: true,
-                                                      physics: AlwaysScrollableScrollPhysics(),
-                                                      itemBuilder: (context, index) {
-                                                        var data = vm.dynamicDta[index];
-                                                        return data['server'] == 0
-                                                            ? Padding(
-                                                                padding: EdgeInsets.only(
-                                                                    left: 50, right: 15, top: 10),
-                                                                child: Align(
-                                                                  alignment: Alignment
-                                                                      .centerRight,
-                                                                  child: ConstrainedBox(
-                                                                    constraints: BoxConstraints(
-                                                                      maxWidth: MediaQuery.of(context)
-                                                                              .size
-                                                                              .width *
-                                                                          0.7,
-                                                                    ),
-                                                                    child: Container(
-                                                                      decoration: const BoxDecoration(
-                                                                        color: Color(0xffd3e2f5),
-                                                                        borderRadius: BorderRadius.only(
-                                                                          topLeft: Radius.circular(10),
-                                                                          topRight: Radius.circular(10),
-                                                                          bottomLeft:
-                                                                              Radius.circular(10),
-                                                                        ),
-                                                                      ),
-                                                                      child: Padding(
-                                                                        padding:
-                                                                            const EdgeInsets.symmetric(
-                                                                          horizontal: 15.0,
-                                                                          vertical: 10.0,
-                                                                        ),
-                                                                        child: MyText(
-                                                                          text: "${data['data']}",
-                                                                          fontWeight: FontWeight.w400,
-                                                                          fontSize: 15,
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              )
-                                                            : Padding(
-                                                                padding: EdgeInsets.only(
-                                                                    left: 15.0, right: 50.0, top: 10),
-                                                                child: Align(
-                                                                  alignment: Alignment
-                                                                      .centerLeft,
-                                                                  child: ConstrainedBox(
-                                                                    constraints: BoxConstraints(
-                                                                      maxWidth: MediaQuery.of(context)
-                                                                              .size
-                                                                              .width *
-                                                                          0.7,
-                                                                    ),
-                                                                    child: Container(
-                                                                      decoration: BoxDecoration(
-                                                                        borderRadius: BorderRadius.only(
-                                                                          topLeft: Radius.circular(10),
-                                                                          topRight: Radius.circular(10),
-                                                                          bottomRight:
-                                                                              Radius.circular(10),
-                                                                        ),
-                                                                        border: Border.all(
-                                                                          width: 2,
-                                                                          color: primaryColor,
-                                                                        ),
-                                                                      ),
-                                                                      child: Padding(
-                                                                        padding:
-                                                                            const EdgeInsets.symmetric(
-                                                                          horizontal: 15.0,
-                                                                          vertical: 10.0,
-                                                                        ),
-                                                                        child: MyText(
-                                                                          text: "${data['data']}",
-                                                                          fontWeight: FontWeight.w400,
-                                                                          fontSize: 15,
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              );
-                                                      },
-                                                    );
-                      },
-                    ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Expanded(
+                        child: Consumer<TabooGameChatPageVM>(
+                          builder: (context, vm, child) {
+                            // Update scroll when new messages are added
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              _scrollToBottomIfNeeded(vm.dynamicDta.length);
+                            });
+
+                            return ListView.builder(
+                              controller: _scrollController,
+                              itemCount: vm.dynamicDta.length,
+                              shrinkWrap: true,
+                              physics: AlwaysScrollableScrollPhysics(),
+                              itemBuilder: (context, index) {
+                                var data = vm.dynamicDta[index];
+                                return data['server'] == 0
+                                    ? Padding(
+                                        padding: EdgeInsets.only(
+                                            left: 50, right: 5, top: 10),
+                                        child: Align(
+                                          alignment: Alignment
+                                              .centerRight, // Align to right for user's messages
+                                          child: ConstrainedBox(
+                                            constraints: BoxConstraints(
+                                              maxWidth: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.7, // Limit width to 70% of screen
+                                            ),
+                                            child: Container(
+                                              decoration: const BoxDecoration(
+                                                color: Color(0xffd3e2f5),
+                                                borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(10),
+                                                  topRight: Radius.circular(10),
+                                                  bottomLeft:
+                                                      Radius.circular(10),
+                                                ),
+                                              ),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 15.0,
+                                                  vertical: 10.0,
+                                                ),
+                                                child: MyText(
+                                                  text: "${data['data']}",
+                                                  fontWeight: FontWeight.w400,
+                                                  fontSize: 15,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    : Padding(
+                                        padding: EdgeInsets.only(
+                                            left: 5.0, right: 50.0, top: 10),
+                                        child: Align(
+                                          alignment: Alignment
+                                              .centerLeft, // Align to left for server messages
+                                          child: ConstrainedBox(
+                                            constraints: BoxConstraints(
+                                              maxWidth: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.7, // Limit width to 70% of screen
+                                            ),
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(10),
+                                                  topRight: Radius.circular(10),
+                                                  bottomRight:
+                                                      Radius.circular(10),
+                                                ),
+                                                border: Border.all(
+                                                  width: 2,
+                                                  color: primaryColor,
+                                                ),
+                                              ),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 15.0,
+                                                  vertical: 10.0,
+                                                ),
+                                                child: MyText(
+                                                  text: "${data['data']}",
+                                                  fontWeight: FontWeight.w400,
+                                                  fontSize: 15,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                      // Your other widgets can go here as needed.
+                    ],
                   ),
                 ),
               ),
