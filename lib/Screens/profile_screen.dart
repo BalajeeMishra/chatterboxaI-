@@ -7,16 +7,17 @@ import 'package:flutter/material.dart';
 
 import '../Utils/app_colors.dart';
 import '../Utils/app_common.dart';
+import '../Utils/app_constants.dart';
 import '../extensions/app_button.dart';
 import '../extensions/app_text_field.dart';
 import '../extensions/colors.dart';
 import '../extensions/common.dart';
 import '../extensions/constants.dart';
 import '../extensions/decorations.dart';
+import '../extensions/shared_pref.dart';
 import '../extensions/text_styles.dart';
 import '../main.dart';
 import 'JabberAIHomePage/JabberAIHomepage.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String country;
@@ -55,10 +56,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
   }
 
-  Future<void> setValue(String key, String value) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString(key, value);
-  }
 
   Future<void> save() async {
     hideKeyboard(context);
@@ -78,9 +75,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
         appStore.setLoading(false);
         if (value.accessToken != null) {
-          setValue("accessToken", value.accessToken! );
+          setValue(TOKEN,value.accessToken);
+          userStore.setToken(value.accessToken.toString());
+          // userStore.setUserID(val)
+          await userStore.setLogin(true);
           JabberAIHomepage().launch(context);
-          // toast('Register')
         } else {
           toast('Contact Admin');
         }

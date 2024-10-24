@@ -36,7 +36,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   SpeechToText _speechToText = SpeechToText();
   bool _speechEnabled = false;
   String _lastWords = '';
-  String _firstWords = '';
 
   String ques = "";
   String sessionId = "";

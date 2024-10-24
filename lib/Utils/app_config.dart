@@ -11,10 +11,6 @@ const mBackendURL = "http://148.113.37.187:3000";
 const DEFAULT_LANGUAGE = 'en';
 //endregion
 
-
-//endregion
-
-
 //region country
 String? countryCode = "IN";
 //endregion
@@ -25,9 +21,6 @@ const ENABLE_GOOGLE_SIGN_IN = true;
 const ENABLE_OTP = true;
 // const ENABLE_APPLE_SIGN_IN = true;
 //endregion
-
-
-
 
 
 //region urls

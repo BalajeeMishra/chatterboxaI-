@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 
 import '../../Constants/ApiURLConstant.dart';
+import '../../main.dart';
 
 class ApiClass {
   static String _baseUrl = baseUrl;
@@ -14,12 +15,13 @@ class ApiClass {
   /// Creating Header With Authenticated Data
   static Future<Map<String, String>> getHeaders({isHeader = false}) async {
     print("Get Header function Called");
+
     //checkUserRegistration? token = await MySharedPreferences.getMobileVerificationData();
     return ({
       "Content-Type": "application/json",
       ...(isHeader != null
           ? {
-              'token': "",
+              'token': 'Bearer ${userStore.token}',
             }
           : {})
     });

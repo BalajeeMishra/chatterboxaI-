@@ -58,6 +58,38 @@ mixin _$AppStore on AppStoreBase, Store {
     });
   }
 
+  late final _$lastWordsAtom =
+      Atom(name: 'AppStoreBase.lastWords', context: context);
+
+  @override
+  String get lastWords {
+    _$lastWordsAtom.reportRead();
+    return super.lastWords;
+  }
+
+  @override
+  set lastWords(String value) {
+    _$lastWordsAtom.reportWrite(value, super.lastWords, () {
+      super.lastWords = value;
+    });
+  }
+
+  late final _$accessTokenAtom =
+      Atom(name: 'AppStoreBase.accessToken', context: context);
+
+  @override
+  String get accessToken {
+    _$accessTokenAtom.reportRead();
+    return super.accessToken;
+  }
+
+  @override
+  set accessToken(String value) {
+    _$accessTokenAtom.reportWrite(value, super.accessToken, () {
+      super.accessToken = value;
+    });
+  }
+
   late final _$signUpIndexAtom =
       Atom(name: 'AppStoreBase.signUpIndex', context: context);
 
@@ -203,6 +235,22 @@ mixin _$AppStore on AppStoreBase, Store {
         .run(() => super.setInterstitialId(val));
   }
 
+  late final _$setLastWordsAsyncAction =
+      AsyncAction('AppStoreBase.setLastWords', context: context);
+
+  @override
+  Future<void> setLastWords(String val) {
+    return _$setLastWordsAsyncAction.run(() => super.setLastWords(val));
+  }
+
+  late final _$setAccessTokenAsyncAction =
+      AsyncAction('AppStoreBase.setAccessToken', context: context);
+
+  @override
+  Future<void> setAccessToken(String val) {
+    return _$setAccessTokenAsyncAction.run(() => super.setAccessToken(val));
+  }
+
   late final _$setInterstitialIdIosAsyncAction =
       AsyncAction('AppStoreBase.setInterstitialIdIos', context: context);
 
@@ -249,6 +297,8 @@ mixin _$AppStore on AppStoreBase, Store {
 isDarkMode: ${isDarkMode},
 isLoading: ${isLoading},
 selectedLanguageCode: ${selectedLanguageCode},
+lastWords: ${lastWords},
+accessToken: ${accessToken},
 signUpIndex: ${signUpIndex},
 isSurvey: ${isSurvey},
 adsType: ${adsType},

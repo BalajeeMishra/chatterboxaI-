@@ -91,44 +91,44 @@ class TabooGameChatPageVM  extends ChangeNotifier{
           dynamicDta.add(data);
           apiHitStatus = true;
           notifyListeners();
-          EasyLoading.dismiss();
+          // EasyLoading.dismiss();
           appStore.setLoading(false);
 
           break;
         case ApiResponseStatus.badRequest:
-          EasyLoading.dismiss();
+          // EasyLoading.dismiss();
           appStore.setLoading(false);
 
           print("${response.error!.responseMsg.toString()}");
           MySnackBar.showSnackBar(context, response.error!.responseMsg!);
           break;
         case ApiResponseStatus.unauthorized:
-          EasyLoading.dismiss();
+          // EasyLoading.dismiss();
           appStore.setLoading(false);
 
           MySnackBar.showSnackBar(context, response.error!.responseMsg!);
           break;
         case ApiResponseStatus.notFound:
-          EasyLoading.dismiss();
+          // EasyLoading.dismiss();
           appStore.setLoading(false);
 
           MySnackBar.showSnackBar(context, response.error!.responseMsg!);
           break;
         case ApiResponseStatus.serverError:
-          EasyLoading.dismiss();
+          // EasyLoading.dismiss();
           appStore.setLoading(false);
 
           MySnackBar.showSnackBar(context, response.error!.responseMsg!);
           break;
         default:
-          EasyLoading.dismiss();
+          // EasyLoading.dismiss();
           appStore.setLoading(false);
 
           // Handle other cases if needed
           break;
       }
     } catch (e) {
-      EasyLoading.dismiss();
+      // EasyLoading.dismiss();
       appStore.setLoading(false);
 
       MySnackBar.showSnackBar(context, e.toString());

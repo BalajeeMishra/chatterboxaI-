@@ -270,24 +270,6 @@ mixin _$UserStore on UserStoreBase, Store {
         .run(() => super.setPhoneNo(val, isInitialization: isInitialization));
   }
 
-  late final _$setDisplayNameAsyncAction =
-      AsyncAction('UserStoreBase.setDisplayName', context: context);
-
-  @override
-  Future<void> setDisplayName(String val, {bool isInitialization = false}) {
-    return _$setDisplayNameAsyncAction.run(
-        () => super.setDisplayName(val, isInitialization: isInitialization));
-  }
-
-  late final _$setUsernameAsyncAction =
-      AsyncAction('UserStoreBase.setUsername', context: context);
-
-  @override
-  Future<void> setUsername(String val, {bool isInitialization = false}) {
-    return _$setUsernameAsyncAction
-        .run(() => super.setUsername(val, isInitialization: isInitialization));
-  }
-
   late final _$setTokenAsyncAction =
       AsyncAction('UserStoreBase.setToken', context: context);
 
@@ -295,15 +277,6 @@ mixin _$UserStore on UserStoreBase, Store {
   Future<void> setToken(String val, {bool isInitialization = false}) {
     return _$setTokenAsyncAction
         .run(() => super.setToken(val, isInitialization: isInitialization));
-  }
-
-  late final _$setUserImageAsyncAction =
-      AsyncAction('UserStoreBase.setUserImage', context: context);
-
-  @override
-  Future<void> setUserImage(String val, {bool isInitialization = false}) {
-    return _$setUserImageAsyncAction
-        .run(() => super.setUserImage(val, isInitialization: isInitialization));
   }
 
   late final _$setUserIDAsyncAction =
@@ -340,33 +313,6 @@ mixin _$UserStore on UserStoreBase, Store {
   Future<void> setLastName(String val, {bool isInitialization = false}) {
     return _$setLastNameAsyncAction
         .run(() => super.setLastName(val, isInitialization: isInitialization));
-  }
-
-  late final _$setMobileVerifyAsyncAction =
-      AsyncAction('UserStoreBase.setMobileVerify', context: context);
-
-  @override
-  Future<void> setMobileVerify(bool val, {bool isInitializing = false}) {
-    return _$setMobileVerifyAsyncAction
-        .run(() => super.setMobileVerify(val, isInitializing: isInitializing));
-  }
-
-  late final _$setUserEmailAsyncAction =
-      AsyncAction('UserStoreBase.setUserEmail', context: context);
-
-  @override
-  Future<void> setUserEmail(String val, {bool isInitialization = false}) {
-    return _$setUserEmailAsyncAction
-        .run(() => super.setUserEmail(val, isInitialization: isInitialization));
-  }
-
-  late final _$setUserPasswordAsyncAction =
-      AsyncAction('UserStoreBase.setUserPassword', context: context);
-
-  @override
-  Future<void> setUserPassword(String val, {bool isInitialization = false}) {
-    return _$setUserPasswordAsyncAction.run(
-        () => super.setUserPassword(val, isInitialization: isInitialization));
   }
 
   late final _$clearUserDataAsyncAction =

@@ -24,10 +24,8 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-
   @override
   void initState() {
-    print("Access Token is ==>" + getStringAsync(TOKEN).toString());
     super.initState();
   }
 
@@ -85,11 +83,7 @@ class _SplashScreenState extends State<SplashScreen> {
         text: 'Sign up',
         color: primaryColor,
         onTap: () {
-          if (getStringAsync(TOKEN).toString().isNotEmpty) {
-            JabberAIHomepage().launch(context);
-          } else {
-            LoginScreen().launch(context);
-          }
+          LoginScreen().launch(context);
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,

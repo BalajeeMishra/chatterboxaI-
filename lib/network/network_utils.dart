@@ -159,8 +159,7 @@ Future handleResponse(Response response) async {
         // await removeKey(USER_ID);
         await removeKey(FIRSTNAME);
         await removeKey(LASTNAME);
-        await removeKey(USER_PROFILE_IMG);
-        await removeKey(DISPLAY_NAME);
+
         await removeKey(PHONE_NUMBER);
 
         // await removeKey(WEIGHT);

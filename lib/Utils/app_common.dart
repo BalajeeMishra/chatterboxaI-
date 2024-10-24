@@ -27,17 +27,6 @@ import '../network/rest_api.dart';
 import 'app_config.dart';
 import 'app_constants.dart';
 
-void setTheme() {
-  int themeModeIndex =
-      getIntAsync(THEME_MODE_INDEX, defaultValue: ThemeModeSystem);
-
-  if (themeModeIndex == ThemeModeLight) {
-    appStore.setDarkMode(false);
-  } else if (themeModeIndex == ThemeModeDark) {
-    appStore.setDarkMode(true);
-  }
-}
-
 class DiagonalPathClipperTwo extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
@@ -165,12 +154,7 @@ setLogInValue() {
   if (userStore.isLoggedIn) {
     userStore.setToken(getStringAsync(TOKEN));
     userStore.setUserID(getIntAsync(USER_ID));
-    userStore.setUserEmail(getStringAsync(EMAIL));
-    userStore.setFirstName(getStringAsync(FIRSTNAME));
-    userStore.setLastName(getStringAsync(LASTNAME));
-    userStore.setUserPassword(getStringAsync(PASSWORD));
-    userStore.setUserImage(getStringAsync(USER_PROFILE_IMG));
-    userStore.setPhoneNo(getStringAsync(PHONE_NUMBER));
+
 
 
   }

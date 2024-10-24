@@ -73,18 +73,9 @@ abstract class UserStoreBase with Store {
     if (!isInitialization) await setValue(PHONE_NUMBER, val);
   }
 
-  @action
-  Future<void> setDisplayName(String val,
-      {bool isInitialization = false}) async {
-    displayName = val;
-    if (!isInitialization) await setValue(DISPLAY_NAME, val);
-  }
 
-  @action
-  Future<void> setUsername(String val, {bool isInitialization = false}) async {
-    username = val;
-    if (!isInitialization) await setValue(USERNAME, val);
-  }
+
+
 
   @action
   Future<void> setToken(String val, {bool isInitialization = false}) async {
@@ -92,15 +83,6 @@ abstract class UserStoreBase with Store {
     if (!isInitialization) await setValue(TOKEN, val);
   }
 
-
-
-
-
-  @action
-  Future<void> setUserImage(String val, {bool isInitialization = false}) async {
-    profileImage = val;
-    if (!isInitialization) await setValue(USER_PROFILE_IMG, val);
-  }
 
   @action
   Future<void> setUserID(int val, {bool isInitialization = false}) async {
@@ -125,26 +107,6 @@ abstract class UserStoreBase with Store {
   Future<void> setLastName(String val, {bool isInitialization = false}) async {
     lName = val;
     if (!isInitialization) await setValue(LASTNAME, val);
-  }
-
-
-  @action
-  Future<void> setMobileVerify(bool val, {bool isInitializing = false}) async {
-    isMobileVerify = val;
-    if (!isInitializing) await setValue(ISMOBILEVERIFY, val);
-  }
-
-  @action
-  Future<void> setUserEmail(String val, {bool isInitialization = false}) async {
-    email = val;
-    if (!isInitialization) await setValue(EMAIL, val);
-  }
-
-  @action
-  Future<void> setUserPassword(String val,
-      {bool isInitialization = false}) async {
-    password = val;
-    if (!isInitialization) await setValue(PASSWORD, val);
   }
 
 

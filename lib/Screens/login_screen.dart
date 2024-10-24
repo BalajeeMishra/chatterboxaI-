@@ -1,5 +1,6 @@
 import 'package:balajiicode/Screens/otp_screen.dart';
 import 'package:balajiicode/Utils/app_colors.dart';
+import 'package:balajiicode/Utils/app_config.dart';
 import 'package:balajiicode/extensions/app_text_field.dart';
 import 'package:balajiicode/extensions/confirmation_dialog.dart';
 import 'package:balajiicode/extensions/extension_util/context_extensions.dart';
@@ -13,6 +14,7 @@ import 'package:flutter/services.dart';
 import '../Utils/app_colors.dart';
 import '../Utils/app_colors.dart';
 import '../Utils/app_colors.dart';
+import '../Utils/app_constants.dart';
 import '../extensions/app_button.dart';
 import '../extensions/colors.dart';
 import '../extensions/constants.dart';
@@ -27,12 +29,11 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  // TextEditingController mCountryCont = TextEditingController();
   TextEditingController mMobileCont = TextEditingController();
   GlobalKey<FormState> mFormKey = GlobalKey<FormState>();
 
-  String selectedCountry = "افغانستان";
-  String countryCode = "+93";
+  String selectedCountry = "India";
+  String cCode = '+91';
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
           padding: EdgeInsets.only(
               bottom: MediaQuery.of(context)
                   .viewInsets
-                  .bottom), // Adjusts the bottom padding for the keyboard
+                  .bottom),
 
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -127,6 +128,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             // mainAxisSize: MainAxisSize.s,
                             children: [
                               CountryCodePicker(
+                                initialSelection: cCode,
                                 showCountryOnly: true,
                                 showFlag: true,
                                 boxDecoration: BoxDecoration(
@@ -144,14 +146,16 @@ class _LoginScreenState extends State<LoginScreen> {
                                         .black), // Customize your text style
                                 onChanged: (c) {
                                   selectedCountry = c.name.toString();
-                                  print("Selcetd COuntry is ==>" +
-                                      selectedCountry.toString());
-                                  // Handle the selected country here
+                                  cCode = c.dialCode.toString();
+                                  setState(() {
+
+                                  });
+
                                 },
                               ),
                               Icon(Icons.keyboard_arrow_down_outlined,
                                   color:
-                                      Colors.grey), // Dropdown icon added here
+                                      Colors.grey),
                             ],
                           ),
                         ),
@@ -192,9 +196,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   CountryCodePicker(
-                                    // initialSelection: getStringAsync(
-                                    //     COUNTRY_CODE,
-                                    //     defaultValue: countryCode!),
+
+                                    enabled: false,
+                                    initialSelection: cCode,
                                     showCountryOnly: false,
                                     showFlag: false,
                                     boxDecoration: BoxDecoration(
@@ -241,7 +245,7 @@ class _LoginScreenState extends State<LoginScreen> {
           if (mFormKey.currentState!.validate()) {
             OtpScreen(
               country: selectedCountry,
-              mobileNumber: countryCode + mMobileCont.text,
+              mobileNumber: countryCode.toString() + mMobileCont.text,
             ).launch(context);
           }
         },
