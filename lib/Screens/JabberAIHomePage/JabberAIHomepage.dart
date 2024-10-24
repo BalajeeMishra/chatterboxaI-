@@ -124,10 +124,19 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
             SystemNavigator.pop();
             return false;
           },
-          child: Stack(
-            children: [
-              SingleChildScrollView(
-                child: Padding(
+          child: RefreshIndicator(
+            color: primaryColor,
+            onRefresh: () async {
+              await Provider.of<JabberHomeAIvm>(context, listen: false)
+                  .seInitialValue();
+              await Provider.of<JabberHomeAIvm>(context, listen: false)
+                  .homepageAPI(context);
+            },
+            // backgroundColor: ,
+
+            child: Stack(
+              children: [
+                Padding(
                   padding: EdgeInsets.symmetric(vertical: 10.0),
                   child: Consumer<JabberHomeAIvm>(
                     builder: (context, vm, child) {
@@ -236,14 +245,14 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
                     },
                   ),
                 ),
-              ),
-              Observer(
-                builder: (context) {
-                  // Show the custom Loader based on appStore.isLoading
-                  return Loader().center().visible(appStore.isLoading);
-                },
-              ),
-            ],
+                Observer(
+                  builder: (context) {
+                    // Show the custom Loader based on appStore.isLoading
+                    return Loader().center().visible(appStore.isLoading);
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
