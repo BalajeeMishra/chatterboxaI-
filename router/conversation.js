@@ -1,19 +1,19 @@
-import {Router} from "express";
-import UserDataLog from "../model/Userdata.js";
-import fs from  'fs';
 import { PromptTemplate } from "@langchain/core/prompts";
 import { ChatOpenAI } from "@langchain/openai";
+import { Router } from "express";
+import fs from "fs";
 import { LLMChain } from "langchain/chains";
 import { BufferMemory } from "langchain/memory";
+import UserDataLog from "../model/Userdata.js";
+import jwtHelper  from "../helper/jwt_helper.js";
+
 const router = Router();
 
+const apiKey = fs.readFileSync("OpenAiKey.txt", "utf-8").trim();
 
+const llm = new ChatOpenAI({ temperature: 0, apiKey: apiKey, modelName: "gpt-4o" });
 
-const apiKey = fs.readFileSync('OpenAiKey.txt', 'utf-8').trim();
-
-const llm = new ChatOpenAI({ temperature: 0,apiKey:apiKey,modelName: "gpt-4o" });
-
-
+//native language....
 
 const template = `
 Please follow these instructions carefully:
@@ -60,7 +60,8 @@ Next you need to check the same and ask for next round.
 
 Note: 
 1)If user ask anything other than this ask him to play the game.You are here to assist with game.
-2)Facts to know about User's hint:
+2)Sometime give emozi to make the chat interactive. 
+3)Facts to know about User's hint:
 This is a speech translated sentence. The speech translator can confuse similar sounding words. It can translate a single word from the user into multiple words that together sound like the single word spoken by the user. Also it can translate to slightly different form of same word that sounds similar. It will have missing punctuations. 
 In those cases try to understood from context. Also the speech translator doesn't get the sound very wrong . User is attempting to speak in English but may speak in his native language or a mix of both.
 Ex: These are some example pairs that speech translator can confuse with. 
@@ -75,27 +76,26 @@ const prompt = PromptTemplate.fromTemplate(template);
 
 const userSessions = {};
 function getUserSession(session) {
-    if (!userSessions[session]) {
-        // Initialize a new session for the user with persistent memory
-        const memory = new BufferMemory({ memoryKey: "chat_history" });
-        
-        userSessions[session] = {
-            memory,
-            chain: new LLMChain({
-                llm,
-                prompt,
-                verbose: true,
-                memory 
-            })
-        };
-    }
-    return userSessions[session];
+  if (!userSessions[session]) {
+    // Initialize a new session for the user with persistent memory
+    const memory = new BufferMemory({ memoryKey: "chat_history" });
+
+    userSessions[session] = {
+      memory,
+      chain: new LLMChain({
+        llm,
+        prompt,
+        verbose: true,
+        memory
+      })
+    };
+  }
+  return userSessions[session];
 }
 
-
 router.post("/play", async (req, res) => {
-  const { question,userId,session } = req.body;
- 
+  const { question, userId, session } = req.body;
+
   let userdatalog;
   // const usedTabooWord = tabooWords.find((word) => question.includes(word));
   // if (usedTabooWord) {
@@ -104,26 +104,36 @@ router.post("/play", async (req, res) => {
   try {
     const userSession = getUserSession(session);
     const response = await userSession.chain.invoke({ question });
-    userdatalog = await UserDataLog.findOne({userId,session});
-     if(userdatalog){
-      userdatalog.userResponse = [...userdatalog.userResponse,question]
-      userdatalog.aiResponse =[...userdatalog.aiResponse,response.text]
-     }
-     else {
+    userdatalog = await UserDataLog.findOne({ userId, sessionId:session });
+    if (userdatalog) {
+      userdatalog.userResponse = [...userdatalog.userResponse, question];
+      userdatalog.aiResponse = [...userdatalog.aiResponse, response.text];
+    } else {
       userdatalog = new UserDataLog({
-      userResponse:[question],
-      aiResponse:[response.text],
-      userId,
-      session
-    });
-  }
-  await userdatalog.save();
-    return res.status(200).json({response:userdatalog});
+        userResponse: [question],
+        aiResponse: [response.text],
+        userId,
+        sessionId:session
+      });
+    }
+    await userdatalog.save();
+    return res.status(200).json({ response: userdatalog });
   } catch (error) {
-    console.log(error)
     res.status(500).json({ error: "Something went wrong" });
   }
 });
 
+//jwtHelper.verifyToken,
+
+router.get("/allconversation",async(req,res)=>{
+  try{
+  const {session} = req.query;
+  const completeConversation = await UserDataLog.findOne({sessionId:session});
+  return res.status(200).json({completeConversation});
+  }
+  catch(err){
+    throw err;
+  }
+})
 
 export default router;

@@ -47,9 +47,6 @@ export default {
       req.payload = payload;
       req.userId = payload.aud;
       const user = await User.findById(req.userId);
-      if (user?.abanDoned) {
-        return res.status(200).json("Please login with correct credential!");
-      }
       next();
     });
   },
