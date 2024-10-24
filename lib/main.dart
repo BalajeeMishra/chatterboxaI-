@@ -21,7 +21,12 @@ Future<void> main() async {
 
   SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(statusBarColor: Color(0xff755be8)));
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Fetch SharedPreferences instance before running the app
   sharedPreferences = await SharedPreferences.getInstance();
+
+  // sharedPreferences = await SharedPreferences.getInstance();
 
   runApp(const MyApp());
 }
@@ -29,14 +34,22 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  Future<String?> getValue(String key) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString(key); // To retrieve a String
+  }
+
   @override
   Widget build(BuildContext context) {
+    String? userToken = sharedPreferences.getString('accessToken');
+    print("balajee mishra");
+    print(userToken);
     return MultiProvider(
       providers: appProvider,
       child: MaterialApp(
         title: APP_NAME,
         debugShowCheckedModeBanner: false,
-        home: SplashScreen(),
+        home:  userToken == null ? const SplashScreen() : JabberAIHomepage(),
         builder: EasyLoading.init(),
       ),
     );

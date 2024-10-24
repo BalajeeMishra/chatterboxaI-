@@ -16,6 +16,7 @@ import '../extensions/decorations.dart';
 import '../extensions/text_styles.dart';
 import '../main.dart';
 import 'JabberAIHomePage/JabberAIHomepage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String country;
@@ -54,6 +55,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
   }
 
+  Future<void> setValue(String key, String value) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString(key, value);
+  }
+
   Future<void> save() async {
     hideKeyboard(context);
     Map<String, dynamic> req = {
@@ -66,14 +72,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     if (mFormKey.currentState!.validate()) {
       appStore.setLoading(true);
+
       await registerApi(req).then((value) async {
         print('Value' + value.toJson().toString());
 
         appStore.setLoading(false);
         if (value.accessToken != null) {
-          print("Access Toklen is ==>"  + value.accessToken.toString());
-          userStore.setToken(value.accessToken.toString());
-          // print("Acces Token is ==>" + appStore.accessToken.toString());
+          setValue("accessToken", value.accessToken! );
           JabberAIHomepage().launch(context);
           // toast('Register')
         } else {
@@ -92,13 +97,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true, // This allows the screen to resize when the keyboard appears
+      resizeToAvoidBottomInset:
+          true, // This allows the screen to resize when the keyboard appears
       appBar: appBarWidget('', context: context),
       body: Form(
         key: mFormKey,
         child: SingleChildScrollView(
           padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom), // Adjusts the bottom padding for the keyboard
+              bottom: MediaQuery.of(context)
+                  .viewInsets
+                  .bottom), // Adjusts the bottom padding for the keyboard
           child: Column(
             children: [
               Stack(
@@ -145,7 +153,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               26.height,
               ListView.builder(
-                physics: NeverScrollableScrollPhysics(), // Disable scrolling in ListView.builder
+                physics:
+                    NeverScrollableScrollPhysics(), // Disable scrolling in ListView.builder
                 shrinkWrap: true,
                 itemCount: 1,
                 itemBuilder: (context, index) {
@@ -200,9 +209,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       DropdownButtonFormField(
                         items: languageList
                             .map((value) => DropdownMenuItem<String>(
-                          child: Text(value, style: primaryTextStyle()),
-                          value: value,
-                        ))
+                                  child: Text(value, style: primaryTextStyle()),
+                                  value: value,
+                                ))
                             .toList(),
                         isExpanded: false,
                         isDense: true,
@@ -235,5 +244,4 @@ class _ProfileScreenState extends State<ProfileScreen> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
-
 }
