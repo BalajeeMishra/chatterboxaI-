@@ -40,6 +40,8 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   String sessionId = "";
   bool isLoading = false;
   bool apiCalled = false;
+  bool isFirstTime = false;
+
 
   //Screen2 data
   double speechRate = 0.4;
@@ -57,49 +59,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     setState(() {});
   }
 
-  save() {
-    message = 'Correcting Speech recognition mistakes';
-    isLoading = true;
-    print("Save  Function Called");
-    flutterTts.setStartHandler(() {
-      print("TTS Started");
-      setState(() {
-        isSpeaking = true;
-      });
-    });
 
-    flutterTts.setCompletionHandler(() {
-      print("TTS Completed");
-      setState(() {
-        isSpeaking = false;
-      });
-    });
-
-    flutterTts.setErrorHandler((msg) {
-      print("TTS Error: $msg");
-      setState(() {
-        isSpeaking = false;
-      });
-    });
-
-    Provider.of<PlayTabooScreenVM>(context, listen: false)
-        .seInitialValue(widget.allGameModel, widget.index, sessionId);
-    Provider.of<PlayTabooScreenVM>(context, listen: false)
-        .chatPageAPI(context, ques, sessionId);
-    configureTts();
-    apiCalled = true;
-    _lastWords = appStore.lastWords;
-
-    Future.delayed(Duration(seconds: 2), () {
-      setState(() {
-        message = 'Thinking your respond';
-      });
-    });
-    setState(() {
-
-    });
-
-  }
 
   void _initSpeech() async {
     _speechEnabled = await _speechToText.initialize();
@@ -113,6 +73,8 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   }
 
   void _startListening() async {
+    print("Api CAlled is 2"+ apiCalled.toString());
+
     await _speechToText.listen(
         localeId: 'en_US',
         onResult: _onSpeechResult);
@@ -178,6 +140,8 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
   /// Stop speaking
   Future<void> stopSpeaking() async {
+    print("Api CAlled is 3"+ apiCalled.toString());
+
     await flutterTts.stop();
   }
 
@@ -242,6 +206,49 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
   _onDecreaseRatePressed() {
     adjustSpeechRate(-0.1);
+  }
+  save() {
+    message = 'Correcting Speech recognition mistakes';
+    isLoading = true;
+    print("Save  Function Called");
+    flutterTts.setStartHandler(() {
+      print("TTS Started");
+      setState(() {
+        isSpeaking = true;
+      });
+    });
+
+    flutterTts.setCompletionHandler(() {
+      print("TTS Completed");
+      setState(() {
+        isSpeaking = false;
+      });
+    });
+
+    flutterTts.setErrorHandler((msg) {
+      print("TTS Error: $msg");
+      setState(() {
+        isSpeaking = false;
+      });
+    });
+
+    Provider.of<PlayTabooScreenVM>(context, listen: false)
+        .seInitialValue(widget.allGameModel, widget.index, sessionId);
+    Provider.of<PlayTabooScreenVM>(context, listen: false)
+        .chatPageAPI(context, ques, sessionId);
+    configureTts();
+    // apiCalled = true;
+    _lastWords = appStore.lastWords;
+
+    Future.delayed(Duration(seconds: 2), () {
+      setState(() {
+        message = 'Thinking your respond';
+      });
+    });
+    setState(() {
+
+    });
+
   }
 
   @override
@@ -315,7 +322,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                             SizedBox(
                               height: 15,
                             ),
-                            if (!apiCalled)
+                            if (!apiCalled && !isFirstTime)
                               Padding(
                                 padding: EdgeInsets.only(left: 20.0),
                                 child: Column(
@@ -399,21 +406,22 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                         ),
                                       ],
                                     ),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: MyText(
-                                            text: _lastWords,
-                                            color: Color(0xff000000),
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+
                                   ],
                                 ),
                               ),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: MyText(
+                                    text: _lastWords,
+                                    color: Color(0xff000000),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ],
+                            ).paddingSymmetric(horizontal: 24,vertical: 14),
                             if (apiCalled)
                               Consumer<PlayTabooScreenVM>(
                                 builder: (context, vm, child) {
@@ -499,8 +507,13 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                             onTap: () {
                               _initSpeech();
                               apiCalled =false;
+                              isFirstTime = true;
+                              print("Api CAlled is 1"+ apiCalled.toString());
 
                               _lastWords = "";
+                              setState(() {
+
+                              });
 
                             },
                             child: Column(
