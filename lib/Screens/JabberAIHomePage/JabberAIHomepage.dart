@@ -1,22 +1,17 @@
+
 import 'package:balajiicode/Constants/ImageConstant.dart';
 import 'package:balajiicode/Utils/app_common.dart';
-import 'package:balajiicode/Widget/appbar.dart';
 import 'package:balajiicode/Screens/ChooseWordScreen/ChooseWords.dart';
-import 'package:balajiicode/extensions/double_press_back_widget.dart';
-import 'package:balajiicode/extensions/extension_util/context_extensions.dart';
 import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
 import 'package:balajiicode/extensions/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../Utils/app_colors.dart';
 import '../../ViewModel/JabberHomeAIvm.dart';
 import '../../Widget/text_widget.dart';
-import '../../Widget/webviewController.dart';
 import '../../components/double_back_to_close_app.dart';
 import '../../extensions/loader_widget.dart';
 import '../../extensions/text_styles.dart';
@@ -63,10 +58,8 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
       "image": ImageConstant.debatechallenge
     },
   ];
-
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     appStore.setLoading(false);
 

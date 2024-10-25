@@ -76,7 +76,7 @@ class TabooGameChatPageVM  extends ChangeNotifier{
     try {
       var data = {
         "question": dataToAdd,
-        "userId":"123",
+        "userId": userStore.userId,
         "session":sessionId
       };
       ApiResponse<TabooGameChatPageModel> response = await _tabooGameChatPageRepository.tabooGameChatPageApiCallFunction(data);

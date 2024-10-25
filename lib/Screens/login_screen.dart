@@ -215,7 +215,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       // setValue(COUNTRY_CODE, c.code);
                                     },
                                     onChanged: (c) {
-                                      countryCode = c.dialCode.toString();
+                                      cCode = c.dialCode.toString();
                                       // countryCode = c.dialCode;
                                       // setValue(COUNTRY_CODE, c.code);
                                     },
@@ -245,7 +245,7 @@ class _LoginScreenState extends State<LoginScreen> {
           if (mFormKey.currentState!.validate()) {
             OtpScreen(
               country: selectedCountry,
-              mobileNumber: countryCode.toString() + mMobileCont.text,
+              mobileNumber: cCode.toString() + mMobileCont.text,
             ).launch(context);
           }
         },

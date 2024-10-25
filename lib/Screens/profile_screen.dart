@@ -77,7 +77,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if (value.accessToken != null) {
           setValue(TOKEN,value.accessToken);
           userStore.setToken(value.accessToken.toString());
-          // userStore.setUserID(val)
+          setValue(USER_ID, value.newUser!.userId.toString());
+          userStore.setUserID(value.newUser!.userId.toString());
           await userStore.setLogin(true);
           JabberAIHomepage().launch(context);
         } else {
@@ -85,9 +86,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         }
       }).catchError((e) {
         appStore.setLoading(false);
-        toast('Invalid credentials');
+        toast(e.toString());
 
-        // toast(e.toString());
       });
       setState(() {});
     }

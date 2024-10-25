@@ -15,7 +15,7 @@ abstract class UserStoreBase with Store {
   bool isLoggedIn = false;
 
   @observable
-  int userId = 0;
+  String userId = '';
 
   @observable
   String email = '';
@@ -85,7 +85,7 @@ abstract class UserStoreBase with Store {
 
 
   @action
-  Future<void> setUserID(int val, {bool isInitialization = false}) async {
+  Future<void> setUserID(String val, {bool isInitialization = false}) async {
     userId = val;
     if (!isInitialization) await setValue(USER_ID, val);
   }

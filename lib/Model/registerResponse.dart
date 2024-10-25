@@ -28,7 +28,7 @@ class NewUser {
   bool? verified;
   String? role;
   String? country;
-  String? sId;
+  String? userId;
   int? iV;
 
   NewUser(
@@ -39,7 +39,7 @@ class NewUser {
         this.verified,
         this.role,
         this.country,
-        this.sId,
+        this.userId,
         this.iV});
 
   NewUser.fromJson(Map<String, dynamic> json) {
@@ -50,7 +50,7 @@ class NewUser {
     verified = json['verified'];
     role = json['role'];
     country = json['country'];
-    sId = json['_id'];
+    userId = json['_id'];
     iV = json['__v'];
   }
 
@@ -63,7 +63,7 @@ class NewUser {
     data['verified'] = this.verified;
     data['role'] = this.role;
     data['country'] = this.country;
-    data['_id'] = this.sId;
+    data['_id'] = this.userId;
     data['__v'] = this.iV;
     return data;
   }

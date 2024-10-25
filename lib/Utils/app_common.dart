@@ -153,7 +153,7 @@ setLogInValue() {
   userStore.setLogin(getBoolAsync(IS_LOGIN));
   if (userStore.isLoggedIn) {
     userStore.setToken(getStringAsync(TOKEN));
-    userStore.setUserID(getIntAsync(USER_ID));
+    userStore.setUserID(getStringAsync(USER_ID));
 
 
 

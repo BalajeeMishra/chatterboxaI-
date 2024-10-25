@@ -29,13 +29,13 @@ mixin _$UserStore on UserStoreBase, Store {
       Atom(name: 'UserStoreBase.userId', context: context);
 
   @override
-  int get userId {
+  String get userId {
     _$userIdAtom.reportRead();
     return super.userId;
   }
 
   @override
-  set userId(int value) {
+  set userId(String value) {
     _$userIdAtom.reportWrite(value, super.userId, () {
       super.userId = value;
     });
@@ -283,7 +283,7 @@ mixin _$UserStore on UserStoreBase, Store {
       AsyncAction('UserStoreBase.setUserID', context: context);
 
   @override
-  Future<void> setUserID(int val, {bool isInitialization = false}) {
+  Future<void> setUserID(String val, {bool isInitialization = false}) {
     return _$setUserIDAsyncAction
         .run(() => super.setUserID(val, isInitialization: isInitialization));
   }
