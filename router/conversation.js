@@ -5,7 +5,7 @@ import fs from "fs";
 import { LLMChain } from "langchain/chains";
 import { BufferMemory } from "langchain/memory";
 import UserDataLog from "../model/Userdata.js";
-import jwtHelper  from "../helper/jwt_helper.js";
+import jwtHelper from "../helper/jwt_helper.js";
 
 const router = Router();
 
@@ -17,6 +17,8 @@ const llm = new ChatOpenAI({ temperature: 0, apiKey: apiKey, modelName: "gpt-4o"
 
 const template = `
 Please follow these instructions carefully:
+
+Name of this Game is Taboo Game. 
 
 User starts a new game: Initialize guess word and set taboo words.
  
@@ -67,6 +69,41 @@ In those cases try to understood from context. Also the speech translator doesn'
 Ex: These are some example pairs that speech translator can confuse with. 
 ( Hints, ends ) ( pictures you, picturesque ) ( anecdotes, and a dots ) (Two, to) (Tabu, Taboo) (Hints, Hands) (previty, brevity)
 
+4)Goal:
+User is trying to practice his English vocabulary & grammar by playing Taboo game. With each response , we need to share feedback on user's hints used while playing the Taboo game.
+Please review all of user's sentences on following parameters.
+
+
+Grammar: Evaluate grammar correctness of sentences spoken by user, assuming user is casually speaking these sentences, so ignore minor errors that are not important in casual spoken english.
+
+
+Vocabulary sophistication: Evaluate the range and appropriateness of the vocabulary used. Highlight any repetitive language or opportunities for more advanced word choices. Would a native english speaker frame a sentence similary?  Is there scope for using more nuanced vocabulary.
+
+
+Clarity & Expressiveness: Where the user's word is clear & expressive to help you guess a precise word.
+
+
+Share a score on 1-5 for each of above parameter and then a composite score from 1 to 5
+
+
+With each response, assess following areas concisely in bullet points telling what was good and what can improve
+
+
+1. Grammar: Evaluate grammar correctness of sentences spoken by user, assuming user is casually speaking these sentences, so ignore minor errors that are not important in casual spoken english.
+
+
+2. Vocabulary: Evaluate the range and appropriateness of the vocabulary used. Highlight any repetitive language or opportunities for more advanced word choices. Would a native english speaker frame a sentence similary?  Is there scope for using more nuanced vocabulary.
+
+
+Share a score on 1-5 for each of above parameter and then a composite score from 1 to 5
+
+
+Overall give the feedback in 20 words only.
+
+
+Give feedback only if user hint is valid.
+
+ 
 Previous conversation:
 {chat_history}
 
@@ -104,7 +141,7 @@ router.post("/play", async (req, res) => {
   try {
     const userSession = getUserSession(session);
     const response = await userSession.chain.invoke({ question });
-    userdatalog = await UserDataLog.findOne({ userId, sessionId:session });
+    userdatalog = await UserDataLog.findOne({ userId, sessionId: session });
     if (userdatalog) {
       userdatalog.userResponse = [...userdatalog.userResponse, question];
       userdatalog.aiResponse = [...userdatalog.aiResponse, response.text];
@@ -113,7 +150,7 @@ router.post("/play", async (req, res) => {
         userResponse: [question],
         aiResponse: [response.text],
         userId,
-        sessionId:session
+        sessionId: session
       });
     }
     await userdatalog.save();
@@ -125,15 +162,14 @@ router.post("/play", async (req, res) => {
 
 //jwtHelper.verifyToken,
 
-router.get("/allconversation",async(req,res)=>{
-  try{
-  const {session} = req.query;
-  const completeConversation = await UserDataLog.findOne({sessionId:session});
-  return res.status(200).json({completeConversation});
-  }
-  catch(err){
+router.get("/allconversation", async (req, res) => {
+  try {
+    const { session } = req.query;
+    const completeConversation = await UserDataLog.findOne({ sessionId: session });
+    return res.status(200).json({ completeConversation });
+  } catch (err) {
     throw err;
   }
-})
+});
 
 export default router;
