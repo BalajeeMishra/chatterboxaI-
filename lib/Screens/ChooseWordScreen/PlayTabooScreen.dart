@@ -24,8 +24,9 @@ import 'package:uuid/uuid.dart';
 class PlayTabooScreen extends StatefulWidget {
   AllGameModel allGameModel;
   int index;
+  String sessionId;
 
-  PlayTabooScreen(this.allGameModel, this.index);
+  PlayTabooScreen(this.allGameModel, this.index, this.sessionId);
 
   @override
   State<StatefulWidget> createState() => _PlayTabooScreen();
@@ -226,9 +227,9 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     });
 
     Provider.of<PlayTabooScreenVM>(context, listen: false)
-        .seInitialValue(widget.allGameModel, widget.index, sessionId);
+        .seInitialValue(widget.allGameModel, widget.index, widget.sessionId);
     Provider.of<PlayTabooScreenVM>(context, listen: false)
-        .chatPageAPI(context, ques, sessionId);
+        .chatPageAPI(context, ques, widget.sessionId);
     configureTts();
     apiCalled = true;
     _lastWords = appStore.lastWords;
@@ -471,14 +472,14 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                           children: [
                             GestureDetector(
                               onTap: () {
-                                sessionId = Uuid().v4();
+                               
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => TaboogamechatPage(
                                             widget.allGameModel,
                                             widget.index,
-                                            sessionId)));
+                                            widget.sessionId)));
                               },
                               child: Column(
                                 children: [
@@ -611,7 +612,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                   _lastWords = "";
                 });
                 if (ques.isNotEmpty) {
-                  sessionId = Uuid().v4();
+                  // sessionId = Uuid().v4();
                   save();
                   print("Last words captured: $ques");
                 }

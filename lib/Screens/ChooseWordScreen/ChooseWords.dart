@@ -11,6 +11,7 @@ import '../../ViewModel/AllGameVm.dart';
 import '../../extensions/loader_widget.dart';
 import '../../main.dart';
 import 'PlayTabooScreen.dart';
+import 'package:uuid/uuid.dart';
 
 class ChooseWordScreen extends StatefulWidget {
   String dataId;
@@ -19,11 +20,11 @@ class ChooseWordScreen extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _ChooseWordScreen();
 }
-
 class _ChooseWordScreen extends State<ChooseWordScreen> {
   @override
   void initState() {
     // TODO: implement initState
+
     super.initState();
     Provider.of<AllGameVm>(context, listen: false).seInitialValue();
     Provider.of<AllGameVm>(context, listen: false)
@@ -96,7 +97,7 @@ class _ChooseWordScreen extends State<ChooseWordScreen> {
                                                   builder: (context) =>
                                                       PlayTabooScreen(
                                                           vm.homePageModel,
-                                                          index)));
+                                                          index,Uuid().v4())));
                                         },
                                         child: Container(
                                             width: MediaQuery.of(context)

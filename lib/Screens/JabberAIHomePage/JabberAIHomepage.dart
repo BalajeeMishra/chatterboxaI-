@@ -62,7 +62,6 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
   void initState() {
     super.initState();
     appStore.setLoading(false);
-
     Provider.of<JabberHomeAIvm>(context, listen: false).seInitialValue();
     Provider.of<JabberHomeAIvm>(context, listen: false).homepageAPI(context);
   }
