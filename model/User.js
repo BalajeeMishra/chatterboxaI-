@@ -35,6 +35,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    playingstatus:{
+        type:Boolean,
+        default:true
+    }
 });
 
 // Create the user model

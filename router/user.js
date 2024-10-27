@@ -22,5 +22,19 @@ catch(err){
 }
 })
 
+router.patch("/changestatus/:id",async(req,res,next)=>{
+  try{
+  const {id} = req.params; 
+  const {playingstatus} = req.body;
+  const updateduser = await User.findByIdAndUpdate(id, {playingstatus},{new:true}); 
+  if(!updateduser){
+    return res.status(500).json({messagae:"Something went wrong."})
+  }
+  return res.status(200).json({updateduser});
+}
+catch(err){
+  throw err;
+}
+})
 
 export default router;
