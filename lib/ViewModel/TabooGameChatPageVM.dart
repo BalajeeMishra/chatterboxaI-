@@ -42,7 +42,7 @@ class TabooGameChatPageVM extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> chatPageAPI(BuildContext context, String sessionId, String messageText) async {
+  Future<void> chatPageAPI(BuildContext context, String sessionId, String messageText,AllGameModel allGameModel, int index) async {
     if (messageText.isEmpty) {
       MySnackBar.showSnackBar(context, "Please Enter Your Response");
       return;
@@ -62,6 +62,7 @@ class TabooGameChatPageVM extends ChangeNotifier {
         "userId": userStore.userId,
         "session": sessionId,
         "question": messageText,
+        "firstword":allGameModel.allGame![index].mainContent
       };
 
 

@@ -43,8 +43,9 @@ class PlayTabooScreenVM extends ChangeNotifier {
           ? data + "," + allGameModel.allGame![index].detailOfContent![i]
           : data + " " + allGameModel.allGame![index].detailOfContent![i];
     }
-    dataToPass =
-        "Guess word is ${allGameModel.allGame![index].mainContent} and taboo words are [${data}] and user hint is an";
+    // dataToPass =
+    //     "Guess word is ${allGameModel.allGame![index].mainContent} and taboo words are [${data}] and user hint is an";
+      dataToPass ="";
     apiHitStatus = false;
     tabooGameChatPageModel = TabooGameChatPageModel();
   }
@@ -56,7 +57,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
   }
 
   Future<void> chatPageAPI(
-      BuildContext context, String dataGet, String sessionId) async {
+      BuildContext context, String dataGet, String sessionId,AllGameModel allGameModel, int index) async {
     if (dataGet == "" || dataGet == null) {
       MySnackBar.showSnackBar(context, "Please speak first!");
       return;
@@ -76,7 +77,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
     // EasyLoading.show(status: ConstText.get_LoaderMessage);
     try {
       print(sessionId);
-      var data = {"question": dataToAdd, "userId": "123", "session": sessionId};
+      var data = {"question": dataToAdd, "userId": userStore.userId, "session": sessionId, "firstword":allGameModel.allGame![index].mainContent};
       print(data);
       print("balajee mishra");
       ApiResponse<TabooGameChatPageModel> response =

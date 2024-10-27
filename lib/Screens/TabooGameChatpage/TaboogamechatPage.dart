@@ -285,10 +285,10 @@ class _TaboogamechatPage extends State<TaboogamechatPage> {
                   'server': 1,
                 });
 
-                chatPageVM.chatPageAPI(context, widget.sessionId, messageText);
+                chatPageVM.chatPageAPI(context, widget.sessionId, messageText,widget.allGameModel,widget.index);
                 isFirst = false;
               } else {
-                chatPageVM.chatPageAPI(context, widget.sessionId, messageText);
+                chatPageVM.chatPageAPI(context, widget.sessionId, messageText,widget.allGameModel,widget.index);
               }
 
               chatPageVM.controller.clear();
