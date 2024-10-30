@@ -31,21 +31,37 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   TextEditingController mMobileCont = TextEditingController();
   GlobalKey<FormState> mFormKey = GlobalKey<FormState>();
+  final FocusNode _focusNode = FocusNode();
+  // final ValueNotifier<bool> _isFabVisible = ValueNotifier(true);
+  final GlobalKey countryPickerKey = GlobalKey();
 
   String selectedCountry = "India";
   String cCode = '+91';
+  @override
+  void initState() {
+    super.initState();
+
+    // _focusNode.addListener(() {
+    //   _isFabVisible.value = !_focusNode.hasFocus;
+    // });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    // _isFabVisible.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Form(
         key: mFormKey,
         child: SingleChildScrollView(
-          padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context)
-                  .viewInsets
-                  .bottom),
-
+          padding:
+              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -114,7 +130,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       ).paddingSymmetric(horizontal: 16, vertical: 4),
                       4.height,
                       Container(
-                        width: double.infinity,
+                        alignment: Alignment.topLeft,
+                        // width: 800,
                         padding:
                             EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                         decoration: BoxDecoration(
@@ -122,44 +139,44 @@ class _LoginScreenState extends State<LoginScreen> {
                               Border.all(color: Colors.grey.withOpacity(0.5)),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: IntrinsicHeight(
+                        child: SizedBox(
+                          width: double.infinity,
+                          // height: 60,
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            // mainAxisSize: MainAxisSize.s,
+                            mainAxisSize: MainAxisSize.min, // Use max size for the row
+
+                            // mainAxisAlignment: MainAxisAlignment.start, // Align children
+
                             children: [
                               CountryCodePicker(
+                                showDropDownButton: true,
                                 initialSelection: cCode,
                                 showCountryOnly: true,
                                 showFlag: true,
                                 boxDecoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(8),
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
+                                  color: Theme.of(context).scaffoldBackgroundColor,
                                 ),
                                 showFlagDialog: true,
                                 showOnlyCountryWhenClosed: true,
                                 alignLeft: false,
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 4),
+                                padding:
+                                    EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                 textStyle: TextStyle(
-                                    color: Colors
-                                        .black), // Customize your text style
+                                    color: Colors.black), // Customize your text style
                                 onChanged: (c) {
                                   selectedCountry = c.name.toString();
                                   cCode = c.dialCode.toString();
-                                  setState(() {
-
-                                  });
-
+                                  setState(() {});
                                 },
-                              ),
-                              Icon(Icons.keyboard_arrow_down_outlined,
-                                  color:
-                                      Colors.grey),
+                              ).expand(),
+                              // Icon(Icons.keyboard_arrow_down_outlined, color: Colors.grey),
+
                             ],
                           ),
                         ),
                       ).paddingSymmetric(horizontal: 16, vertical: 4),
+
                       40.height,
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -173,6 +190,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       ).paddingSymmetric(horizontal: 16, vertical: 4),
                       4.height,
                       AppTextField(
+                        focus: _focusNode,
+
                         controller: mMobileCont,
                         textFieldType: TextFieldType.PHONE,
                         // maxLength: 10,
@@ -196,7 +215,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   CountryCodePicker(
-
                                     enabled: false,
                                     initialSelection: cCode,
                                     showCountryOnly: false,
@@ -238,8 +256,9 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       floatingActionButton: AppButton(
         text: 'Request OTP',
-        width: 358,
-        height: 48,
+        padding: EdgeInsetsDirectional.all(0),
+        width: context.width() * 0.68,
+        height: context.height() * 0.056,
         color: primaryColor,
         onTap: () {
           if (mFormKey.currentState!.validate()) {

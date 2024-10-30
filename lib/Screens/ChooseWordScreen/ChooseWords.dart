@@ -57,17 +57,17 @@ class _ChooseWordScreen extends State<ChooseWordScreen> {
                     const SizedBox(
                       height: 10,
                     ),
-                    EquiDistantRow(
-                        playstatus: true,
-                        feedbackstatus: false,
-                        practicestatus: false),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    const Divider(
-                      height: 1,
-                      color: Color(0xffc1c1c1),
-                    ),
+                    // EquiDistantRow(
+                    //     playstatus: true,
+                    //     feedbackstatus: false,
+                    //     practicestatus: false),
+                    // const SizedBox(
+                    //   height: 10,
+                    // ),
+                    // const Divider(
+                    //   height: 1,
+                    //   color: Color(0xffc1c1c1),
+                    // ),
                     SizedBox(
                       height: 15.0,
                     ),
@@ -87,6 +87,9 @@ class _ChooseWordScreen extends State<ChooseWordScreen> {
                                 scrollDirection: Axis.vertical,
                                 itemBuilder: (context, index) {
                                   var data = vm.homePageModel.allGame![index];
+                                  Color containerColor = (index % 2 == 0) ? Color(0xffd3e2f5) : Color(
+                                      0xffe4d7f1);
+
                                   return Column(
                                     children: [
                                       InkWell(
@@ -104,8 +107,8 @@ class _ChooseWordScreen extends State<ChooseWordScreen> {
                                                     .size
                                                     .width *
                                                 0.9,
-                                            decoration: const BoxDecoration(
-                                                color: Color(0xffd3e2f5),
+                                            decoration:  BoxDecoration(
+                                                color: containerColor,
                                                 borderRadius: BorderRadius.all(
                                                     Radius.circular(10.0))),
                                             child: Padding(

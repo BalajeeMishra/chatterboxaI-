@@ -41,7 +41,7 @@ class _OtpScreenState extends State<OtpScreen> {
     return OTPTextField(
 
       key: otpTextFieldKey,
-      pinLength: 6,
+      pinLength: 4,
       fieldWidth: context.width() * 0.1,
       onChanged: (s) {
         // otpCode = s;
@@ -58,6 +58,7 @@ class _OtpScreenState extends State<OtpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: appBarWidget('', context: context),
       body: SingleChildScrollView(
         child: Column(
@@ -180,8 +181,9 @@ class _OtpScreenState extends State<OtpScreen> {
       ),
       floatingActionButton: AppButton(
         text: 'Confirm',
-        width: 358,
-        height: 48,
+        padding: EdgeInsetsDirectional.all(0),
+        width: context.width() * 0.68,
+        height: context.height() * 0.056,
         color: primaryColor,
         onTap: () {
           ProfileScreen(country: widget.country,mobileNumber: widget.mobileNumber,).launch(context);

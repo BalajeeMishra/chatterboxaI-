@@ -32,6 +32,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   GlobalKey<FormState> mFormKey = GlobalKey<FormState>();
   TextEditingController mNameCont = TextEditingController();
   TextEditingController mAgeCont = TextEditingController();
+
+  final FocusNode nameFocus = FocusNode();
+  final FocusNode ageFocus = FocusNode();
+  final FocusNode languageFocus = FocusNode();
+
   List languageList = [
     'Hindi',
     'English',
@@ -96,8 +101,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset:
-          true, // This allows the screen to resize when the keyboard appears
+      resizeToAvoidBottomInset: false,
+
+      // resizeToAvoidBottomInset:
+      //     true, // This allows the screen to resize when the keyboard appears
       appBar: appBarWidget('', context: context),
       body: Form(
         key: mFormKey,
@@ -170,7 +177,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ).paddingSymmetric(horizontal: 16, vertical: 4),
                       4.height,
                       AppTextField(
-                        controller: mNameCont,
+                        focus: nameFocus,
+                        controller: mNameCont,nextFocus: ageFocus,
                         textFieldType: TextFieldType.NAME,
                         isValidationRequired: true,
                         decoration: defaultInputDecoration(context,
@@ -188,6 +196,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ).paddingSymmetric(horizontal: 16, vertical: 4),
                       4.height,
                       AppTextField(
+                        focus: ageFocus,
+                        nextFocus: languageFocus,
                         controller: mAgeCont,
                         textFieldType: TextFieldType.NAME,
                         isValidationRequired: true,
@@ -233,8 +243,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       floatingActionButton: AppButton(
         text: 'Confirm',
-        width: 358,
-        height: 48,
+        padding: EdgeInsetsDirectional.all(0),
+        width: context.width() * 0.68,
+        height: context.height() * 0.056,
         color: primaryColor,
         onTap: () {
           save();

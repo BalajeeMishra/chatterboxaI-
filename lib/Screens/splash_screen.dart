@@ -80,6 +80,9 @@ class _SplashScreenState extends State<SplashScreen> {
         ),
       ),
       floatingActionButton: AppButton(
+        padding: EdgeInsetsDirectional.all(0),
+        width: context.width() * 0.68,
+        height: context.height() * 0.056,
         text: 'Sign up',
         color: primaryColor,
         onTap: () {

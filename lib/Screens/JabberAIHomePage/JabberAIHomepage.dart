@@ -2,6 +2,8 @@
 import 'package:balajiicode/Constants/ImageConstant.dart';
 import 'package:balajiicode/Utils/app_common.dart';
 import 'package:balajiicode/Screens/ChooseWordScreen/ChooseWords.dart';
+import 'package:balajiicode/extensions/app_text_field.dart';
+import 'package:balajiicode/extensions/extension_util/int_extensions.dart';
 import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
 import 'package:balajiicode/extensions/widgets.dart';
 import 'package:flutter/material.dart';
@@ -90,10 +92,10 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
         titleWidget: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Image(image: AssetImage(ImageConstant.micImage)),
-            SizedBox(
-              width: 5.0,
-            ),
+            // Image(image: AssetImage(ImageConstant.micImage)),
+            // SizedBox(
+            //   width: 5.0,
+            // ),
             Text(
               "Jabber AI",
               style: TextStyle(
@@ -124,12 +126,10 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
               await Provider.of<JabberHomeAIvm>(context, listen: false)
                   .homepageAPI(context);
             },
-            // backgroundColor: ,
-
             child: Stack(
               children: [
                 Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10.0),
+                  padding: EdgeInsets.symmetric(vertical: 16.0),
                   child: Consumer<JabberHomeAIvm>(
                     builder: (context, vm, child) {
                       return vm.apiHitStatus
@@ -148,6 +148,9 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
                                   shrinkWrap: true,
                                   itemBuilder: (context, index) {
                                     var data = vm.homePageModel.allGame![index];
+                                    Color containerColor = (index % 2 == 0) ? Color(0xffd3e2f5) : Color(
+                                        0xffe4d7f1);
+
                                     return Padding(
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 20.0),
@@ -162,8 +165,8 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
                                                                 data.sId!)));
                                               },
                                               child: Container(
-                                                  decoration: const BoxDecoration(
-                                                      color: Color(0xffd3e2f5),
+                                                  decoration:  BoxDecoration(
+                                                      color: containerColor,
                                                       borderRadius:
                                                           BorderRadius.all(
                                                               Radius.circular(

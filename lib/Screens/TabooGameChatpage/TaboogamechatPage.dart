@@ -11,9 +11,11 @@ import 'package:provider/provider.dart';
 import '../../Constants/constantRow.dart';
 import '../../Model/AllGameModel.dart';
 import '../../Utils/app_colors.dart';
+import '../../Utils/app_common.dart';
 import '../../ViewModel/TabooGameChatPageVM.dart';
 import '../../Widget/appbar.dart';
 import '../../main.dart';
+import '../../network/rest_api.dart';
 
 class TaboogamechatPage extends StatefulWidget {
   final AllGameModel allGameModel;
@@ -35,10 +37,24 @@ class _TaboogamechatPage extends State<TaboogamechatPage> {
   void initState() {
     super.initState();
     _scrollController = ScrollController();
-    Provider.of<TabooGameChatPageVM>(context, listen: false).dynamicData.clear();
+    Provider.of<TabooGameChatPageVM>(context, listen: false)
+        .dynamicData
+        .clear();
 
     Provider.of<TabooGameChatPageVM>(context, listen: false)
         .setInitialValue(widget.allGameModel, widget.index);
+    allConversationApiCall();
+  }
+
+  allConversationApiCall() async {
+    await allConversationApi(widget.sessionId)
+        .then((value) async {})
+        .catchError((e) {
+      appStore.setLoading(false);
+      toast(e.toString());
+
+      setState(() {});
+    });
   }
 
   @override
@@ -77,16 +93,16 @@ class _TaboogamechatPage extends State<TaboogamechatPage> {
           Column(
             children: [
               SizedBox(height: 10),
-              EquiDistantRow(
-                playstatus: true,
-                feedbackstatus: false,
-                practicestatus: false,
-              ),
-              const SizedBox(height: 10),
-              const Divider(
-                height: 1,
-                color: Color(0xffc1c1c1),
-              ),
+              // EquiDistantRow(
+              //   playstatus: true,
+              //   feedbackstatus: false,
+              //   practicestatus: false,
+              // ),
+              // const SizedBox(height: 10),
+              // const Divider(
+              //   height: 1,
+              //   color: Color(0xffc1c1c1),
+              // ),
               const SizedBox(height: 10),
               Expanded(
                 child: Padding(
@@ -118,19 +134,20 @@ class _TaboogamechatPage extends State<TaboogamechatPage> {
                                           vertical: 10.0,
                                         ),
                                         child: Column(
-
                                           children: [
                                             Row(
                                               children: [
                                                 MyText(
-                                                  text: "${vm.initialdata.keys.first}:",
+                                                  text:
+                                                      "${vm.initialdata.keys.first}:",
                                                   fontWeight: FontWeight.w600,
                                                   fontSize: 15,
                                                 ),
                                                 SizedBox(width: 2),
                                                 Expanded(
                                                   child: MyText(
-                                                    text: "${vm.initialdata.values.first}",
+                                                    text:
+                                                        "${vm.initialdata.values.first}",
                                                     fontWeight: FontWeight.w400,
                                                     fontSize: 15,
                                                   ),
@@ -138,11 +155,12 @@ class _TaboogamechatPage extends State<TaboogamechatPage> {
                                               ],
                                             ),
                                             Row(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 MyText(
-                                                  text: "${vm.initialdata.keys.last}:",
+                                                  text:
+                                                      "${vm.initialdata.keys.last}:",
                                                   fontWeight: FontWeight.w600,
                                                   fontSize: 15,
                                                 ),
@@ -150,7 +168,8 @@ class _TaboogamechatPage extends State<TaboogamechatPage> {
                                                 Flexible(
                                                   child: Text(
                                                     "${vm.initialdata.values.last}"
-                                                        .replaceAll('\u200b', ""),
+                                                        .replaceAll(
+                                                            '\u200b', ""),
                                                     style: primaryTextStyle(
                                                       weight: FontWeight.w400,
                                                       size: 15,
@@ -185,13 +204,15 @@ class _TaboogamechatPage extends State<TaboogamechatPage> {
                                 var data = vm.dynamicData[index];
                                 return data['server'] == 0
                                     ? Align(
-                                  alignment: Alignment.centerRight,
-                                  child: _buildMessageBubble(data['data'], true),
-                                )
+                                        alignment: Alignment.centerRight,
+                                        child: _buildMessageBubble(
+                                            data['data'], true),
+                                      )
                                     : Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: _buildMessageBubble(data['data'].toString(), false),
-                                );
+                                        alignment: Alignment.centerLeft,
+                                        child: _buildMessageBubble(
+                                            data['data'].toString(), false),
+                                      );
                               },
                             );
                           },
@@ -205,7 +226,8 @@ class _TaboogamechatPage extends State<TaboogamechatPage> {
             ],
           ),
           Positioned(
-            bottom: 30,
+            bottom: 20,
+            right: 220,
             child: Observer(
               builder: (context) {
                 return Lottie.asset(
@@ -225,7 +247,8 @@ class _TaboogamechatPage extends State<TaboogamechatPage> {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
+        constraints:
+            BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
           decoration: BoxDecoration(
@@ -244,6 +267,7 @@ class _TaboogamechatPage extends State<TaboogamechatPage> {
       ),
     );
   }
+
   Widget _buildMessageInput(BuildContext context) {
     return Padding(
       padding: EdgeInsets.all(15),
@@ -272,23 +296,28 @@ class _TaboogamechatPage extends State<TaboogamechatPage> {
           GestureDetector(
             onTap: () {
               FocusScope.of(context).unfocus();
-              var chatPageVM = Provider.of<TabooGameChatPageVM>(context, listen: false);
+              var chatPageVM =
+                  Provider.of<TabooGameChatPageVM>(context, listen: false);
               String messageText = chatPageVM.controller.text.trim();
 
               if (isFirst) {
                 chatPageVM.dynamicData.insert(0, {
-                  'data': "${chatPageVM.initialdata.keys.first}: ${chatPageVM.initialdata.values.first}",
+                  'data':
+                      "${chatPageVM.initialdata.keys.first}: ${chatPageVM.initialdata.values.first}",
                   'server': 1,
                 });
                 chatPageVM.dynamicData.insert(1, {
-                  'data': "${chatPageVM.initialdata.keys.last}: ${chatPageVM.initialdata.values.last}",
+                  'data':
+                      "${chatPageVM.initialdata.keys.last}: ${chatPageVM.initialdata.values.last}",
                   'server': 1,
                 });
 
-                chatPageVM.chatPageAPI(context, widget.sessionId, messageText,widget.allGameModel,widget.index);
+                chatPageVM.chatPageAPI(context, widget.sessionId, messageText,
+                    widget.allGameModel, widget.index);
                 isFirst = false;
               } else {
-                chatPageVM.chatPageAPI(context, widget.sessionId, messageText,widget.allGameModel,widget.index);
+                chatPageVM.chatPageAPI(context, widget.sessionId, messageText,
+                    widget.allGameModel, widget.index);
               }
 
               chatPageVM.controller.clear();
@@ -306,5 +335,4 @@ class _TaboogamechatPage extends State<TaboogamechatPage> {
       ),
     );
   }
-
 }

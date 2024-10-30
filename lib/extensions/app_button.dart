@@ -113,10 +113,10 @@ class _AppButtonState extends State<AppButton>
     return Padding(
       padding: widget.margin ?? EdgeInsets.zero,
       child: Container(
-        width: context.width() * 0.8,
-        height: context.height() * 0.08,
-        // width: widget.width,
-        // height: widget.height,
+        // width: context.width() * 0.8,
+        // height: context.height() * 0.08,
+        width: widget.width,
+        height: widget.height,
         decoration: BoxDecoration(
           color: widget.color ?? appButtonBackgroundColorGlobal,
           borderRadius: widget.shapeBorder is RoundedRectangleBorder
