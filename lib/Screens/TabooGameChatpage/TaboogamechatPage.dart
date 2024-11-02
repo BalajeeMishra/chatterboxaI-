@@ -47,9 +47,9 @@ class _TaboogamechatPage extends State<TaboogamechatPage> {
   }
 
   allConversationApiCall() async {
-    await allConversationApi(widget.sessionId)
-        .then((value) async {})
-        .catchError((e) {
+    await allConversationApi(widget.sessionId).then((value) async {
+      print("Response Value is ==>" + value.completeConversation.toString());
+    }).catchError((e) {
       appStore.setLoading(false);
       toast(e.toString());
 
