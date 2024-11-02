@@ -22,6 +22,22 @@ catch(err){
 }
 })
 
+router.post("/checkphoneno",async(req,res,next)=>{
+  try{
+  const {mobileNo} = req.body; 
+  const user = await User.findOne({mobileNo});
+  if(user){
+    return res.status(200).json({message:"User already exist"}); 
+  }
+  else{
+    return res.status(404).json({message:"User doesn't exist"}); 
+  }
+}
+catch(err){
+  throw err;
+}
+})
+
 router.patch("/changestatus/:id",async(req,res,next)=>{
   try{
   const {id} = req.params; 
