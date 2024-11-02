@@ -89,10 +89,10 @@ class MyAppState extends State<MyApp> {
         navigatorKey: navigatorKey,
         title: APP_NAME,
         debugShowCheckedModeBanner: false,
-        home: getStringAsync(TOKEN).toString().isEmpty
-            ?  SplashScreen()
-            : JabberAIHomepage(),
-        // home:SplashScreen(),
+        // home: getStringAsync(TOKEN).toString().isEmpty
+        //     ?  SplashScreen()
+        //     : JabberAIHomepage(),
+        home:SplashScreen(),
         // home:ExpiredScreen(),
         scrollBehavior: SBehavior(),
         builder: EasyLoading.init(),

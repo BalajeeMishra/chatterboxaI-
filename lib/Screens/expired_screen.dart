@@ -1,4 +1,5 @@
 import 'package:balajiicode/Utils/app_images.dart';
+import 'package:balajiicode/extensions/extension_util/context_extensions.dart';
 import 'package:balajiicode/extensions/extension_util/int_extensions.dart';
 import 'package:flutter/material.dart';
 import '../Constants/ImageConstant.dart';
@@ -99,6 +100,9 @@ class _ExpiredScreenState extends State<ExpiredScreen> {
               padding: const EdgeInsets.only(
                   bottom: 40.0), // 40 pixels from the bottom
               child: AppButton(
+                padding: EdgeInsetsDirectional.all(8),
+                width: context.width() * 0.70,
+                height: context.height() * 0.056,
                 // text: '',
                 textColor: Colors.black,
                 color: Colors.white,

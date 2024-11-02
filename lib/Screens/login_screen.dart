@@ -14,12 +14,15 @@ import 'package:flutter/services.dart';
 import '../Utils/app_colors.dart';
 import '../Utils/app_colors.dart';
 import '../Utils/app_colors.dart';
+import '../Utils/app_common.dart';
 import '../Utils/app_constants.dart';
 import '../extensions/app_button.dart';
 import '../extensions/colors.dart';
 import '../extensions/constants.dart';
 import '../extensions/decorations.dart';
 import '../extensions/shared_pref.dart';
+import '../main.dart';
+import '../network/rest_api.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -32,7 +35,6 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController mMobileCont = TextEditingController();
   GlobalKey<FormState> mFormKey = GlobalKey<FormState>();
   final FocusNode _focusNode = FocusNode();
-  // final ValueNotifier<bool> _isFabVisible = ValueNotifier(true);
   final GlobalKey countryPickerKey = GlobalKey();
 
   String selectedCountry = "India";
@@ -40,10 +42,34 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
+  }
 
-    // _focusNode.addListener(() {
-    //   _isFabVisible.value = !_focusNode.hasFocus;
-    // });
+  Future<void> mobileNumberCheck() async {
+    Map<String, dynamic> req = {
+      'checkphoneno': mMobileCont.text.trim(),
+    };
+    await mobileNumberCheckApi(
+      req,
+    ).then((value) async {
+      if (value.message == "User already exist") {
+        toast(value.message.toString());
+      } else {
+        OtpScreen(
+          country: selectedCountry,
+          mobileNumber: cCode.toString() + mMobileCont.text,
+        ).launch(context);
+      }
+    }).catchError((e) {
+      if (e.toString() == "User doesn't exist") {
+        OtpScreen(
+          country: selectedCountry,
+          mobileNumber: cCode.toString() + mMobileCont.text,
+        ).launch(context);
+      } else {
+        toast(e.toString());
+      }
+      appStore.setLoading(false);
+    });
   }
 
   @override
@@ -143,7 +169,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           width: double.infinity,
                           // height: 60,
                           child: Row(
-                            mainAxisSize: MainAxisSize.min, // Use max size for the row
+                            mainAxisSize:
+                                MainAxisSize.min, // Use max size for the row
 
                             // mainAxisAlignment: MainAxisAlignment.start, // Align children
 
@@ -155,15 +182,17 @@ class _LoginScreenState extends State<LoginScreen> {
                                 showFlag: true,
                                 boxDecoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(8),
-                                  color: Theme.of(context).scaffoldBackgroundColor,
+                                  color:
+                                      Theme.of(context).scaffoldBackgroundColor,
                                 ),
                                 showFlagDialog: true,
                                 showOnlyCountryWhenClosed: true,
                                 alignLeft: false,
-                                padding:
-                                    EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 4),
                                 textStyle: TextStyle(
-                                    color: Colors.black), // Customize your text style
+                                    color: Colors
+                                        .black), // Customize your text style
                                 onChanged: (c) {
                                   selectedCountry = c.name.toString();
                                   cCode = c.dialCode.toString();
@@ -171,7 +200,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                 },
                               ).expand(),
                               // Icon(Icons.keyboard_arrow_down_outlined, color: Colors.grey),
-
                             ],
                           ),
                         ),
@@ -262,10 +290,7 @@ class _LoginScreenState extends State<LoginScreen> {
         color: primaryColor,
         onTap: () {
           if (mFormKey.currentState!.validate()) {
-            OtpScreen(
-              country: selectedCountry,
-              mobileNumber: cCode.toString() + mMobileCont.text,
-            ).launch(context);
+            mobileNumberCheck();
           }
         },
       ),

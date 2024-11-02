@@ -41,7 +41,7 @@ class _OtpScreenState extends State<OtpScreen> {
     return OTPTextField(
 
       key: otpTextFieldKey,
-      pinLength: 4,
+      pinLength: 6,
       fieldWidth: context.width() * 0.1,
       onChanged: (s) {
         // otpCode = s;

@@ -1,5 +1,5 @@
-
 import 'package:balajiicode/Constants/ImageConstant.dart';
+import 'package:balajiicode/Screens/expired_screen.dart';
 import 'package:balajiicode/Utils/app_common.dart';
 import 'package:balajiicode/Screens/ChooseWordScreen/ChooseWords.dart';
 import 'package:balajiicode/extensions/app_text_field.dart';
@@ -18,6 +18,7 @@ import '../../components/double_back_to_close_app.dart';
 import '../../extensions/loader_widget.dart';
 import '../../extensions/text_styles.dart';
 import '../../main.dart';
+import '../../network/rest_api.dart';
 
 class JabberAIHomepage extends StatefulWidget {
   @override
@@ -25,6 +26,7 @@ class JabberAIHomepage extends StatefulWidget {
 }
 
 class _JabberAIHomepage extends State<JabberAIHomepage> {
+  bool isStatus = false;
   List<Map<String, dynamic>> datalist = [
     {
       "title": "Taboo",
@@ -63,9 +65,22 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
   @override
   void initState() {
     super.initState();
+    checkStatus();
     appStore.setLoading(false);
     Provider.of<JabberHomeAIvm>(context, listen: false).seInitialValue();
     Provider.of<JabberHomeAIvm>(context, listen: false).homepageAPI(context);
+  }
+
+  Future<void> checkStatus() async {
+    Map<String, dynamic> req = {
+      'playingstatus': true,
+    };
+    await statusCheckApi(req, userId: userStore.userId).then((value) async {
+      isStatus = value.updateduser!.playingstatus!;
+    }).catchError((e) {
+      appStore.setLoading(false);
+      toast(e.toString());
+    });
   }
 
   @override
@@ -148,8 +163,9 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
                                   shrinkWrap: true,
                                   itemBuilder: (context, index) {
                                     var data = vm.homePageModel.allGame![index];
-                                    Color containerColor = (index % 2 == 0) ? Color(0xffd3e2f5) : Color(
-                                        0xffe4d7f1);
+                                    Color containerColor = (index % 2 == 0)
+                                        ? Color(0xffd3e2f5)
+                                        : Color(0xffe4d7f1);
 
                                     return Padding(
                                         padding: const EdgeInsets.symmetric(
@@ -158,14 +174,19 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
                                           children: [
                                             InkWell(
                                               onTap: () {
-                                                Navigator.of(context).push(
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            ChooseWordScreen(
-                                                                data.sId!)));
+                                                if (isStatus == false) {
+                                                  ExpiredScreen()
+                                                      .launch(context);
+                                                } else {
+                                                  Navigator.of(context).push(
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              ChooseWordScreen(
+                                                                  data.sId!)));
+                                                }
                                               },
                                               child: Container(
-                                                  decoration:  BoxDecoration(
+                                                  decoration: BoxDecoration(
                                                       color: containerColor,
                                                       borderRadius:
                                                           BorderRadius.all(
