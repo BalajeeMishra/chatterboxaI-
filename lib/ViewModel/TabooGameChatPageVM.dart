@@ -1,4 +1,5 @@
 import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
+import 'package:balajiicode/extensions/shared_pref.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
@@ -8,6 +9,7 @@ import '../Model/TabooGameChatPageModel.dart';
 import '../Repository/TaboogameChatPageRepository.dart';
 import '../Services/ApiResponseStatus.dart';
 import '../Utils/ShowSnackBar.dart';
+import '../Utils/app_constants.dart';
 import '../extensions/loader_widget.dart';
 import '../main.dart';
 
@@ -41,7 +43,10 @@ class TabooGameChatPageVM extends ChangeNotifier {
     tabooGameChatPageModel = TabooGameChatPageModel();
     notifyListeners();
   }
-
+  void updateTransactionData(List<Map<String, dynamic>> transactions) {
+    dynamicData = transactions;
+    notifyListeners();
+  }
   Future<void> chatPageAPI(BuildContext context, String sessionId, String messageText,AllGameModel allGameModel, int index) async {
     if (messageText.isEmpty) {
       MySnackBar.showSnackBar(context, "Please Enter Your Response");
@@ -59,7 +64,7 @@ class TabooGameChatPageVM extends ChangeNotifier {
 
     try {
       var data = {
-        "userId": userStore.userId,
+        "userId": getStringAsync(USER_ID),
         "session": sessionId,
         "question": messageText,
         "firstword":allGameModel.allGame![index].mainContent

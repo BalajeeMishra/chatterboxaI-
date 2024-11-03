@@ -4,6 +4,7 @@ import 'package:balajiicode/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import '../Model/AllConversationModel.dart';
 import '../Model/AllGameModel.dart';
 import '../Constants/constant_text.dart';
 import '../Model/TabooGameChatPageModel.dart';
@@ -50,11 +51,22 @@ class PlayTabooScreenVM extends ChangeNotifier {
     tabooGameChatPageModel = TabooGameChatPageModel();
   }
 
+  Response convertToResponse(CompleteConversation completeConversation) {
+    return Response(
+      aiResponse: completeConversation.aiResponse,
+    );
+  }
   Future<void> clearAiResponse() async {
     tabooGameChatPageModel.response?.aiResponse?.last = "";
-    notifyListeners(); // Notify listeners to update the UI
+    notifyListeners();
     await Future.delayed(Duration(milliseconds: 100));
   }
+  void updateResponse(CompleteConversation completeConversation) {
+    tabooGameChatPageModel.response = convertToResponse(completeConversation); // Make sure this returns a Response
+    notifyListeners();
+  }
+
+
 
   Future<void> chatPageAPI(
       BuildContext context, String dataGet, String sessionId,AllGameModel allGameModel, int index) async {

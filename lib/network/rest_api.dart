@@ -1,5 +1,6 @@
 import '../Model/AllConversationModel.dart';
 import '../Model/ChangeStatusModel.dart';
+import '../Model/CheckStatusModel.dart';
 import '../Model/base_response.dart';
 import '../Model/registerResponse.dart';
 
@@ -18,11 +19,11 @@ Future<AllConversationResponse> allConversationApi(String sessionId) async {
           method: HttpMethod.GET)));
 }
 
-Future<ChangeStatusModel> statusCheckApi(Map req,
+Future<CheckStatusModel> statusCheckApi(
     {String? userId}) async {
-  return ChangeStatusModel.fromJson(await handleResponse(
-      await buildHttpResponse('user/changestatus/$userId',
-          request: req, method: HttpMethod.PATCH)));
+  return CheckStatusModel.fromJson(await handleResponse(
+      await buildHttpResponse('user/checkstatus/$userId',
+          method: HttpMethod.GET)));
 }
 Future<ChatterboxAiBaseResponse> mobileNumberCheckApi(Map req,
     ) async {

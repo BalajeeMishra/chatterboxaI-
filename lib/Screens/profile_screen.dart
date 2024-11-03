@@ -84,6 +84,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           userStore.setToken(value.accessToken.toString());
           setValue(USER_ID, value.newUser!.userId.toString());
           userStore.setUserID(value.newUser!.userId.toString());
+          setValue(USER_NATIVE_LANGUAGE, value.newUser!.nativeLanguage.toString());
+          userStore.setUserNativeLanguage(value.newUser!.nativeLanguage.toString());
           await userStore.setLogin(true);
           JabberAIHomepage().launch(context);
         } else {

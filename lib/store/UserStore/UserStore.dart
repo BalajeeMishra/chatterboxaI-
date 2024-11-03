@@ -1,10 +1,11 @@
 import 'dart:convert';
 // import '../../models/progress_setting_model.dart';
 // import 'package:image_picker/image_picker.dart';
+import 'package:balajiicode/Utils/app_constants.dart';
 import 'package:mobx/mobx.dart';
 import '../../extensions/shared_pref.dart';
 // import '../../models/user_response.dart';
-import '../../utils/app_constants.dart';
+// import '../../utils/app_constants.dart';
 
 part 'UserStore.g.dart';
 
@@ -16,6 +17,9 @@ abstract class UserStoreBase with Store {
 
   @observable
   String userId = '';
+
+  @observable
+  String userNativeLanguage = '';
 
   @observable
   String email = '';
@@ -88,6 +92,11 @@ abstract class UserStoreBase with Store {
   Future<void> setUserID(String val, {bool isInitialization = false}) async {
     userId = val;
     if (!isInitialization) await setValue(USER_ID, val);
+  }
+  @action
+  Future<void> setUserNativeLanguage(String val, {bool isInitialization = false}) async {
+    userNativeLanguage = val;
+    if (!isInitialization) await setValue(USER_NATIVE_LANGUAGE, val);
   }
 
   @action

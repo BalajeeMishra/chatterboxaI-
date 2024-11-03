@@ -2,6 +2,7 @@ import 'package:balajiicode/Constants/ImageConstant.dart';
 import 'package:balajiicode/Screens/expired_screen.dart';
 import 'package:balajiicode/Utils/app_common.dart';
 import 'package:balajiicode/Screens/ChooseWordScreen/ChooseWords.dart';
+import 'package:balajiicode/Utils/app_constants.dart';
 import 'package:balajiicode/extensions/app_text_field.dart';
 import 'package:balajiicode/extensions/extension_util/int_extensions.dart';
 import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
@@ -16,6 +17,7 @@ import '../../ViewModel/JabberHomeAIvm.dart';
 import '../../Widget/text_widget.dart';
 import '../../components/double_back_to_close_app.dart';
 import '../../extensions/loader_widget.dart';
+import '../../extensions/shared_pref.dart';
 import '../../extensions/text_styles.dart';
 import '../../main.dart';
 import '../../network/rest_api.dart';
@@ -72,11 +74,9 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
   }
 
   Future<void> checkStatus() async {
-    Map<String, dynamic> req = {
-      'playingstatus': true,
-    };
-    await statusCheckApi(req, userId: userStore.userId).then((value) async {
-      isStatus = value.updateduser!.playingstatus!;
+
+    await statusCheckApi( userId: getStringAsync(USER_ID)).then((value) async {
+      isStatus = value.playingstatus!;
     }).catchError((e) {
       appStore.setLoading(false);
       toast(e.toString());

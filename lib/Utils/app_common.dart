@@ -154,6 +154,8 @@ setLogInValue() {
   if (userStore.isLoggedIn) {
     userStore.setToken(getStringAsync(TOKEN));
     userStore.setUserID(getStringAsync(USER_ID));
+    userStore.setUserNativeLanguage(getStringAsync(USER_NATIVE_LANGUAGE));
+
 
 
 

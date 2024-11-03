@@ -41,6 +41,22 @@ mixin _$UserStore on UserStoreBase, Store {
     });
   }
 
+  late final _$userNativeLanguageAtom =
+      Atom(name: 'UserStoreBase.userNativeLanguage', context: context);
+
+  @override
+  String get userNativeLanguage {
+    _$userNativeLanguageAtom.reportRead();
+    return super.userNativeLanguage;
+  }
+
+  @override
+  set userNativeLanguage(String value) {
+    _$userNativeLanguageAtom.reportWrite(value, super.userNativeLanguage, () {
+      super.userNativeLanguage = value;
+    });
+  }
+
   late final _$emailAtom = Atom(name: 'UserStoreBase.email', context: context);
 
   @override
@@ -288,6 +304,16 @@ mixin _$UserStore on UserStoreBase, Store {
         .run(() => super.setUserID(val, isInitialization: isInitialization));
   }
 
+  late final _$setUserNativeLanguageAsyncAction =
+      AsyncAction('UserStoreBase.setUserNativeLanguage', context: context);
+
+  @override
+  Future<void> setUserNativeLanguage(String val,
+      {bool isInitialization = false}) {
+    return _$setUserNativeLanguageAsyncAction.run(() =>
+        super.setUserNativeLanguage(val, isInitialization: isInitialization));
+  }
+
   late final _$setLoginAsyncAction =
       AsyncAction('UserStoreBase.setLogin', context: context);
 
@@ -328,6 +354,7 @@ mixin _$UserStore on UserStoreBase, Store {
     return '''
 isLoggedIn: ${isLoggedIn},
 userId: ${userId},
+userNativeLanguage: ${userNativeLanguage},
 email: ${email},
 password: ${password},
 fName: ${fName},

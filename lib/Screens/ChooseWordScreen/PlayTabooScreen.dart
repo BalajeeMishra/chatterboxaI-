@@ -1,7 +1,9 @@
 import 'package:balajiicode/Constants/ImageConstant.dart';
 import 'package:balajiicode/Constants/constantRow.dart';
+import 'package:balajiicode/Model/TabooGameChatPageModel.dart';
 import 'package:balajiicode/Widget/text_widget.dart';
 import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
+import 'package:balajiicode/extensions/shared_pref.dart';
 import 'package:balajiicode/extensions/text_styles.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -11,13 +13,17 @@ import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
+import '../../Model/AllConversationModel.dart';
 import '../../Model/AllGameModel.dart';
 import '../../Utils/app_colors.dart';
+import '../../Utils/app_common.dart';
+import '../../Utils/app_constants.dart';
 import '../../Utils/app_images.dart';
 import '../../ViewModel/PlayTabooScreenVM.dart';
 import '../../Widget/appbar.dart';
 import '../../components/loader_widget_new.dart';
 import '../../main.dart';
+import '../../network/rest_api.dart';
 import '../TabooGameChatpage/TaboogamechatPage.dart';
 import 'package:uuid/uuid.dart';
 
@@ -50,15 +56,49 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   bool isSpeaking = false;
   String message = '';
   int _lastSpokenIndex = 0;
+  String selectedLanguage = 'English';
 
   @override
   void initState() {
     super.initState();
     appStore.setLoading(false);
     startListening = false;
-    print("at Init time session id is==>" + Uuid().v4());
+    if(getStringAsync(USER_NATIVE_LANGUAGE).isNotEmpty){
+      selectedLanguage = getStringAsync(USER_NATIVE_LANGUAGE);
+      print("Selected Language is ==>  "+selectedLanguage.toString());
+    }
+    // print("at Init time session id is==>" + Uuid().v4());
+    // allConversationApiCall();
+
     setState(() {});
   }
+  Response convertToResponse(CompleteConversation completeConversation) {
+    return Response(
+      aiResponse: completeConversation.aiResponse,
+    );
+  }
+  Future<void> allConversationApiCall() async {
+    appStore.setLoading(true);
+
+    await allConversationApi(widget.sessionId).then((value) async {
+      appStore.setLoading(false);
+
+      if (value.completeConversation != null) {
+        print("Received complete conversation: ${value.completeConversation}");
+        apiCalled = true;
+
+        Provider.of<PlayTabooScreenVM>(context, listen: false)
+            .updateResponse(value.completeConversation!);
+      } else {
+        print("No conversations available.");
+      }
+    }).catchError((e) {
+      appStore.setLoading(false);
+      toast(e.toString());
+      setState(() {});
+    });
+  }
+
 
   void _initSpeech() async {
     _speechEnabled = await _speechToText.initialize();
@@ -95,10 +135,58 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   }
 
   Future<void> configureTts() async {
-    await flutterTts.setLanguage('en-US');
+    setTtsLanguage(selectedLanguage);
+    // await flutterTts.setLanguage('en-US');
     await flutterTts.setVolume(1.0);
     await flutterTts.setSpeechRate(speechRate);
     isSpeaking = true;
+  }
+  Future<void> setTtsLanguage(String language) async {
+    String ttsLanguage;
+
+    switch (language) {
+      case 'Hindi':
+        ttsLanguage = 'hi-IN';
+        break;
+      case 'English':
+        ttsLanguage = 'en-US';
+        break;
+      case 'Bengali':
+        ttsLanguage = 'bn-IN';
+        break;
+      case 'Kannada':
+        ttsLanguage = 'kn-IN';
+        break;
+      case 'Malayalam':
+        ttsLanguage = 'ml-IN';
+        break;
+      case 'Marathi':
+        ttsLanguage = 'mr-IN';
+        break;
+      case 'Nepali':
+        ttsLanguage = 'ne-NP';
+        break;
+      case 'Punjabi':
+        ttsLanguage = 'pa-IN';
+        break;
+      case 'Tamil':
+        ttsLanguage = 'ta-IN';
+        break;
+      case 'Telugu':
+        ttsLanguage = 'te-IN';
+        break;
+      case 'Urdu':
+        ttsLanguage = 'ur-IN';
+        break;
+      case 'Gujarati':
+        ttsLanguage = 'gu-IN';
+        break;
+      default:
+        ttsLanguage = 'en-US';
+        break;
+    }
+
+    await flutterTts.setLanguage(ttsLanguage);
   }
 
   /// Speak text with TTS
@@ -184,9 +272,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
   String _getRemainingText() {
     if (_lastSpokenIndex < _lastWords.length) {
-      print("_getRemainingText_lastWords 3 ==>" + _lastWords.toString());
-      print("_getRemainingText_lastWords 4==>" + _lastWords.length.toString());
-      print("_getRemainingText_lastWords 5==>" + _lastSpokenIndex.toString());
 
       return _lastWords.substring(_lastSpokenIndex);
     }
@@ -228,8 +313,8 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
     Provider.of<PlayTabooScreenVM>(context, listen: false)
         .seInitialValue(widget.allGameModel, widget.index, widget.sessionId);
-    Provider.of<PlayTabooScreenVM>(context, listen: false)
-        .chatPageAPI(context, ques, widget.sessionId, widget.allGameModel, widget.index);
+    Provider.of<PlayTabooScreenVM>(context, listen: false).chatPageAPI(
+        context, ques, widget.sessionId, widget.allGameModel, widget.index);
     configureTts();
     apiCalled = true;
     _lastWords = appStore.lastWords;
@@ -361,7 +446,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                 width: MediaQuery.of(context).size.width,
                                 height: 50,
                                 child: ListView.builder(
-                                  physics: AlwaysScrollableScrollPhysics(),
+                                    physics: AlwaysScrollableScrollPhysics(),
                                     itemCount: widget
                                         .allGameModel
                                         .allGame![widget.index]
@@ -420,9 +505,10 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                 ? LoadingWidget(
                                     message: message,
                                   )
-                                : Padding(
+                                :
+                            Padding(
                                     padding: EdgeInsets.symmetric(
-                                        horizontal: 28.0,vertical: 8),
+                                        horizontal: 28.0, vertical: 8),
                                     child: Row(
                                       children: [
                                         Expanded(
@@ -446,11 +532,15 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                                               .last ==
                                                           "")
                                                   ? Text("")
-                                                  : Text(vm
-                                                      .tabooGameChatPageModel
-                                                      .response!
-                                                      .aiResponse!
-                                                      .last,style: primaryTextStyle(size: 16),),
+                                                  : Text(
+                                                      vm
+                                                          .tabooGameChatPageModel
+                                                          .response!
+                                                          .aiResponse!
+                                                          .last,
+                                                      style: primaryTextStyle(
+                                                          size: 16),
+                                                    ),
                                         )
                                       ],
                                     ),
@@ -467,16 +557,30 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             GestureDetector(
-                              onTap: () {
-                               
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => TaboogamechatPage(
-                                            widget.allGameModel,
-                                            widget.index,
-                                            widget.sessionId)));
+                              onTap: () async {
+                                stopSpeaking();
+                                final bool? res = await TaboogamechatPage(
+                                  widget.allGameModel,
+                                  widget.index,
+                                  widget.sessionId,
+                                ).launch(context);
+                                if (res == true) {
+                                  allConversationApiCall();
+                                  print("R!E!S");
+                                }else{
+                                  print("False");
+                                }
                               },
+                              // onTap: () {
+                              //
+                              //   Navigator.push(
+                              //       context,
+                              //       MaterialPageRoute(
+                              //           builder: (context) => TaboogamechatPage(
+                              //               widget.allGameModel,
+                              //               widget.index,
+                              //               widget.sessionId)));
+                              // },
                               child: Column(
                                 children: [
                                   Icon(
