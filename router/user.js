@@ -27,7 +27,8 @@ router.post("/checkphoneno",async(req,res,next)=>{
   const {mobileNo} = req.body; 
   const user = await User.findOne({mobileNo});
   if(user){
-    return res.status(200).json({message:"User already exist"}); 
+    const accessToken = await jwtHelper.signAccessToken(user?.id);
+    return res.status(200).json({user,accessToken}); 
   }
   else{
     return res.status(404).json({message:"User doesn't exist"}); 
