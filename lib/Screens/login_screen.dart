@@ -44,33 +44,6 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
   }
 
-  Future<void> mobileNumberCheck() async {
-    Map<String, dynamic> req = {
-      'checkphoneno': mMobileCont.text.trim(),
-    };
-    await mobileNumberCheckApi(
-      req,
-    ).then((value) async {
-      if (value.message == "User already exist") {
-        toast(value.message.toString());
-      } else {
-        OtpScreen(
-          country: selectedCountry,
-          mobileNumber: cCode.toString() + mMobileCont.text,
-        ).launch(context);
-      }
-    }).catchError((e) {
-      if (e.toString() == "User doesn't exist") {
-        OtpScreen(
-          country: selectedCountry,
-          mobileNumber: cCode.toString() + mMobileCont.text,
-        ).launch(context);
-      } else {
-        toast(e.toString());
-      }
-      appStore.setLoading(false);
-    });
-  }
 
   @override
   void dispose() {
@@ -290,8 +263,10 @@ class _LoginScreenState extends State<LoginScreen> {
         color: primaryColor,
         onTap: () {
           if (mFormKey.currentState!.validate()) {
-            mobileNumberCheck();
-          }
+            OtpScreen(
+              country: selectedCountry,
+              mobileNumber: cCode.toString() + mMobileCont.text,
+            ).launch(context);          }
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,

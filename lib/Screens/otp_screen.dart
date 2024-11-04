@@ -1,3 +1,4 @@
+import 'package:balajiicode/Screens/JabberAIHomePage/JabberAIHomepage.dart';
 import 'package:balajiicode/Screens/profile_screen.dart';
 import 'package:balajiicode/extensions/extension_util/context_extensions.dart';
 import 'package:balajiicode/extensions/extension_util/int_extensions.dart';
@@ -6,27 +7,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 
 import '../Utils/app_colors.dart';
+import '../Utils/app_common.dart';
 import '../extensions/app_button.dart';
 import '../extensions/loader_widget.dart';
 import '../extensions/otp_text_field.dart';
 import '../extensions/text_styles.dart';
 import '../extensions/widgets.dart';
 import '../main.dart';
+import '../network/rest_api.dart';
 
 class OtpScreen extends StatefulWidget {
-  final String  country;
+  final String country;
   final String mobileNumber;
-   OtpScreen({required this.country,required this.mobileNumber, super.key});
+  OtpScreen({required this.country, required this.mobileNumber, super.key});
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
 }
 
 class _OtpScreenState extends State<OtpScreen> {
-
   GlobalKey<OTPTextFieldState> otpTextFieldKey = GlobalKey<OTPTextFieldState>();
-
-
 
   @override
   void initState() {
@@ -36,10 +36,8 @@ class _OtpScreenState extends State<OtpScreen> {
     super.initState();
   }
 
-
   Widget otpInputField() {
     return OTPTextField(
-
       key: otpTextFieldKey,
       pinLength: 6,
       fieldWidth: context.width() * 0.1,
@@ -55,6 +53,30 @@ class _OtpScreenState extends State<OtpScreen> {
     ).center();
   }
 
+  Future<void> mobileNumberCheck() async {
+    Map<String, dynamic> req = {
+      'mobileNo': widget.mobileNumber.trim(),
+    };
+    await mobileNumberCheckApi(
+      req,
+    ).then((value) async {
+      if (value.message == "User already exist") {
+        JabberAIHomepage().launch(context);
+      }
+    }).catchError((e) {
+      if (e.toString() == "User doesn't exist") {
+        ProfileScreen(
+          country: widget.country,
+          mobileNumber: widget.mobileNumber,
+        ).launch(context);
+        setState(() {
+
+        });
+      }
+      appStore.setLoading(false);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,7 +89,7 @@ class _OtpScreenState extends State<OtpScreen> {
               alignment: Alignment.topCenter,
               children: [
                 Container(
-                  height: context.height() *0.28,
+                  height: context.height() * 0.28,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
@@ -80,7 +102,7 @@ class _OtpScreenState extends State<OtpScreen> {
                   ),
                 ),
                 Positioned(
-                  top: context.height() *0.07,
+                  top: context.height() * 0.07,
                   child: Column(
                     children: [
                       CircleAvatar(
@@ -112,11 +134,11 @@ class _OtpScreenState extends State<OtpScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       50.height,
-                      Text('Verify Phone Number', style: boldTextStyle(size: 22)),
-                      Text(
-                          '${'We have sent the code verification to'} ',
-                              // ''
-                              // '${widget.phoneNumber!}',
+                      Text('Verify Phone Number',
+                          style: boldTextStyle(size: 22)),
+                      Text('${'We have sent the code verification to'} ',
+                          // ''
+                          // '${widget.phoneNumber!}',
                           style: secondaryTextStyle()),
                       20.height,
                       // PinFieldAutoFill(
@@ -128,14 +150,14 @@ class _OtpScreenState extends State<OtpScreen> {
                       //   },
                       // ),
                       otpInputField(),
-        
-        
+
                       20.height,
                       StatefulBuilder(builder: (context, setState) {
                         return Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
-                            Text("Didn't receive OTP?", style: primaryTextStyle()),
+                            Text("Didn't receive OTP?",
+                                style: primaryTextStyle()),
                             // GestureDetector(
                             //   child: Row(
                             //     children: [
@@ -175,7 +197,6 @@ class _OtpScreenState extends State<OtpScreen> {
                 )
               ],
             ),
-        
           ],
         ),
       ),
@@ -186,7 +207,7 @@ class _OtpScreenState extends State<OtpScreen> {
         height: context.height() * 0.056,
         color: primaryColor,
         onTap: () {
-          ProfileScreen(country: widget.country,mobileNumber: widget.mobileNumber,).launch(context);
+          mobileNumberCheck();
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
