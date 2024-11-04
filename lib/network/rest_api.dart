@@ -1,5 +1,6 @@
 import '../Model/AllConversationModel.dart';
 import '../Model/ChangeStatusModel.dart';
+import '../Model/CheckMobileNumberResponse.dart';
 import '../Model/CheckStatusModel.dart';
 import '../Model/base_response.dart';
 import '../Model/registerResponse.dart';
@@ -25,9 +26,9 @@ Future<CheckStatusModel> statusCheckApi(
       await buildHttpResponse('user/checkstatus/$userId',
           method: HttpMethod.GET)));
 }
-Future<ChatterboxAiBaseResponse> mobileNumberCheckApi(Map req,
+Future<CheckPhoneNumberResponse> mobileNumberCheckApi(Map req,
     ) async {
-  return ChatterboxAiBaseResponse.fromJson(await handleResponse(
+  return CheckPhoneNumberResponse.fromJson(await handleResponse(
       await buildHttpResponse('user/checkphoneno',
           request: req, method: HttpMethod.POST)));
 }
