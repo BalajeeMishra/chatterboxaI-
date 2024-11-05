@@ -7,16 +7,14 @@ const LASTNAME = "LASTNAME";
 const USER_ID = "USER_ID";
 const USER_NATIVE_LANGUAGE = "USER_NATIVE_LANGUAGE";
 
-
 const IS_LOGIN = "IS_LOGIN";
 const TOKEN = "TOKEN";
 const PHONE_NUMBER = "PHONE_NUMBER";
 
-
-
-
-
-
+const FIREBASEAPIKEY = 'AIzaSyB8DUT1gjVJ1dRcFEhUXF_H8awO4AiCRGw';
+const FIREBASEAPPID = '1:573742835177:android:26c34e5e8cf7db76c69778';
+const FIREBASEMESSAGINGSENDERID ='573742835177';
+const FIREBASEPROJECTID ='jabber-ai';
 
 const statusSuccess = 'User registered successfully';
 

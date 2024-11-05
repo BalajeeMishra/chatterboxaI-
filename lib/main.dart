@@ -6,6 +6,7 @@ import 'package:balajiicode/providers/providers.dart';
 import 'package:balajiicode/store/UserStore/UserStore.dart';
 import 'package:balajiicode/store/app_store.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -21,6 +22,7 @@ import 'Utils/app_constants.dart';
 import 'extensions/common.dart';
 import 'extensions/shared_pref.dart';
 import 'extensions/system_utils.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 AppStore appStore = AppStore();
 UserStore userStore = UserStore();
@@ -30,10 +32,19 @@ final navigatorKey = GlobalKey<NavigatorState>();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  await Firebase.initializeApp(
+          name: 'jabber-ai',
+          options: const FirebaseOptions(
+              apiKey: FIREBASEAPIKEY,
+              appId: FIREBASEAPPID,
+              messagingSenderId: FIREBASEMESSAGINGSENDERID,
+              projectId: FIREBASEPROJECTID))
+      .then((value) {
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
+  });
+
   SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(statusBarColor: Color(0xff755be8)));
-  WidgetsFlutterBinding.ensureInitialized();
-
   sharedPreferences = await SharedPreferences.getInstance();
   setLogInValue();
 
@@ -90,9 +101,9 @@ class MyAppState extends State<MyApp> {
         title: APP_NAME,
         debugShowCheckedModeBanner: false,
         home: getStringAsync(TOKEN).toString().isEmpty
-            ?  SplashScreen()
+            ? SplashScreen()
             : JabberAIHomepage(),
-        // home:SplashScreen(),
+        // home: SplashScreen(),
         // home:ExpiredScreen(),
         scrollBehavior: SBehavior(),
         builder: EasyLoading.init(),

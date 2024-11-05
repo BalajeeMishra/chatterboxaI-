@@ -11,6 +11,7 @@ import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../Services/auth_service.dart';
 import '../Utils/app_colors.dart';
 import '../Utils/app_colors.dart';
 import '../Utils/app_colors.dart';
@@ -18,6 +19,7 @@ import '../Utils/app_common.dart';
 import '../Utils/app_constants.dart';
 import '../extensions/app_button.dart';
 import '../extensions/colors.dart';
+import '../extensions/common.dart';
 import '../extensions/constants.dart';
 import '../extensions/decorations.dart';
 import '../extensions/shared_pref.dart';
@@ -44,6 +46,25 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
   }
 
+  Future<void> sendOTP() async {
+    hideKeyboard(context);
+    appStore.setLoading(true);
+
+    String number = '$cCode${mMobileCont.text.trim()}';
+    if (!number.startsWith('+')) {
+      number = '$mMobileCont ${mMobileCont.text.trim()}';
+    }
+
+    await loginWithOTP(
+      context,
+      number,
+      mMobileCont.text.trim(),
+      selectedCountry,
+    ).then((value) {}).catchError((e) {
+      toast(e.toString());
+      appStore.setLoading(false);
+    });
+  }
 
   @override
   void dispose() {
@@ -263,10 +284,8 @@ class _LoginScreenState extends State<LoginScreen> {
         color: primaryColor,
         onTap: () {
           if (mFormKey.currentState!.validate()) {
-            OtpScreen(
-              country: selectedCountry,
-              mobileNumber: cCode.toString() + mMobileCont.text,
-            ).launch(context);          }
+            sendOTP();
+          }
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,

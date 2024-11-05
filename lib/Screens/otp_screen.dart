@@ -1,15 +1,20 @@
+import 'dart:async';
+
 import 'package:balajiicode/Screens/JabberAIHomePage/JabberAIHomepage.dart';
 import 'package:balajiicode/Screens/profile_screen.dart';
 import 'package:balajiicode/extensions/extension_util/context_extensions.dart';
 import 'package:balajiicode/extensions/extension_util/int_extensions.dart';
 import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:telephony/telephony.dart';
 
 import '../Utils/app_colors.dart';
 import '../Utils/app_common.dart';
 import '../Utils/app_constants.dart';
 import '../extensions/app_button.dart';
+import '../extensions/common.dart';
 import '../extensions/loader_widget.dart';
 import '../extensions/otp_text_field.dart';
 import '../extensions/shared_pref.dart';
@@ -21,14 +26,28 @@ import '../network/rest_api.dart';
 class OtpScreen extends StatefulWidget {
   final String country;
   final String mobileNumber;
-  OtpScreen({required this.country, required this.mobileNumber, super.key});
+  final String? verificationId;
+
+  OtpScreen({required this.country, required this.mobileNumber,this.verificationId, super.key});
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
 }
 
-class _OtpScreenState extends State<OtpScreen> {
+class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   GlobalKey<OTPTextFieldState> otpTextFieldKey = GlobalKey<OTPTextFieldState>();
+
+  // final TextEditingController _otpController = TextEditingController();
+  Telephony telephony = Telephony.instance;
+
+  String otpCode = '';
+  int _start = 30;
+  bool _canResendOTP = false;
+  Timer? _timer;
+  bool isResend = false;
+  String resendVerificationId = '';
+  String? appSignature;
 
   @override
   void initState() {
@@ -36,6 +55,151 @@ class _OtpScreenState extends State<OtpScreen> {
     print("Country Name  Is ==>" + widget.country.toString());
 
     super.initState();
+    init();
+  }
+  init() async {
+    // requestSmsPermissions();
+    appStore.setLoading(false);
+    startTimer();
+    telephony.listenIncomingSms(
+      onNewMessage: (SmsMessage message) {
+        print(message.address);
+        print(message.body);
+
+        String sms = message.body.toString();
+
+        if (message.body!.contains('yourFirebaseProjectName.firebaseapp.com')) {
+          String otpcode = sms.replaceAll(new RegExp(r'[^0-9]'), '');
+          // _otpController.set(otpcode.split(""));
+          Future.delayed(Duration(milliseconds: 100), () {
+            otpTextFieldKey.currentState?.updateOTP(otpcode);
+          });
+          print("Otp  is  ==> " + otpCode.toString());
+          setState(() {
+            // refresh UI
+          });
+        } else {
+          print("error");
+        }
+      },
+      listenInBackground: false,
+    );
+    // Start listening for SMS code
+    setState(() {});
+  }
+  @override
+  void setState(fn) {
+    if (mounted) super.setState(fn);
+  }
+
+  void startTimer() {
+    _start = 60;
+    _canResendOTP = false;
+
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (_start > 0) {
+        _start--;
+        if (mounted) {
+          setState(() {});
+        }
+      } else {
+        timer.cancel();
+        if (mounted) {
+          setState(() {
+            _canResendOTP = true;
+          });
+        }
+      }
+    });
+  }
+
+  void resendOtpFunction() {
+    if (_canResendOTP) {
+      isResend = true;
+      reSendOTP();
+      startTimer();
+    } else {
+      toast('You cannot resend OTP yet. Please wait.');
+    }
+  }
+
+  Future<void> resendOTP(
+      BuildContext context,
+      String phoneNumber,
+      String mobileNo,
+      ) async {
+    return await _auth.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      verificationCompleted: (PhoneAuthCredential credential) async {},
+      verificationFailed: (FirebaseAuthException e) {
+        appStore.setLoading(false);
+        if (e.code == 'invalid-phone-number') {
+          toast('The provided Phone number is not valid.');
+          throw 'The provided Phone number is not valid.';
+        } else {
+          toast(e.toString());
+          throw e.toString();
+        }
+      },
+      timeout: Duration(minutes: 1),
+      codeSent: (String verificationId, int? resendToken) async {
+        resendVerificationId = verificationId;
+      },
+      codeAutoRetrievalTimeout: (String verificationId) {
+        //
+      },
+    );
+  }
+
+  Future<void> reSendOTP({bool isResend = false}) async {
+    hideKeyboard(context);
+    // appStore.setLoading(true);
+
+    String number = widget.mobileNumber.toString();
+
+    print("Number is " + number.toString());
+
+    await resendOTP(
+      context,
+      number,
+      widget.mobileNumber!,
+    ).then((value) {}).catchError((e) {
+      toast(e.toString());
+      appStore.setLoading(false);
+    });
+  }
+
+  Future<void> submit() async {
+    print("Otp Code is -->"+ otpCode.toString());
+    hideKeyboard(context);
+    appStore.setLoading(true);
+
+    AuthCredential credential = PhoneAuthProvider.credential(
+        verificationId:
+        isResend ? resendVerificationId : widget.verificationId!,
+        smsCode: otpCode);
+
+    try {
+      await FirebaseAuth.instance.signInWithCredential(credential);
+      mobileNumberCheck();
+    } on FirebaseAuthException catch (e) {
+      String errorMessage;
+      switch (e.code) {
+        case 'invalid-verification-code':
+          errorMessage = 'Invalid verification code. Please try again.';
+          break;
+        case 'user-not-found':
+          errorMessage = 'No user found with this phone number.';
+          break;
+        default:
+          errorMessage = 'An unknown error occurred. Please try again.';
+      }
+      toast(errorMessage);
+    } catch (e) {
+      toast('An error occurred: ${e.toString()}');
+    } finally {
+      appStore.setLoading(false);
+    }
   }
 
   Widget otpInputField() {
@@ -44,16 +208,23 @@ class _OtpScreenState extends State<OtpScreen> {
       pinLength: 6,
       fieldWidth: context.width() * 0.1,
       onChanged: (s) {
-        // otpCode = s;
+        otpCode = s;
+        print("OTP on ChnageCODE ==>" + otpCode.toString());
+
       },
       onCompleted: (pin) {
-        // otpCode = pin;
+        otpCode = pin;
+        print("OTP CODE ==>" + otpCode.toString());
+        setState(() {
+
+        },);
         // submit();
         // submit();
         // UserDetails().launch(context);
       },
     ).center();
   }
+
   Future<void> mobileNumberCheck() async {
     Map<String, dynamic> req = {
       'mobileNo': widget.mobileNumber.trim(),
@@ -74,6 +245,8 @@ class _OtpScreenState extends State<OtpScreen> {
         userStore.setUserNativeLanguage(value.user!.nativeLanguage.toString());
         await userStore.setLogin(true);
         JabberAIHomepage().launch(context);
+        setState(() {});
+
       }
     } catch (e) {
       print("Error: $e");
@@ -170,31 +343,31 @@ class _OtpScreenState extends State<OtpScreen> {
                             children: <Widget>[
                               Text("Didn't receive OTP?",
                                   style: primaryTextStyle()),
-                              // GestureDetector(
-                              //   child: Row(
-                              //     children: [
-                              //       Text(
-                              //         _canResendOTP ? 'Resend' : '',
-                              //         style: primaryTextStyle(color: primaryColor),
-                              //       ).paddingLeft(4),
-                              //       if (!_canResendOTP)
-                              //         Container(
-                              //           width: 120,
-                              //           alignment: Alignment.center,
-                              //           child: Text('$_start seconds',
-                              //               style: primaryTextStyle(
-                              //                   color: primaryColor)),
-                              //         ),
-                              //     ],
-                              //   ),
-                              //   onTap: () {
-                              //     if (_canResendOTP) {
-                              //       resendOtpFunction();
-                              //       setState(() {});
-                              //     }
-                              //   },
-                              // ),
-                              //
+                              GestureDetector(
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      _canResendOTP ? 'Resend' : '',
+                                      style: primaryTextStyle(color: primaryColor),
+                                    ).paddingLeft(4),
+                                    if (!_canResendOTP)
+                                      Container(
+                                        width: 120,
+                                        alignment: Alignment.center,
+                                        child: Text('$_start seconds',
+                                            style: primaryTextStyle(
+                                                color: primaryColor)),
+                                      ),
+                                  ],
+                                ),
+                                onTap: () {
+                                  if (_canResendOTP) {
+                                    resendOtpFunction();
+                                    setState(() {});
+                                  }
+                                },
+                              ),
+
                             ],
                           );
                         }),
@@ -219,7 +392,7 @@ class _OtpScreenState extends State<OtpScreen> {
           height: context.height() * 0.056,
           color: primaryColor,
           onTap: () {
-            mobileNumberCheck();
+            submit();
           },
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "573742835177",
+    "project_id": "jabber-ai",
+    "storage_bucket": "jabber-ai.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:573742835177:android:26c34e5e8cf7db76c69778",
+        "android_client_info": {
+          "package_name": "com.talkyplay.jabberai"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDmEnlZPd6q-glKKlXbkAXTLRWSuzstkGQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
