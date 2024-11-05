@@ -4,7 +4,7 @@ import { UserTable } from "./userTable";
 export default function User() {
   return (
     <div>
-      <PageHeadDesc title="Game Content" desc="Game Content details" />
+      <PageHeadDesc title="Userlog" desc="Userlog details" />
       <div className="mx-6">
         <UserTable />
       </div>

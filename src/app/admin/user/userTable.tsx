@@ -34,6 +34,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { DialogCloseButton } from "./userlogDialogue";
 
 // Define the user data structure
 interface User {
@@ -68,28 +69,7 @@ const data: User[] = [
 
 // Define the columns for the new table structure
 export const columns: ColumnDef<User>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
+ 
   {
     accessorKey: "name",
     header: "Name",
@@ -114,7 +94,8 @@ export const columns: ColumnDef<User>[] = [
 
 export function UserTable() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
@@ -208,6 +189,25 @@ export function UserTable() {
                       )}
                     </TableCell>
                   ))}
+                  <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Open menu</span>
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="bg-white">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        {/* <DropdownMenuItem
+                        onClick={() => deleteGame(row.original._id)}
+                        >
+                          View uselog
+                        </DropdownMenuItem> */}
+                        <DialogCloseButton />
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
@@ -225,7 +225,8 @@ export function UserTable() {
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredRowModel().rows.length} of {table.getRowModel().rows.length} rows
+          {table.getFilteredRowModel().rows.length} of{" "}
+          {table.getRowModel().rows.length} rows
         </div>
         <Button
           variant="outline"
