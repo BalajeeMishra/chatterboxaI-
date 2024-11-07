@@ -80,4 +80,13 @@ router.get("/allgameconversation", async (req, res) => {
   }
 });
 
+router.get("/all", async (req, res) => {
+  try {
+    const allUser = await User.find({ });
+    return res.status(200).json({ allUser });
+  } catch (err) {
+    throw err;
+  }
+});
+
 export default router;
