@@ -23,8 +23,6 @@ class ChooseWordScreen extends StatefulWidget {
 class _ChooseWordScreen extends State<ChooseWordScreen> {
   @override
   void initState() {
-    // TODO: implement initState
-
     super.initState();
     Provider.of<AllGameVm>(context, listen: false).seInitialValue();
     Provider.of<AllGameVm>(context, listen: false)
@@ -149,7 +147,7 @@ class _ChooseWordScreen extends State<ChooseWordScreen> {
                                       )
                                     ],
                                   );
-                                })
+                                }).expand()
                         : SizedBox()
                   ],
                 );

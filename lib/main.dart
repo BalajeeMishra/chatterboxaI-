@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:balajiicode/Screens/expired_screen.dart';
 import 'package:balajiicode/Screens/login_screen.dart';
+import 'package:balajiicode/Screens/profile_screen.dart';
 import 'package:balajiicode/providers/providers.dart';
 import 'package:balajiicode/store/UserStore/UserStore.dart';
 import 'package:balajiicode/store/app_store.dart';
@@ -105,6 +106,8 @@ class MyAppState extends State<MyApp> {
             : JabberAIHomepage(),
         // home: SplashScreen(),
         // home:ExpiredScreen(),
+        // home: ProfileScreen(country: "", mobileNumber: ""),
+
         scrollBehavior: SBehavior(),
         builder: EasyLoading.init(),
       ),

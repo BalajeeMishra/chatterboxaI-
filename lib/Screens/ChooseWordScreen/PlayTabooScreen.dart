@@ -261,7 +261,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
         if (remainingText.isNotEmpty) {
           print("Inside  Yes");
           print("_lastWords 2==>" + _lastWords.toString());
-          print("remainingText ==>" + remainingText.toString());
+          print("remaining Text ==>" + remainingText.toString());
 
           await flutterTts.setSpeechRate(speechRate);
           await speakText(remainingText);
@@ -321,7 +321,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
     Future.delayed(Duration(seconds: 2), () {
       setState(() {
-        message = 'Thinking your respond';
+        message = 'Thinking...';
       });
     });
     setState(() {});

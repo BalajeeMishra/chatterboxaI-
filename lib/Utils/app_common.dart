@@ -147,6 +147,22 @@ toast(String? value,
     fontSize: 16.0,
   );
 }
+toastLeft(String? value,
+    {ToastGravity? gravity,
+      length = Toast.LENGTH_SHORT,
+      Color? bgColor,
+      Color? textColor}) {
+  Fluttertoast.showToast(
+    msg: value.validate(),
+    toastLength: length,
+    gravity: ToastGravity.BOTTOM,
+    timeInSecForIosWeb: 1,
+    backgroundColor: bgColor,
+    textColor: textColor,
+    fontSize: 16.0,
+    webPosition: "left",
+  );
+}
 
 setLogInValue() {
   print(getBoolAsync(IS_LOGIN));

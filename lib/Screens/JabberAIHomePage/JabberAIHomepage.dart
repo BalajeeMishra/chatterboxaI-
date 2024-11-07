@@ -29,41 +29,41 @@ class JabberAIHomepage extends StatefulWidget {
 
 class _JabberAIHomepage extends State<JabberAIHomepage> {
   bool isStatus = false;
-  List<Map<String, dynamic>> datalist = [
-    {
-      "title": "Taboo",
-      "subtitle":
-          "Make AI guess same word multiple times using different hints",
-      "image": ImageConstant.tabooimage
-    },
-    {
-      "title": "Who wants to be a Shakespeare",
-      "subtitle":
-          "9 Levels. Win each level by using a flashed word in an appropriate setence",
-      "image": ImageConstant.shakespere
-    },
-    {
-      "title": "Co-script a story",
-      "subtitle":
-          "Two charaters experience something spooky. Help AI complete the plot",
-      "image": ImageConstant.scripstory
-    },
-    {
-      "title": "Roleplays",
-      "subtitle": "Practice real life conversation",
-      "image": ImageConstant.roleplay
-    },
-    {
-      "title": "Guess the word",
-      "subtitle": "You guess a word by asking AI questions",
-      "image": ImageConstant.guessworld
-    },
-    {
-      "title": "Debate challenge",
-      "subtitle": "You vs AI.One winner",
-      "image": ImageConstant.debatechallenge
-    },
-  ];
+  // List<Map<String, dynamic>> datalist = [
+  //   {
+  //     "title": "Taboo",
+  //     "subtitle":
+  //         "Make AI guess same word multiple times using different hints",
+  //     "image": ImageConstant.tabooimage
+  //   },
+  //   {
+  //     "title": "Who wants to be a Shakespeare",
+  //     "subtitle":
+  //         "9 Levels. Win each level by using a flashed word in an appropriate setence",
+  //     "image": ImageConstant.shakespere
+  //   },
+  //   {
+  //     "title": "Co-script a story",
+  //     "subtitle":
+  //         "Two charaters experience something spooky. Help AI complete the plot",
+  //     "image": ImageConstant.scripstory
+  //   },
+  //   {
+  //     "title": "Roleplays",
+  //     "subtitle": "Practice real life conversation",
+  //     "image": ImageConstant.roleplay
+  //   },
+  //   {
+  //     "title": "Guess the word",
+  //     "subtitle": "You guess a word by asking AI questions",
+  //     "image": ImageConstant.guessworld
+  //   },
+  //   {
+  //     "title": "Debate challenge",
+  //     "subtitle": "You vs AI.One winner",
+  //     "image": ImageConstant.debatechallenge
+  //   },
+  // ];
   @override
   void initState() {
     super.initState();

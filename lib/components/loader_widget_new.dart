@@ -15,7 +15,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
     super.initState();
     Future.delayed(Duration(seconds: 2), () {
       setState(() {
-        message = 'Thinking your respond';
+        message = 'Thinking...';
       });
     });
   }

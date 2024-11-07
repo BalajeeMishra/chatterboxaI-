@@ -161,8 +161,11 @@ class _TaboogamechatPage extends State<TaboogamechatPage> {
                                             vertical: 10.0,
                                           ),
                                           child: Column(
+
                                             children: [
                                               Row(
+                                                crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                                 children: [
                                                   MyText(
                                                     text:

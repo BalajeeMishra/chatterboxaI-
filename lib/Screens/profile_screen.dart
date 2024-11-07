@@ -3,6 +3,7 @@ import 'package:balajiicode/extensions/extension_util/int_extensions.dart';
 import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
 import 'package:balajiicode/extensions/widgets.dart';
 import 'package:balajiicode/network/rest_api.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 
 import '../Utils/app_colors.dart';
@@ -36,8 +37,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final FocusNode nameFocus = FocusNode();
   final FocusNode ageFocus = FocusNode();
   final FocusNode languageFocus = FocusNode();
+  final FocusNode englishLevelFocus = FocusNode();
 
-  List languageList = [
+  final dropDownKey = GlobalKey<DropdownSearchState>();
+
+  final List<String> languageList = [
     'Hindi',
     'English',
     'Bengali',
@@ -51,16 +55,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
     'Urdu',
     'Gujarati'
   ];
+  final List<String> englishLevelList = [
+    'Beginner',
+    'Intermediate',
+    'Advanced',
+  ];
   String selectedLanguage = 'Hindi';
+  String englishLevel = 'Beginner';
 
   @override
   void initState() {
-    print("at Profile Screen Mobile Number Is ==>" +
-        widget.mobileNumber.toString());
-    print("at Profile Screen Country Name  Is ==>" + widget.country.toString());
     super.initState();
   }
-
 
   Future<void> save() async {
     hideKeyboard(context);
@@ -70,22 +76,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
       'nativeLanguage': selectedLanguage,
       'mobileNo': widget.mobileNumber.trim(),
       'country': widget.country.trim(),
+      'engprolevel': englishLevel,
     };
 
     if (mFormKey.currentState!.validate()) {
       appStore.setLoading(true);
 
       await registerApi(req).then((value) async {
-        print('Value' + value.toJson().toString());
-
         appStore.setLoading(false);
         if (value.accessToken != null) {
-          setValue(TOKEN,value.accessToken);
+          setValue(TOKEN, value.accessToken);
           userStore.setToken(value.accessToken.toString());
           setValue(USER_ID, value.newUser!.userId.toString());
           userStore.setUserID(value.newUser!.userId.toString());
-          setValue(USER_NATIVE_LANGUAGE, value.newUser!.nativeLanguage.toString());
-          userStore.setUserNativeLanguage(value.newUser!.nativeLanguage.toString());
+          setValue(
+              USER_NATIVE_LANGUAGE, value.newUser!.nativeLanguage.toString());
+          userStore
+              .setUserNativeLanguage(value.newUser!.nativeLanguage.toString());
           await userStore.setLogin(true);
           JabberAIHomepage().launch(context);
         } else {
@@ -94,7 +101,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }).catchError((e) {
         appStore.setLoading(false);
         toast(e.toString());
-
       });
       setState(() {});
     }
@@ -104,17 +110,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-
-      // resizeToAvoidBottomInset:
-      //     true, // This allows the screen to resize when the keyboard appears
-      appBar: appBarWidget('', context: context),
       body: Form(
         key: mFormKey,
         child: SingleChildScrollView(
-          padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context)
-                  .viewInsets
-                  .bottom), // Adjusts the bottom padding for the keyboard
+          padding:
+              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
           child: Column(
             children: [
               Stack(
@@ -138,17 +138,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: Column(
                       children: [
                         CircleAvatar(
+                          backgroundColor: Colors.black,
+                          radius: 30,
                           child: Icon(
                             Icons.person,
                             size: 26,
                             color: Colors.white,
                           ),
-                          backgroundColor: Colors.black,
-                          radius: 30,
                         ),
                         16.height,
                         Text(
-                          'Profile',
+                          'Personalise your Learning',
                           style: boldTextStyle(
                             color: Colors.white,
                             size: 26,
@@ -161,8 +161,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               26.height,
               ListView.builder(
-                physics:
-                    NeverScrollableScrollPhysics(), // Disable scrolling in ListView.builder
+                physics: NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 itemCount: 1,
                 itemBuilder: (context, index) {
@@ -180,7 +179,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       4.height,
                       AppTextField(
                         focus: nameFocus,
-                        controller: mNameCont,nextFocus: ageFocus,
+                        controller: mNameCont,
+                        nextFocus: ageFocus,
                         textFieldType: TextFieldType.NAME,
                         isValidationRequired: true,
                         decoration: defaultInputDecoration(context,
@@ -209,7 +209,54 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       16.height,
                       Row(
                         children: [
-                          Text('Native Language',
+                          Text('Your Native Language',
+                              style: secondaryTextStyle(
+                                  color: textPrimaryColorGlobal)),
+                          2.width,
+                          Text('*', style: secondaryTextStyle(color: redColor))
+                        ],
+                      ).paddingSymmetric(horizontal: 16, vertical: 4),
+                      4.height,
+                      DropdownSearch<String>(
+                        key: dropDownKey,
+                        items: (String filter, LoadProps? loadProps) async {
+                          if (filter.isEmpty) {
+                            return languageList;
+                          } else {
+                            return languageList
+                                .where((language) => language
+                                    .toLowerCase()
+                                    .contains(filter.toLowerCase()))
+                                .toList();
+                          }
+                        },
+                        selectedItem: selectedLanguage,
+                        popupProps: PopupProps.menu(
+                          showSearchBox: true,
+                          searchFieldProps: TextFieldProps(
+                            decoration:
+                                InputDecoration(hintText: 'Search Language'),
+                          ),
+                          emptyBuilder: (context, searchEntry) {
+                            return Text('No Language available').center();
+                          },
+                        ),
+                        onChanged: (String? value) {
+                          setState(() {
+                            selectedLanguage = value!;
+                            print("Selceted Language is ==>" +
+                                selectedLanguage.toString());
+                          });
+                        },
+                        decoratorProps: DropDownDecoratorProps(
+                          decoration: defaultInputDecoration(
+                              context), // Applying the decoration here
+                        ),
+                      ).paddingSymmetric(horizontal: 16, vertical: 4),
+                      16.height,
+                      Row(
+                        children: [
+                          Text('Your English Proficiency',
                               style: secondaryTextStyle(
                                   color: textPrimaryColorGlobal)),
                           2.width,
@@ -218,7 +265,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ).paddingSymmetric(horizontal: 16, vertical: 4),
                       4.height,
                       DropdownButtonFormField(
-                        items: languageList
+                        items: englishLevelList
                             .map((value) => DropdownMenuItem<String>(
                                   child: Text(value, style: primaryTextStyle()),
                                   value: value,
@@ -228,13 +275,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         isDense: true,
                         borderRadius: radius(),
                         decoration: defaultInputDecoration(context),
-                        value: selectedLanguage,
+                        value: englishLevel,
                         onChanged: (String? value) {
                           setState(() {
-                            selectedLanguage = value!;
+                            englishLevel = value!;
+                            if (selectedLanguage.isNotEmpty)
+                              toastLeft(
+                                  bgColor: primaryColor,
+                                  textColor: Colors.white,
+                                  "You have chosen $englishLevel.\nAI will talk in your Native language & share few references in $selectedLanguage");
                           });
                         },
+                        focusNode: englishLevelFocus,
                       ).paddingSymmetric(horizontal: 16, vertical: 4),
+                      40.height,
+
                     ],
                   );
                 },
