@@ -101,9 +101,7 @@ export const GameContentTable: React.FC<NewGameContentFormProps> = ({
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
   const [newgameData, setNewgameData] = React.useState<Games[]>([]);
-  const [selectgameId, setSelectgameId] = React.useState<string>(
-    "670592d31ced4336d6bba9a1"
-  );
+  const [selectgameId, setSelectgameId] = React.useState<string>("");
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   React.useEffect(() => {
@@ -122,6 +120,9 @@ export const GameContentTable: React.FC<NewGameContentFormProps> = ({
 
   React.useEffect(() => {
     const loadGames = async () => {
+      if (!selectgameId) {
+        return;
+      }
       console.log(selectgameId);
       try {
         const gamesContent = await fetchGameContent(selectgameId);
@@ -158,7 +159,7 @@ export const GameContentTable: React.FC<NewGameContentFormProps> = ({
       // Check if the response is successful before proceeding
 
       // If delete was successful, fetch updated game content
-      const updatedContent = await fetchGameContent("670592d31ced4336d6bba9a1");
+      const updatedContent = await fetchGameContent(selectgameId);
       setData(updatedContent);
       console.log(updatedContent);
       // Return the updated content or handle it as needed
@@ -220,6 +221,9 @@ export const GameContentTable: React.FC<NewGameContentFormProps> = ({
             onChange={(e) => setSelectgameId(e.target.value)}
             className=" block w-full p-2 border border-gray-300 rounded-md"
           >
+            <option key="2" value="">
+              Select a game
+            </option>
             {newgameData?.map((game) => (
               <option key={game._id} value={game._id}>
                 {game.gameName}

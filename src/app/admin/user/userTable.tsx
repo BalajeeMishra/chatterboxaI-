@@ -35,60 +35,64 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { DialogCloseButton } from "./userlogDialogue";
+import { fetchAllUsers } from "./fetchuserApi";
 
 // Define the user data structure
 interface User {
+  _id: string;
+  playingstatus: boolean;
+  mobileNo: string;
   name: string;
-  mobileNumber: string;
-  email: string;
-  dateOfJoin: string;
+  age: number;
+  nativeLanguage: string;
+  verified: boolean;
+  role: string;
+  country: string;
 }
-
-// Example user data
-const data: User[] = [
-  {
-    name: "John Doe",
-    mobileNumber: "1234567890",
-    email: "john.doe@example.com",
-    dateOfJoin: "2023-10-12",
-  },
-  {
-    name: "Jane Smith",
-    mobileNumber: "0987654321",
-    email: "jane.smith@example.com",
-    dateOfJoin: "2024-01-15",
-  },
-  {
-    name: "Emily Johnson",
-    mobileNumber: "1122334455",
-    email: "emily.johnson@example.com",
-    dateOfJoin: "2022-05-20",
-  },
-  // Add more user entries if needed...
-];
 
 // Define the columns for the new table structure
 export const columns: ColumnDef<User>[] = [
- 
   {
     accessorKey: "name",
     header: "Name",
     cell: ({ row }) => <div>{row.getValue("name")}</div>,
   },
   {
-    accessorKey: "mobileNumber",
+    accessorKey: "mobileNo",
     header: "Mobile Number",
-    cell: ({ row }) => <div>{row.getValue("mobileNumber")}</div>,
+    cell: ({ row }) => <div>{row.getValue("mobileNo")}</div>,
   },
   {
-    accessorKey: "email",
-    header: "Email",
-    cell: ({ row }) => <div>{row.getValue("email")}</div>,
+    accessorKey: "age",
+    header: "Age",
+    cell: ({ row }) => <div>{row.getValue("age")}</div>,
   },
   {
-    accessorKey: "dateOfJoin",
-    header: "Date of Join",
-    cell: ({ row }) => <div>{row.getValue("dateOfJoin")}</div>,
+    accessorKey: "nativeLanguage",
+    header: "Native Language",
+    cell: ({ row }) => <div>{row.getValue("nativeLanguage")}</div>,
+  },
+  {
+    accessorKey: "verified",
+    header: "Verified",
+    cell: ({ row }) => <div>{row.getValue("verified") ? "Yes" : "No"}</div>,
+  },
+  {
+    accessorKey: "role",
+    header: "Role",
+    cell: ({ row }) => <div>{row.getValue("role")}</div>,
+  },
+  {
+    accessorKey: "country",
+    header: "Country",
+    cell: ({ row }) => <div>{row.getValue("country")}</div>,
+  },
+  {
+    accessorKey: "playingstatus",
+    header: "Playing Status",
+    cell: ({ row }) => (
+      <div>{row.getValue("playingstatus") ? "Active" : "Inactive"}</div>
+    ),
   },
 ];
 
@@ -97,9 +101,58 @@ export function UserTable() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const [allUser, setAlluser] = React.useState<User[]>([]);
+  const [error, setError] = React.useState<string | null>(null);
+  const [loading, setLoading] = React.useState<boolean>(true);
 
+  React.useEffect(() => {
+    loadUsers();
+  }, []);
+  const loadUsers = async () => {
+    try {
+      const userData = await fetchAllUsers();
+
+      setAlluser(userData);
+    } catch (err) {
+      console.log(err);
+      setError("Failed to load users");
+    } finally {
+      setLoading(false);
+    }
+  };
+  const updatePlayingStatus = async (userId: string) => {
+    const requestBody = {
+      playingstatus: "false",
+    };
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user/changestatus/${userId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestBody),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update playing status");
+      }
+
+      const data = await response.json();
+      loadUsers();
+      alert("Successfully updated playing status");
+
+      return data;
+    } catch (error: any) {
+      console.error("Error updating playing status:", error.message);
+      return null;
+    }
+  };
   const table = useReactTable({
-    data,
+    data: allUser,
     columns,
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
@@ -199,12 +252,14 @@ export function UserTable() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="bg-white">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        {/* <DropdownMenuItem
-                        onClick={() => deleteGame(row.original._id)}
+                        <DialogCloseButton selectUserId={row.original._id} />
+
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={() => updatePlayingStatus(row.original._id)}
                         >
-                          View uselog
-                        </DropdownMenuItem> */}
-                        <DialogCloseButton />
+                          Change Status
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>

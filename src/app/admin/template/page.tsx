@@ -7,15 +7,12 @@ import Addtemplate from "./addtemplateform";
 
 export default function Newgame() {
   const [data, setData] = useState<Game[]>([]);
-  const [editorder, setEditorder] = useState<string>("");
-  const [editgameName, setEditGameName] = useState<string>("");
-  const [editgameIcon, setEditGameIcon] = useState<string>("");
-  const [editstatus, setEditStatus] = useState<"active" | "inactive">("active");
-  const [editdescription, setEditDescription] = useState<string>("");
+  const [edittemplate, setEditTemplate] = useState<string>("");
+  const [editEnglishProficiency, setEditEnglishProficiency] = useState<
+    "active" | "inactive"
+  >("active");
   const [editId, setEditId] = useState<string>("");
-  useEffect(() => {
-    console.log(editgameName, editgameIcon, editdescription, editstatus);
-  }, [editgameName, editgameIcon, editdescription, editstatus]);
+
   return (
     <div>
       <PageHeadDesc title="Game Template" desc="Game Template details" />
@@ -23,28 +20,19 @@ export default function Newgame() {
         {/* <AddNewGameForm/> */}
 
         <Addtemplate
-          editorder={editorder}
-          setEditorder={setEditorder}
           editId={editId}
           setEditId={setEditId}
           setData={setData}
-          editgameName={editgameName}
-          editgameIcon={editgameIcon}
-          editstatus={editstatus}
-          editdescription={editdescription}
-          setEditGameName={setEditGameName}
-          setEditGameIcon={setEditGameIcon}
-          setEditStatus={setEditStatus}
-          setEditDescription={setEditDescription}
+         
+          setEditTemplate={setEditTemplate}
+          edittemplate={edittemplate}
+         
+          editEnglishProficiency={editEnglishProficiency}
         />
         <NewGameTable
-          editorder={editorder}
-          setEditorder={setEditorder}
           setEditId={setEditId}
-          setEditGameName={setEditGameName}
-          setEditGameIcon={setEditGameIcon}
-          setEditStatus={setEditStatus}
-          setEditDescription={setEditDescription}
+          setEditTemplate={setEditTemplate}
+          setEditEnglishProficiency={setEditEnglishProficiency}
           data={data}
           setData={setData}
         />
