@@ -7,22 +7,37 @@ import { Games } from "../game-content/addgamecontent";
 
 interface AddTemplateFormProps {
   setData: React.Dispatch<React.SetStateAction<Game[]>>;
+  editId?: any;
+  edittemplate?: any;
+  editEnglishProficiency?: any;
+  setEditId?: any;
+  setEditTemplate?: any;
 }
 
-const AddTemplate: React.FC<AddTemplateFormProps> = ({ setData }) => {
-  const [template, setTemplate] = useState<string>("");
-  const [englishProficiency, setEnglishProficiency] =
-    useState<string>("option1");
-  const [game, setGame] = useState<string>("option1");
+const AddTemplate: React.FC<AddTemplateFormProps> = ({
+  setData,
+  editId,
+
+  edittemplate,
+  editEnglishProficiency,
+ 
+}) => {
+  const [template, setTemplate] = useState<string>(edittemplate || "");
+  const [englishProficiency, setEnglishProficiency] = useState<string>(
+    editEnglishProficiency || ""
+  );
+  const [game, setGame] = useState<string>("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [newgameData, setNewgameData] = useState<Games[]>([]);
-
+  useEffect(() => {
+    setTemplate(edittemplate || "");
+    setEnglishProficiency(editEnglishProficiency || "");
+  }, [editId, edittemplate, editEnglishProficiency]);
   useEffect(() => {
     const loadGames = async () => {
       try {
         const newGamesContent = await fetchAllGames();
         setNewgameData(newGamesContent);
-        setData(newGamesContent);
       } catch (err) {
         console.error("Error loading games:", err);
       }
@@ -44,22 +59,21 @@ const AddTemplate: React.FC<AddTemplateFormProps> = ({ setData }) => {
       setErrors(newErrors);
       return;
     }
-
+    console.log(englishProficiency, template, editId);
+    const url = editId
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/game/game-template/${editId}`
+      : `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/game/game-template/${game}`;
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/game/new-template`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            template,
-            englishProficiency,
-            game,
-          }),
-        }
-      );
+      const response = await fetch(url, {
+        method: editId ? "PUT" : "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          engprolevel: englishProficiency,
+          content: template,
+        }),
+      });
 
       if (!response.ok) {
         throw new Error(`Error: ${response.status} ${response.statusText}`);
@@ -70,12 +84,12 @@ const AddTemplate: React.FC<AddTemplateFormProps> = ({ setData }) => {
 
       // Fetch updated game list
       const updatedGamesContent = await fetchAllGames();
-      setData(updatedGamesContent);
+      setNewgameData(updatedGamesContent);
 
       // Reset form fields
       setTemplate("");
-      setEnglishProficiency("option1");
-      setGame("option1");
+      setEnglishProficiency("");
+      setGame("");
     } catch (error) {
       console.error("Error adding template:", error);
       alert("Failed to add template. Please try again.");
@@ -119,41 +133,44 @@ const AddTemplate: React.FC<AddTemplateFormProps> = ({ setData }) => {
             onChange={(e) => setEnglishProficiency(e.target.value)}
             className="mt-1 block w-full p-[10px] border border-gray-300 rounded-md"
           >
-            <option value="option1">Option 1</option>
-            <option value="option2">Option 2</option>
-            <option value="option3">Option 3</option>
-            <option value="option4">Option 4</option>
-            <option value="option5">Option 5</option>
+            {" "}
+            <option value="">Select Proficiency</option>
+            <option value="Beginner">Beginner</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Advanced">Advanced</option>
           </select>
         </div>
 
         {/* Game */}
-        <div className="mb-4">
-          <label
-            htmlFor="game"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Game
-          </label>
-          {newgameData.length > 0 ? (
-            <select
-              id="game"
-              value={game}
-              onChange={(e) => setGame(e.target.value)}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+        {!editId ? (
+          <div className="mb-4">
+            <label
+              htmlFor="game"
+              className="block text-sm font-medium text-gray-700"
             >
-              <option value="">Select game</option>
-              {newgameData.map((game) => (
-                <option key={game._id} value={game._id}>
-                  {game.gameName}
-                </option>
-              ))}
-            </select>
-          ) : (
-            <p>No games available</p>
-          )}
-        </div>
-
+              Game
+            </label>
+            {newgameData.length > 0 ? (
+              <select
+                id="game"
+                value={game}
+                onChange={(e) => setGame(e.target.value)}
+                className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+              >
+                <option value="">Select game</option>
+                {newgameData.map((game) => (
+                  <option key={game._id} value={game._id}>
+                    {game.gameName}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <p>No games available</p>
+            )}
+          </div>
+        ) : (
+          ""
+        )}
         {/* Submit Button */}
         <button
           type="submit"
