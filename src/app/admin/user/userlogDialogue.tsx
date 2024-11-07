@@ -39,71 +39,40 @@ export function DialogCloseButton({ selectUserId }: DialogCloseButtonProps) {
     setUserId(selectUserId);
   }, []);
   React.useEffect(() => {
-    const fetchGameConversations = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user/allgameconversation?userId=${userId}`
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch game conversations");
-        }
-        const data = await response.json();
-        console.log(data);
-        setGameConversations(data.completeConversation);
-      } catch (error: any) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchGameConversations();
   }, [userId]); // Re-run the effect when userId changes
+  const fetchGameConversations = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user/allgameconversation?userId=${userId}`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch game conversations");
+      }
+      const data = await response.json();
+      console.log(data);
+      setGameConversations(data.completeConversation);
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   console.log(gameConversations);
   return (
     <Dialog>
       <DialogTrigger asChild>
         <p className="text-sm p-2 cursor-pointer">View Userlog</p>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-2xl max-h-[600px] overflow-scroll">
+      <DialogContent className="sm:max-w-4xl max-h-[600px] overflow-scroll">
         <DialogHeader>
           <DialogTitle>Userlog</DialogTitle>
           <DialogDescription>Userlog full details</DialogDescription>
         </DialogHeader>
+
         {/* <div className="flex flex-col gap-2">
-
-{gameConversations.map((game, index) => (
-  <div key={game._id} className="flex items-center space-x-2">
-    <Accordion type="single" collapsible className="w-full">
-      <AccordionItem value={`item-${index + 1}`}>
-        <AccordionTrigger>Session {index + 1}</AccordionTrigger>
-        <AccordionContent>
-          <div className="flex items-center space-x-2">
-            <Accordion type="single" collapsible className="w-full">
-              {game.userResponse.map((response, idx) => (
-                <AccordionItem key={idx} value={`response-${idx + 1}`}>
-                  <AccordionTrigger>{`User Response ${idx + 1}`}</AccordionTrigger>
-                  <AccordionContent>{response}</AccordionContent>
-                </AccordionItem>
-              ))}
-              {game.aiResponse.map((response, idx) => (
-                <AccordionItem key={idx + game.userResponse.length} value={`ai-response-${idx + 1}`}>
-                  <AccordionTrigger>{`AI Response ${idx + 1}`}</AccordionTrigger>
-                  <AccordionContent>{response}</AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          </div>
-        </AccordionContent>
-      </AccordionItem>
-    </Accordion>
-  </div>
-))}
-
-        </div> */}
-
-        <div className="flex flex-col gap-2">
           {gameConversations.map((game, index) => (
             <Accordion
               type="single"
@@ -155,7 +124,57 @@ export function DialogCloseButton({ selectUserId }: DialogCloseButtonProps) {
               </AccordionItem>
             </Accordion>
           ))}
+        </div> */}
+        <div className="flex flex-col gap-2">
+          {gameConversations.map((game, index) => (
+            <Accordion
+              type="single"
+              collapsible
+              key={game._id}
+              className="w-full"
+            >
+              <AccordionItem value={`session-${index + 1}`}>
+                <AccordionTrigger className="font-semibold">
+                  Session {index + 1}
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="flex flex-col gap-2">
+                    {game.userResponse.map((userResp, idx) => (
+                      <React.Fragment key={`response-pair-${idx}`}>
+                        {/* User Response */}
+                        <Accordion type="single" collapsible>
+                          <AccordionItem value={`user-response-${idx + 1}`}>
+                            <AccordionTrigger className="bg-blue-100 p-2 rounded-md">
+                              User Response {idx + 1}
+                            </AccordionTrigger>
+                            <AccordionContent className="bg-gray-100 p-4 rounded-md mt-2">
+                              {userResp}
+                            </AccordionContent>
+                          </AccordionItem>
+                        </Accordion>
+
+                        {/* AI Response */}
+                        {game.aiResponse[idx] && (
+                          <Accordion type="single" collapsible>
+                            <AccordionItem value={`ai-response-${idx + 1}`}>
+                              <AccordionTrigger className="bg-green-100 p-2 rounded-md">
+                                AI Response {idx + 1}
+                              </AccordionTrigger>
+                              <AccordionContent className="bg-gray-100 p-4 rounded-md mt-2">
+                                {game.aiResponse[idx]}
+                              </AccordionContent>
+                            </AccordionItem>
+                          </Accordion>
+                        )}
+                      </React.Fragment>
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          ))}
         </div>
+
         <DialogFooter className="sm:justify-start">
           <DialogClose asChild>
             <Button type="button" variant="secondary">

@@ -90,7 +90,9 @@ export const columns: ColumnDef<User>[] = [
   {
     accessorKey: "playingstatus",
     header: "Playing Status",
-    cell: ({ row }) => <div>{row.getValue("playingstatus") ? "Active" : "Inactive"}</div>,
+    cell: ({ row }) => (
+      <div>{row.getValue("playingstatus") ? "Active" : "Inactive"}</div>
+    ),
   },
 ];
 
@@ -102,24 +104,53 @@ export function UserTable() {
   const [allUser, setAlluser] = React.useState<User[]>([]);
   const [error, setError] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState<boolean>(true);
-  
-  React.useEffect(() => {
-    const loadUsers = async () => {
-      try {
-        const userData = await fetchAllUsers();
-        console.log(userData);
-        setAlluser(userData);
-      } catch (err) {
-        console.log(err);
-        setError("Failed to load users");
-      } finally {
-        setLoading(false);
-      }
-    };
 
+  React.useEffect(() => {
     loadUsers();
   }, []);
+  const loadUsers = async () => {
+    try {
+      const userData = await fetchAllUsers();
 
+      setAlluser(userData);
+    } catch (err) {
+      console.log(err);
+      setError("Failed to load users");
+    } finally {
+      setLoading(false);
+    }
+  };
+  const updatePlayingStatus = async (userId: string) => {
+    const requestBody = {
+      playingstatus: "false",
+    };
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user/changestatus/${userId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestBody),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update playing status");
+      }
+
+      const data = await response.json();
+      loadUsers();
+      alert("Successfully updated playing status");
+
+      return data;
+    } catch (error: any) {
+      console.error("Error updating playing status:", error.message);
+      return null;
+    }
+  };
   const table = useReactTable({
     data: allUser,
     columns,
@@ -222,6 +253,13 @@ export function UserTable() {
                       <DropdownMenuContent align="end" className="bg-white">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DialogCloseButton selectUserId={row.original._id} />
+
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={() => updatePlayingStatus(row.original._id)}
+                        >
+                          Change Status
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
