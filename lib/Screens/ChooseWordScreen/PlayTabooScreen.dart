@@ -50,6 +50,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   bool apiCalled = false;
   bool isFirstTime = false;
 
+
   //Screen2 data
   double speechRate = 0.4;
   FlutterTts flutterTts = FlutterTts();
@@ -485,6 +486,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                             ],
                           ),
                         ),
+
                       if (!apiCalled)
                         Row(
                           children: [

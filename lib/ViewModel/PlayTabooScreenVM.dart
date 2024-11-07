@@ -46,7 +46,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
     }
     // dataToPass =
     //     "Guess word is ${allGameModel.allGame![index].mainContent} and taboo words are [${data}] and user hint is an";
-      dataToPass ="";
+    dataToPass = "";
     apiHitStatus = false;
     tabooGameChatPageModel = TabooGameChatPageModel();
   }
@@ -56,20 +56,36 @@ class PlayTabooScreenVM extends ChangeNotifier {
       aiResponse: completeConversation.aiResponse,
     );
   }
+
   Future<void> clearAiResponse() async {
     tabooGameChatPageModel.response?.aiResponse?.last = "";
     notifyListeners();
     await Future.delayed(Duration(milliseconds: 100));
   }
+
   void updateResponse(CompleteConversation completeConversation) {
-    tabooGameChatPageModel.response = convertToResponse(completeConversation); // Make sure this returns a Response
+    tabooGameChatPageModel.response = convertToResponse(
+        completeConversation);
+    // if (completeConversation.aiResponse != null && completeConversation.aiResponse != null) {
+    //   // var data = {
+    //   //   "server": 1,
+    //   //   "data":completeConversation. aiResponse!.last.characters
+    //   // };
+    //   // dynamicDta.add(data);
+    //   // apiHitStatus = true;
+    //   // tabooGameChatPageModel.response = tabooGameChatPageModel.response!;
+    //
+    //   dynamicDta.add({
+    //     "server": 1,
+    //     "data":completeConversation. aiResponse!.last.characters
+    //
+    //   });
+    // }
     notifyListeners();
   }
 
-
-
-  Future<void> chatPageAPI(
-      BuildContext context, String dataGet, String sessionId,AllGameModel allGameModel, int index) async {
+  Future<void> chatPageAPI(BuildContext context, String dataGet,
+      String sessionId, AllGameModel allGameModel, int index) async {
     if (dataGet == "" || dataGet == null) {
       MySnackBar.showSnackBar(context, "Please speak first!");
       return;
@@ -89,7 +105,12 @@ class PlayTabooScreenVM extends ChangeNotifier {
     // EasyLoading.show(status: ConstText.get_LoaderMessage);
     try {
       print(sessionId);
-      var data = {"question": dataToAdd, "userId": userStore.userId, "session": sessionId, "firstword":allGameModel.allGame![index].mainContent};
+      var data = {
+        "question": dataToAdd,
+        "userId": userStore.userId,
+        "session": sessionId,
+        "firstword": allGameModel.allGame![index].mainContent
+      };
       print(data);
       print("balajee mishra");
       ApiResponse<TabooGameChatPageModel> response =
@@ -122,25 +143,25 @@ class PlayTabooScreenVM extends ChangeNotifier {
 
           // EasyLoading.dismiss();
           print("${response.error!.responseMsg.toString()}");
-          MySnackBar.showSnackBar(context, response.error!.responseMsg!);
+          // MySnackBar.showSnackBar(context, response.error!.responseMsg!);
           break;
         case ApiResponseStatus.unauthorized:
           // EasyLoading.dismiss();
           appStore.setLoading(false);
 
-          MySnackBar.showSnackBar(context, response.error!.responseMsg!);
+          // MySnackBar.showSnackBar(context, response.error!.responseMsg!);
           break;
         case ApiResponseStatus.notFound:
           // EasyLoading.dismiss();
           appStore.setLoading(false);
 
-          MySnackBar.showSnackBar(context, response.error!.responseMsg!);
+          // MySnackBar.showSnackBar(context, response.error!.responseMsg!);
           break;
         case ApiResponseStatus.serverError:
           // EasyLoading.dismiss();
           appStore.setLoading(false);
 
-          MySnackBar.showSnackBar(context, response.error!.responseMsg!);
+          // MySnackBar.showSnackBar(context, response.error!.responseMsg!);
           break;
         default:
           appStore.setLoading(false);
@@ -155,7 +176,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
       print(e);
       print("hellooo");
       // EasyLoading.dismiss();
-      MySnackBar.showSnackBar(context, e.toString());
+      // MySnackBar.showSnackBar(context, e.toString());
     }
     appStore.setLoading(false);
   }

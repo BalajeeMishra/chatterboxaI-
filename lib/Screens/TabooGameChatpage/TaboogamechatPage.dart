@@ -45,8 +45,12 @@ class _TaboogamechatPage extends State<TaboogamechatPage> {
         .setInitialValue(widget.allGameModel, widget.index);
     allConversationApiCall();
   }
-  allConversationApiCall() async {
+  void allConversationApiCall() async {
     await allConversationApi(widget.sessionId).then((value) async {
+      if (widget.allGameModel == null || widget.index == null) {
+        print("allGameModel or index is null!");
+        return; // or handle this case as needed
+      }
       if (value.completeConversation != null) {
         List<Map<String, dynamic>> combinedMessages = [];
 
@@ -66,9 +70,16 @@ class _TaboogamechatPage extends State<TaboogamechatPage> {
             combinedMessages.add({'data': aiReply, 'server': 1});
           }
         }
+        if(combinedMessages.isNotEmpty){
+          isFirst=false;
+          setState(() {
+
+          });
+        }
 
         Provider.of<TabooGameChatPageVM>(context, listen: false)
-            .updateTransactionData(combinedMessages);
+            .updateTransactionData(combinedMessages, widget.allGameModel, widget.index);
+
       } else {
         print("No conversations available.");
       }
@@ -119,7 +130,7 @@ class _TaboogamechatPage extends State<TaboogamechatPage> {
           children: [
             Column(
               children: [
-                SizedBox(height: 10),
+                // SizedBox(height: 10),
                 // EquiDistantRow(
                 //   playstatus: true,
                 //   feedbackstatus: false,
@@ -130,7 +141,7 @@ class _TaboogamechatPage extends State<TaboogamechatPage> {
                 //   height: 1,
                 //   color: Color(0xffc1c1c1),
                 // ),
-                const SizedBox(height: 10),
+                // const SizedBox(height: 10),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.all(10.0),
@@ -209,6 +220,7 @@ class _TaboogamechatPage extends State<TaboogamechatPage> {
                                                   ),
                                                 ],
                                               )
+
                                             ],
                                           ),
                                         ),
