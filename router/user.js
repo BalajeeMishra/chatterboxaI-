@@ -6,9 +6,9 @@ const router = Router();
 
 router.post("/register",async(req,res,next)=>{
   try{
-  const {name,age,nativeLanguage,country,mobileNo } = req.body; 
+  const {name,age,nativeLanguage,country,mobileNo,engprolevel } = req.body; 
   const newUser = new User({
-    name,age,nativeLanguage,country,mobileNo
+    name,age,nativeLanguage,country,mobileNo,engprolevel
   });
   const accessToken = await jwtHelper.signAccessToken(newUser.id);
   await newUser.save();

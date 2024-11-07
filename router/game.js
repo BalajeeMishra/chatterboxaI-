@@ -1,7 +1,7 @@
 import {Router} from "express";
 import Game from "../model/Game.js";
 import GameContent from "../model/GameContent.js";
-
+import Template from "../model/Template.js";
 const router = Router();
 
 router.post("/new-game",async(req,res,next)=>{
@@ -139,6 +139,63 @@ catch(err){
   throw err;
 }
 }); 
+
+router.post("/game-template/:id",async(req,res,next)=>{
+  try{
+  const {id}= req.params;
+  const {engprolevel,content} = req.body;
+  const template = new Template({
+    gameId:id,
+    engprolevel,
+    content,
+  });
+  await template.save();
+  return res.status(200).json({template});
+}
+catch(err){
+  throw err; 
+}
+}); 
+
+router.put("/game-template/:id",async(req,res,next)=>{
+  try{
+  const {id}= req.params;
+  const {engprolevel,content} = req.body;
+  const updatedTemplate = await Template.findByIdAndUpdate(id, {engprolevel,content},{new:true});
+  return res.status(200).json({updatedTemplate});
+}
+catch(err){
+  throw err; 
+}
+}); 
+
+
+router.delete("/game-template/:id",async(req,res,next)=>{
+  try{
+  const id = req.params.id;
+  const deletedGameContent = await Template.findByIdAndDelete(id);
+  if(!deletedGameContent){
+    return res.status(500).json({messagae:"Something went wrong."})
+  }
+  return res.status(200).json({deletedGameContent});
+}
+catch(err){
+  throw err;
+}
+}); 
+
+router.get("/game-template/:id",async(req,res,next)=>{
+  try{
+    const id = req.params.id;
+    const alltemplate = await Template.find({gameId:id});
+    return res.status(200).json({alltemplate});
+  }
+  catch(err){
+    throw err; 
+  }
+})
+
+
 
 
 export default router;

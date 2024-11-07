@@ -38,7 +38,11 @@ const userSchema = new mongoose.Schema({
     playingstatus:{
         type:Boolean,
         default:true
-    }
+    },
+    engprolevel:{
+        type:String, 
+        enum: ["Beginner","Intermediate","Advanced"],
+      },
 });
 
 // Create the user model
