@@ -28,14 +28,18 @@ class TaboogamechatPage extends StatefulWidget {
   State<StatefulWidget> createState() => _TaboogamechatPage();
 }
 
-class _TaboogamechatPage extends State<TaboogamechatPage> {
+class _TaboogamechatPage extends State<TaboogamechatPage> with WidgetsBindingObserver {
   late ScrollController _scrollController;
   int _previousMessageCount = 0;
   bool isFirst = true;
+  // FocusNode _focusNode = FocusNode();
+  final TextEditingController _textController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+
     _scrollController = ScrollController();
     Provider.of<TabooGameChatPageVM>(context, listen: false)
         .dynamicData
@@ -44,6 +48,11 @@ class _TaboogamechatPage extends State<TaboogamechatPage> {
     Provider.of<TabooGameChatPageVM>(context, listen: false)
         .setInitialValue(widget.allGameModel, widget.index);
     allConversationApiCall();
+    // _focusNode.addListener(() {
+    //   if (!_focusNode.hasFocus) {
+    //     _scrollToBottomIfNeeded(Provider.of<TabooGameChatPageVM>(context, listen: false).dynamicData.length);
+    //   }
+    // });
   }
   void allConversationApiCall() async {
     await allConversationApi(widget.sessionId).then((value) async {
@@ -89,29 +98,69 @@ class _TaboogamechatPage extends State<TaboogamechatPage> {
       setState(() {});
     });
   }
+  @override
+  void didChangeMetrics() {
+    super.didChangeMetrics();
+    // Check if the keyboard is visible by comparing the viewInsets bottom value
+    if (MediaQuery.of(context).viewInsets.bottom > 0) {
+      _scrollToBottom();
+    }
+  }
+
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
+  }
+
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _scrollController.dispose();
+    _textController.dispose();
+    // _focusNode.dispose();
+
     super.dispose();
   }
 
   void _scrollToBottomIfNeeded(int messageCount) {
     if (messageCount > _previousMessageCount) {
-      Future.delayed(Duration(milliseconds: 100), () {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
+      Future.delayed(Duration(milliseconds: 300), () {
+        // Check if the keyboard is open by inspecting view insets
+        if (MediaQuery.of(context).viewInsets.bottom == 0) {
+          _scrollController.animateTo(
+            _scrollController.position.maxScrollExtent,
+            duration: Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        } else {
+          // Schedule the scroll after the keyboard is closed
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Future.delayed(Duration(milliseconds: 200), () {
+              _scrollController.animateTo(
+                _scrollController.position.maxScrollExtent,
+                duration: Duration(milliseconds: 300),
+                curve: Curves.easeOut,
+              );
+            });
+          });
+        }
       });
     }
     _previousMessageCount = messageCount;
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // resizeToAvoidBottomInset: false, // Add this line
+
       appBar: backCustomAppBar(
         backButtonshow: true,
         centerTile: false,
@@ -320,6 +369,8 @@ class _TaboogamechatPage extends State<TaboogamechatPage> {
             child: Consumer<TabooGameChatPageVM>(
               builder: (context, vm, child) {
                 return TextField(
+                  onTap: _scrollToBottom,
+                  // focusNode: _focusNode,
                   controller: vm.controller,
                   maxLines: null,
                   decoration: InputDecoration(
@@ -338,7 +389,7 @@ class _TaboogamechatPage extends State<TaboogamechatPage> {
           SizedBox(width: 10),
           GestureDetector(
             onTap: () {
-              FocusScope.of(context).unfocus();
+              // FocusScope.of(context).unfocus();
               var chatPageVM =
                   Provider.of<TabooGameChatPageVM>(context, listen: false);
               String messageText = chatPageVM.controller.text.trim();
