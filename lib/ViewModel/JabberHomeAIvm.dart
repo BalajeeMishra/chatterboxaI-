@@ -35,18 +35,15 @@ class JabberHomeAIvm extends ChangeNotifier {
     try {
       ApiResponse<HomePageModel> response =
           await _jabberHomeAIRepository.homePageApiCallFunction();
-      print("Response ::: ${response.data}");
       switch (response.status) {
         case ApiResponseStatus.success:
           homePageModel = response.data!;
-          print(homePageModel.allGame);
           apiHitStatus = true;
           notifyListeners();
           EasyLoading.dismiss();
           break;
         case ApiResponseStatus.badRequest:
           EasyLoading.dismiss();
-          print("${response.error!.responseMsg.toString()}");
           MySnackBar.showSnackBar(context, response.error!.responseMsg!);
           break;
         case ApiResponseStatus.unauthorized:

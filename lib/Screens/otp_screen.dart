@@ -51,8 +51,7 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
 
   @override
   void initState() {
-    print("Mobile NUmber Is ==>" + widget.mobileNumber.toString());
-    print("Country Name  Is ==>" + widget.country.toString());
+
 
     super.initState();
     init();
@@ -63,8 +62,7 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
     startTimer();
     telephony.listenIncomingSms(
       onNewMessage: (SmsMessage message) {
-        print(message.address);
-        print(message.body);
+
 
         String sms = message.body.toString();
 
@@ -74,12 +72,10 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
           Future.delayed(Duration(milliseconds: 100), () {
             otpTextFieldKey.currentState?.updateOTP(otpcode);
           });
-          print("Otp  is  ==> " + otpCode.toString());
           setState(() {
             // refresh UI
           });
         } else {
-          print("error");
         }
       },
       listenInBackground: false,
@@ -157,7 +153,6 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
 
     String number = widget.mobileNumber.toString();
 
-    print("Number is " + number.toString());
 
     await resendOTP(
       context,
@@ -170,7 +165,6 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
   }
 
   Future<void> submit() async {
-    print("Otp Code is -->"+ otpCode.toString());
     hideKeyboard(context);
     appStore.setLoading(true);
 
@@ -209,12 +203,10 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
       fieldWidth: context.width() * 0.1,
       onChanged: (s) {
         otpCode = s;
-        print("OTP on ChnageCODE ==>" + otpCode.toString());
 
       },
       onCompleted: (pin) {
         otpCode = pin;
-        print("OTP CODE ==>" + otpCode.toString());
         setState(() {
 
         },);
@@ -232,11 +224,9 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
 
     try {
       final value = await mobileNumberCheckApi(req);
-      print(value.toJson());
-      print("Access Token: ${value.accessToken}");
+
 
       if (value.accessToken != null) {
-        print("Inside If");
         setValue(TOKEN, value.accessToken);
         userStore.setToken(value.accessToken.toString());
         setValue(USER_ID, value.user!.sId.toString());
@@ -249,7 +239,6 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
 
       }
     } catch (e) {
-      print("Error: $e");
       if (e.toString() == "User doesn't exist") {
         ProfileScreen(
           country: widget.country,

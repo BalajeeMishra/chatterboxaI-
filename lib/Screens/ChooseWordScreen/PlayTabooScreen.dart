@@ -66,10 +66,8 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     startListening = false;
     if(getStringAsync(USER_NATIVE_LANGUAGE).isNotEmpty){
       selectedLanguage = getStringAsync(USER_NATIVE_LANGUAGE);
-      print("Selected Language is ==>  "+selectedLanguage.toString());
     }
-    // print("at Init time session id is==>" + Uuid().v4());
-    // allConversationApiCall();
+
 
     setState(() {});
   }
@@ -85,13 +83,11 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
       appStore.setLoading(false);
 
       if (value.completeConversation != null) {
-        print("Received complete conversation: ${value.completeConversation}");
         apiCalled = true;
 
         Provider.of<PlayTabooScreenVM>(context, listen: false)
             .updateResponse(value.completeConversation!);
       } else {
-        print("No conversations available.");
       }
     }).catchError((e) {
       appStore.setLoading(false);
@@ -113,7 +109,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   }
 
   void _startListening() async {
-    print("Api CAlled is 2" + apiCalled.toString());
 
     await _speechToText.listen(localeId: 'en_US', onResult: _onSpeechResult);
     setState(() {});
@@ -131,7 +126,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   void _onSpeechResult(SpeechRecognitionResult result) {
     setState(() {
       _lastWords = result.recognizedWords;
-      print("Last word is something like that" + _lastWords.toString());
     });
   }
 
@@ -195,19 +189,11 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   Future<void> speakText(String text) async {
     await flutterTts.stop();
 
-    print("Speacl Test calling----");
     if (text.isNotEmpty) {
-      print("TExts is not empty");
       _lastWords = text;
 
-      print("Text is ==>" + text.toString());
-      print("_lastWords is ==>" + _lastWords.toString());
-
       await flutterTts.speak(text);
-      print("_lastWords  is 2 ==>" + _lastWords.toString());
-      print("Text is 2 ==>" + text.toString());
-
-      isSpeaking = true;
+       isSpeaking = true;
 
       flutterTts.setCompletionHandler(() {
         isSpeaking = false;
@@ -216,16 +202,13 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
       flutterTts.setErrorHandler((error) {
         isSpeaking = false;
-        print("Error in TTS: $error");
       });
     } else {
-      print("No text provided to speak.");
     }
   }
 
   /// Stop speaking
   Future<void> stopSpeaking() async {
-    print("Api CAlled is 3" + apiCalled.toString());
 
     await flutterTts.stop();
   }
@@ -240,29 +223,22 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
   Future<void> adjustSpeechRate(double change) async {
     _lastWords = appStore.lastWords;
-    print("AppStore data is available ==>" + appStore.lastWords.toString());
-    print("Last words data is available ==>" + _lastWords.toString());
+
 
     speechRate += change;
     speechRate = speechRate.clamp(0.1, 2.0);
 
-    print("New Speech Rate: $speechRate");
 
     await flutterTts.setSpeechRate(speechRate);
 
     if (isSpeaking) {
-      print("Updating speech rate during ongoing speech");
 
       await flutterTts.stop();
-      print("_lastWords 1==>" + _lastWords.toString());
 
       String remainingText = _getRemainingText();
 
       Future.delayed(Duration(milliseconds: 200), () async {
         if (remainingText.isNotEmpty) {
-          print("Inside  Yes");
-          print("_lastWords 2==>" + _lastWords.toString());
-          print("remaining Text ==>" + remainingText.toString());
 
           await flutterTts.setSpeechRate(speechRate);
           await speakText(remainingText);
@@ -290,23 +266,19 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   save() {
     message = 'Correcting Speech recognition mistakes';
     isLoading = true;
-    print("Save  Function Called");
     flutterTts.setStartHandler(() {
-      print("TTS Started");
       setState(() {
         isSpeaking = true;
       });
     });
 
     flutterTts.setCompletionHandler(() {
-      print("TTS Completed");
       setState(() {
         isSpeaking = false;
       });
     });
 
     flutterTts.setErrorHandler((msg) {
-      print("TTS Error: $msg");
       setState(() {
         isSpeaking = false;
       });
@@ -568,9 +540,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                 ).launch(context);
                                 if (res == true) {
                                   allConversationApiCall();
-                                  print("R!E!S");
                                 }else{
-                                  print("False");
                                 }
                               },
                               // onTap: () {
@@ -604,7 +574,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                 _initSpeech();
                                 apiCalled = false;
                                 isFirstTime = true;
-                                print("Api CAlled is 1" + apiCalled.toString());
 
                                 _lastWords = "";
                                 setState(() {});
@@ -714,9 +683,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                   _lastWords = "";
                 });
                 if (ques.isNotEmpty) {
-                  // sessionId = Uuid().v4();
                   save();
-                  print("Last words captured: $ques");
                 }
               },
               child: Container(

@@ -46,17 +46,7 @@ class OTPTextFieldState extends State<OTPTextField>  {
     }).toList());
   }
 
-  // @override
-  // void codeUpdated() {
-  //   print("Code update called");
-  //   final otp = concatText;
-  //   updateOTP(otp);
-  //
-  //   if (otp.length == widget.pinLength) {
-  //     widget.onCompleted?.call(otp);
-  //   }
-  // }
-  //
+
   void updateOTP(String otp) {
     for (int i = 0; i < otp.length && i < list.length; i++) {
       list[i].textEditingController?.text = otp[i];

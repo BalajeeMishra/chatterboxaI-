@@ -15,12 +15,10 @@ class TabooGameChatPageRepository{
       ) async {
     try {
       final response = await ApiClass.post(tabooGameChatPage,data, isHeader: true);
-      print("API Response HomePage Data ${response.body} ${response.statusCode}");
       final ApiResponseStatus status = mapStatusCode(response.statusCode!);
       final Map<String, dynamic> responseData = jsonDecode(response.body);
       if (status == ApiResponseStatus.success) {
         final data = TabooGameChatPageModel.fromJson(responseData);
-        print("ResponseData In success ${data.response}");
         return ApiResponse.success(data);
       } else {
         final error = ErrorModal.fromJson(responseData);

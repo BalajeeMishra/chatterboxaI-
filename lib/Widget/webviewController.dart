@@ -12,14 +12,11 @@ class WebViewHelper {
       ..setNavigationDelegate(
         NavigationDelegate(
           onProgress: (int progress) {
-            print("PDF ON onProgress - $progress");
           },
           onPageStarted: (String url) {
-            print("PDF ON onPageStarted - $url");
           },
           onPageFinished: onPageFinished,
           onWebResourceError: (WebResourceError error) {
-            print("PDF ON onWebResourceError - $error, ${error.description}");
           },
         ),
       )

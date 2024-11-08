@@ -244,8 +244,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         onChanged: (String? value) {
                           setState(() {
                             selectedLanguage = value!;
-                            print("Selceted Language is ==>" +
-                                selectedLanguage.toString());
+
                           });
                         },
                         decoratorProps: DropDownDecoratorProps(

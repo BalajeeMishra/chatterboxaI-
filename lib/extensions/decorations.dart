@@ -118,7 +118,6 @@ Decoration boxDecorationWithShadow({
   BoxShape boxShape = BoxShape.rectangle,
   BorderRadius? borderRadius,
 }) {
-  print(backgroundColor);
   return BoxDecoration(
     boxShadow: boxShadow ??
         defaultBoxShadow(

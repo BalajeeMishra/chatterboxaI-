@@ -42,7 +42,6 @@ class AllGameVm extends ChangeNotifier {
       switch (response.status) {
         case ApiResponseStatus.success:
           homePageModel = response.data!;
-          print(homePageModel.allGame);
           apiHitStatus = true;
           notifyListeners();
           EasyLoading.dismiss();
@@ -53,7 +52,6 @@ class AllGameVm extends ChangeNotifier {
           EasyLoading.dismiss();
           appStore.setLoading(false);
 
-          print("${response.error!.responseMsg.toString()}");
           MySnackBar.showSnackBar(context, response.error!.responseMsg!);
           break;
         case ApiResponseStatus.unauthorized:

@@ -43,7 +43,6 @@ void snackBar(
   double? elevation,
 }) {
   if (title.isEmpty && content == null) {
-    print('SnackBar message is empty');
   } else {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

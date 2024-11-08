@@ -93,7 +93,6 @@ class TabooGameChatPageVM extends ChangeNotifier {
 
 
       ApiResponse<TabooGameChatPageModel> response = await _tabooGameChatPageRepository.tabooGameChatPageApiCallFunction(data);
-      print("Response ::: ${response.data}");
 
       switch (response.status) {
         case ApiResponseStatus.success:

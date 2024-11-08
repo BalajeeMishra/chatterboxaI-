@@ -104,19 +104,15 @@ class PlayTabooScreenVM extends ChangeNotifier {
     // Loader().center();
     // EasyLoading.show(status: ConstText.get_LoaderMessage);
     try {
-      print(sessionId);
       var data = {
         "question": dataToAdd,
         "userId": userStore.userId,
         "session": sessionId,
         "firstword": allGameModel.allGame![index].mainContent
       };
-      print(data);
-      print("balajee mishra");
       ApiResponse<TabooGameChatPageModel> response =
           await _tabooGameChatPageRepository
               .tabooGameChatPageApiCallFunction(data);
-      print("Response ::: ${response.data}");
       switch (response.status) {
         case ApiResponseStatus.success:
           dataGet = "";
@@ -142,7 +138,6 @@ class PlayTabooScreenVM extends ChangeNotifier {
           appStore.setLoading(false);
 
           // EasyLoading.dismiss();
-          print("${response.error!.responseMsg.toString()}");
           // MySnackBar.showSnackBar(context, response.error!.responseMsg!);
           break;
         case ApiResponseStatus.unauthorized:
@@ -173,8 +168,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
     } catch (e) {
       appStore.setLoading(false);
 
-      print(e);
-      print("hellooo");
+
       // EasyLoading.dismiss();
       // MySnackBar.showSnackBar(context, e.toString());
     }
@@ -190,10 +184,8 @@ class PlayTabooScreenVM extends ChangeNotifier {
   }
 
   void speakText(String text) async {
-    print('Speak text called at Play TabooVM Screen');
     appStore.setLastWords(text);
 
-    print("Data is set or not" + appStore.lastWords.toString());
     await flutterTts.speak(text);
   }
 }

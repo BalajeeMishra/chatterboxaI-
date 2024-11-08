@@ -48,17 +48,12 @@ class _TaboogamechatPage extends State<TaboogamechatPage> with WidgetsBindingObs
     Provider.of<TabooGameChatPageVM>(context, listen: false)
         .setInitialValue(widget.allGameModel, widget.index);
     allConversationApiCall();
-    // _focusNode.addListener(() {
-    //   if (!_focusNode.hasFocus) {
-    //     _scrollToBottomIfNeeded(Provider.of<TabooGameChatPageVM>(context, listen: false).dynamicData.length);
-    //   }
-    // });
+
   }
   void allConversationApiCall() async {
     await allConversationApi(widget.sessionId).then((value) async {
       if (widget.allGameModel == null || widget.index == null) {
-        print("allGameModel or index is null!");
-        return; // or handle this case as needed
+        return;
       }
       if (value.completeConversation != null) {
         List<Map<String, dynamic>> combinedMessages = [];
@@ -90,7 +85,6 @@ class _TaboogamechatPage extends State<TaboogamechatPage> with WidgetsBindingObs
             .updateTransactionData(combinedMessages, widget.allGameModel, widget.index);
 
       } else {
-        print("No conversations available.");
       }
     }).catchError((e) {
       appStore.setLoading(false);
@@ -101,7 +95,6 @@ class _TaboogamechatPage extends State<TaboogamechatPage> with WidgetsBindingObs
   @override
   void didChangeMetrics() {
     super.didChangeMetrics();
-    // Check if the keyboard is visible by comparing the viewInsets bottom value
     if (MediaQuery.of(context).viewInsets.bottom > 0) {
       _scrollToBottom();
     }

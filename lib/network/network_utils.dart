@@ -152,7 +152,6 @@ Future handleResponse(Response response) async {
     return jsonDecode(response.body);
   } else {
     var string = await (isJsonValid(response.body));
-    print("jsonDecode(response.body)" + string.toString());
     if (string!.isNotEmpty) {
       if (string.toString().contains("Unauthenticated")) {
         await removeKey(IS_LOGIN);
@@ -220,7 +219,6 @@ Future<void> sendMultiPartRequest(MultipartRequest multiPartRequest,
     {Function(dynamic)? onSuccess, Function(dynamic)? onError}) async {
   http.Response response =
       await http.Response.fromStream(await multiPartRequest.send());
-  print("Result: ${response.body}");
 
   if (response.statusCode.isSuccessful()) {
     onSuccess?.call(response.body);

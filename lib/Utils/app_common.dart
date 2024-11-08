@@ -165,7 +165,6 @@ toastLeft(String? value,
 }
 
 setLogInValue() {
-  print(getBoolAsync(IS_LOGIN));
   userStore.setLogin(getBoolAsync(IS_LOGIN));
   if (userStore.isLoggedIn) {
     userStore.setToken(getStringAsync(TOKEN));
@@ -248,27 +247,6 @@ Widget mOption(String img, String title, Function? onCall) {
     },
   );
 }
-//
-// Future<void> getUserDetail(BuildContext context) async {
-//   await getUserDataApi().then((value) async {
-//     userStore.setUserID(value.user!.id.validate());
-//     userStore.setFirstName(value.user!.firstname.validate());
-//     userStore.setUserEmail(value.user!.email.validate());
-//     userStore.setLastName(value.user!.lastname.validate());
-//     userStore.setDesignation(value.user!.designation.validate());
-//     userStore.setPhoneNo(value.user!.mobile.validate());
-//     // userStore.setMobileVerify(value.user!.isMobileVerify!);
-//     userStore.setClinicAdded(value.user!.isClinicAdded!);
-//
-//     // userStore.setUserImage(value.user!.profileImage!);
-//
-//     print("user data->" + value.toJson().toString());
-//     appStore.setLoading(false);
-//   }).catchError((e) {
-//     print("error-" + e.toString());
-//     appStore.setLoading(false);
-//   });
-// }
 
 Widget mSuffixTextFieldIconWidget(String? img) {
   return Image.asset(img.validate(), height: 20, width: 20, color: Colors.grey)
