@@ -172,7 +172,7 @@ export const NewGameTable: React.FC<NewGameTableProps> = ({
       const templateContent = await fetchGameTemplateContent(selectgameId);
       console.log(templateContent);
       setData(templateContent);
-      alert(`Template with ID ${templateid} deleted successfully.`);
+      alert(`Prompt Template with ID ${templateid} deleted successfully.`);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error(
@@ -191,7 +191,7 @@ export const NewGameTable: React.FC<NewGameTableProps> = ({
     <div className="w-full">
       <div className="flex items-center justify-between py-4">
         <Input
-          placeholder="Filter by Template..."
+          placeholder="Filter by Prompt Template..."
           value={
             (table.getColumn("template")?.getFilterValue() as string) ?? ""
           }

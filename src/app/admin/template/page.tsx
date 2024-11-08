@@ -15,7 +15,7 @@ export default function Newgame() {
 
   return (
     <div>
-      <PageHeadDesc title="Game Template" desc="Game Template details" />
+      <PageHeadDesc title="Game Prompt Template" desc="Game Prompt Template details" />
       <div className="mx-6">
         {/* <AddNewGameForm/> */}
 
