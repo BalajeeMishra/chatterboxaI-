@@ -5,9 +5,7 @@ import 'package:balajiicode/Widget/text_widget.dart';
 import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
 import 'package:balajiicode/extensions/shared_pref.dart';
 import 'package:balajiicode/extensions/text_styles.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
@@ -22,6 +20,7 @@ import '../../Utils/app_images.dart';
 import '../../ViewModel/PlayTabooScreenVM.dart';
 import '../../Widget/appbar.dart';
 import '../../components/loader_widget_new.dart';
+import '../../extensions/loader_widget.dart';
 import '../../main.dart';
 import '../../network/rest_api.dart';
 import '../TabooGameChatpage/TaboogamechatPage.dart';
@@ -50,7 +49,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   bool apiCalled = false;
   bool isFirstTime = false;
 
-
   //Screen2 data
   double speechRate = 0.4;
   FlutterTts flutterTts = FlutterTts();
@@ -64,18 +62,19 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     super.initState();
     appStore.setLoading(false);
     startListening = false;
-    if(getStringAsync(USER_NATIVE_LANGUAGE).isNotEmpty){
+    if (getStringAsync(USER_NATIVE_LANGUAGE).isNotEmpty) {
       selectedLanguage = getStringAsync(USER_NATIVE_LANGUAGE);
     }
 
-
     setState(() {});
   }
+
   Response convertToResponse(CompleteConversation completeConversation) {
     return Response(
       aiResponse: completeConversation.aiResponse,
     );
   }
+
   Future<void> allConversationApiCall() async {
     appStore.setLoading(true);
 
@@ -87,15 +86,13 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
         Provider.of<PlayTabooScreenVM>(context, listen: false)
             .updateResponse(value.completeConversation!);
-      } else {
-      }
+      } else {}
     }).catchError((e) {
       appStore.setLoading(false);
       toast(e.toString());
       setState(() {});
     });
   }
-
 
   void _initSpeech() async {
     _speechEnabled = await _speechToText.initialize();
@@ -109,6 +106,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   }
 
   void _startListening() async {
+    // isLoading = true;
 
     await _speechToText.listen(localeId: 'en_US', onResult: _onSpeechResult);
     setState(() {});
@@ -119,23 +117,33 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     await _speechToText.stop();
     setState(() {
       startListening = false;
+
+
     });
   }
 
   /// Process speech result
   void _onSpeechResult(SpeechRecognitionResult result) {
+
     setState(() {
+      isLoading = true;
       _lastWords = result.recognizedWords;
+     if( _lastWords.isNotEmpty ){
+       isLoading= false;
+       setState(() {
+
+       });
+     }
     });
   }
 
   Future<void> configureTts() async {
     setTtsLanguage(selectedLanguage);
-    // await flutterTts.setLanguage('en-US');
     await flutterTts.setVolume(1.0);
     await flutterTts.setSpeechRate(speechRate);
     isSpeaking = true;
   }
+
   Future<void> setTtsLanguage(String language) async {
     String ttsLanguage;
 
@@ -193,7 +201,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
       _lastWords = text;
 
       await flutterTts.speak(text);
-       isSpeaking = true;
+      isSpeaking = true;
 
       flutterTts.setCompletionHandler(() {
         isSpeaking = false;
@@ -203,13 +211,11 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
       flutterTts.setErrorHandler((error) {
         isSpeaking = false;
       });
-    } else {
-    }
+    } else {}
   }
 
   /// Stop speaking
   Future<void> stopSpeaking() async {
-
     await flutterTts.stop();
   }
 
@@ -219,27 +225,26 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     await flutterTts.setSpeechRate(speechRate);
     await flutterTts.speak(ques);
     isSpeaking = false;
+    // isLoading = true;
+
   }
 
   Future<void> adjustSpeechRate(double change) async {
     _lastWords = appStore.lastWords;
 
-
     speechRate += change;
     speechRate = speechRate.clamp(0.1, 2.0);
-
 
     await flutterTts.setSpeechRate(speechRate);
 
     if (isSpeaking) {
-
       await flutterTts.stop();
 
       String remainingText = _getRemainingText();
 
       Future.delayed(Duration(milliseconds: 200), () async {
+        // isLoading =false;
         if (remainingText.isNotEmpty) {
-
           await flutterTts.setSpeechRate(speechRate);
           await speakText(remainingText);
         }
@@ -249,7 +254,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
   String _getRemainingText() {
     if (_lastSpokenIndex < _lastWords.length) {
-
       return _lastWords.substring(_lastSpokenIndex);
     }
     return '';
@@ -265,7 +269,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
   save() {
     message = 'Correcting Speech recognition mistakes';
-    isLoading = true;
     flutterTts.setStartHandler(() {
       setState(() {
         isSpeaking = true;
@@ -362,8 +365,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                           if (apiCalled)
                             IconButton(
                               icon: Icon(Icons.fast_forward),
-                              onPressed: () =>
-                                  _onIncreaseRatePressed(), // Increase speech rate
+                              onPressed: () => _onIncreaseRatePressed(),
                             ),
                         ],
                       ).paddingOnly(left: 8, right: 8),
@@ -415,7 +417,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                   ),
                                 ],
                               ),
-                              Container(
+                              SizedBox(
                                 width: MediaQuery.of(context).size.width,
                                 height: 50,
                                 child: ListView.builder(
@@ -458,7 +460,11 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                             ],
                           ),
                         ),
-
+                      Lottie.asset(
+                        'assets/lottiefile/loader.json',
+                        height: 180,
+                        fit: BoxFit.contain,
+                      ).center().visible(isLoading),
                       if (!apiCalled)
                         Row(
                           children: [
@@ -479,8 +485,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                 ? LoadingWidget(
                                     message: message,
                                   )
-                                :
-                            Padding(
+                                : Padding(
                                     padding: EdgeInsets.symmetric(
                                         horizontal: 28.0, vertical: 8),
                                     child: Row(
@@ -540,19 +545,8 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                 ).launch(context);
                                 if (res == true) {
                                   allConversationApiCall();
-                                }else{
-                                }
+                                } else {}
                               },
-                              // onTap: () {
-                              //
-                              //   Navigator.push(
-                              //       context,
-                              //       MaterialPageRoute(
-                              //           builder: (context) => TaboogamechatPage(
-                              //               widget.allGameModel,
-                              //               widget.index,
-                              //               widget.sessionId)));
-                              // },
                               child: Column(
                                 children: [
                                   Icon(
@@ -574,6 +568,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                 _initSpeech();
                                 apiCalled = false;
                                 isFirstTime = true;
+
 
                                 _lastWords = "";
                                 setState(() {});
@@ -645,11 +640,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                             height: 120,
                             fit: BoxFit.contain,
                           ),
-                          // Lottie.asset(
-                          //   'assets/lottiefile/recordaudio.json',
-                          //   height: 60,
-                          //   fit: BoxFit.contain,
-                          // ),
                         ],
                       ),
                     )
