@@ -48,7 +48,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                   className="flex gap-2 py-2 px-4 rounded hover:bg-gray-100 hover:text-black"
                 >
                   <Icon icon="cil:description" width="20" />
-                  <span> Template</span>
+                  <span>Prompt Template</span>
                 </a>
               </li>
             </ul>

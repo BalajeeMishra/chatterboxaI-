@@ -81,7 +81,11 @@ const AddTemplate: React.FC<AddTemplateFormProps> = ({
       }
 
       const data = await response.json();
+<<<<<<< HEAD
       toast.success("Template added successfully");
+=======
+      alert("Prompt Template added successfully");
+>>>>>>> f9645bb7cb05276d9e460efc77b659957c6ad75e
 
       // Fetch updated game list
       const updatedGamesContent = await fetchAllGames();
@@ -107,7 +111,7 @@ const AddTemplate: React.FC<AddTemplateFormProps> = ({
             htmlFor="template"
             className="block text-sm font-medium text-gray-700"
           >
-            Template
+            Prompt Template
           </label>
           <Editor
             value={template}
@@ -177,7 +181,7 @@ const AddTemplate: React.FC<AddTemplateFormProps> = ({
           type="submit"
           className="w-full py-2 px-4 bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
         >
-          Add Template
+          Add Prompt Template
         </button>
       </form>
     </div>
