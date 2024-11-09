@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { fetchAllGames, Game } from "../newgame/gamesApi";
 import Editor from "react-simple-wysiwyg";
 import { Games } from "../game-content/addgamecontent";
+import toast from "react-hot-toast";
 
 interface AddTemplateFormProps {
   setData: React.Dispatch<React.SetStateAction<Game[]>>;
@@ -80,7 +81,7 @@ const AddTemplate: React.FC<AddTemplateFormProps> = ({
       }
 
       const data = await response.json();
-      alert("Template added successfully");
+      toast.success("Template added successfully");
 
       // Fetch updated game list
       const updatedGamesContent = await fetchAllGames();
@@ -92,7 +93,7 @@ const AddTemplate: React.FC<AddTemplateFormProps> = ({
       setGame("");
     } catch (error) {
       console.error("Error adding template:", error);
-      alert("Failed to add template. Please try again.");
+      toast.error("Failed to add template. Please try again.");
     }
   };
 

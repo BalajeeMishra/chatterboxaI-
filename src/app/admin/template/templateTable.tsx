@@ -37,6 +37,7 @@ import { fetchAllGames } from "../newgame/gamesApi";
 import axios from "axios";
 import { fetchGameTemplateContent } from "./gameTemplateApi";
 import RenderContent from "./htmltext";
+import toast from "react-hot-toast";
 
 // Define the game data structure without id
 interface Game {
@@ -172,7 +173,7 @@ export const NewGameTable: React.FC<NewGameTableProps> = ({
       const templateContent = await fetchGameTemplateContent(selectgameId);
       console.log(templateContent);
       setData(templateContent);
-      alert(`Template with ID ${templateid} deleted successfully.`);
+      toast.success(`Template with ID ${templateid} deleted successfully.`);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error(

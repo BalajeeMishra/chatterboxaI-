@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { fetchAllGames, Game } from "./gamesApi";
 import axios from "axios";
+import toast from "react-hot-toast";
 interface AddgameFormProps {
   editgameName: string;
   setEditGameName: React.Dispatch<React.SetStateAction<string>>;
@@ -108,7 +109,7 @@ const AddgameForm: React.FC<AddgameFormProps> = ({
 
       const data = await response.json();
       console.log("Game added successfully:", data);
-      alert("Game added successfully");
+      toast.success("Game added successfully");
 
       // Fetch updated game list
       const NewgamesContent = await fetchAllGames();
@@ -123,7 +124,7 @@ const AddgameForm: React.FC<AddgameFormProps> = ({
       setEditId("");
     } catch (error) {
       console.error("Error adding game:", error);
-      alert("Failed to add game. Please try again.");
+      toast.error("Failed to add game. Please try again.");
     }
   };
 

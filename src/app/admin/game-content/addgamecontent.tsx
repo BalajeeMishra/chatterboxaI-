@@ -5,6 +5,7 @@ import { Game } from "./gamecontent";
 import { fetchGameContent } from "./gamecontentApi";
 import { fetchAllGames } from "../newgame/gamesApi";
 import axios from "axios";
+import toast from "react-hot-toast";
 interface NewGameContentFormProps {
   editgameId: string;
   setEditgameId: any;
@@ -124,7 +125,7 @@ const NewGameContentForm: React.FC<NewGameContentFormProps> = ({
       // If we are adding new game content, use POST method
       url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/game/new-game-content/${newgameId}`;
     } else {
-      alert("Fill all details.");
+      toast.error("Fill all details.");
       return;
     }
 
@@ -145,7 +146,7 @@ const NewGameContentForm: React.FC<NewGameContentFormProps> = ({
       console.log(response);
       const data = response.data;
       console.log("Game content saved successfully:", data);
-      alert("Game content saved successfully");
+      toast.success("Game content saved successfully");
 
       // Reset form fields
       setMainContent("");
@@ -157,7 +158,7 @@ const NewGameContentForm: React.FC<NewGameContentFormProps> = ({
       setEditgameId("");
     } catch (error) {
       console.error("Error saving game content:", error);
-      alert("Failed to save game content. Please try again.");
+      toast.error("Failed to save game content. Please try again.");
     }
   };
 
