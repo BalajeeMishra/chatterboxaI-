@@ -111,8 +111,8 @@ const AddTemplate: React.FC<AddTemplateFormProps> = ({
           <Editor
             value={template}
             onChange={(e) => setTemplate(e.target.value)}
-            height="200px"
             className="border border-gray-300 rounded-md"
+            containerProps={{ style: { height: '200px' } }}
           />
           {errors.template && (
             <div className="text-red-600 text-sm">{errors.template}</div>
