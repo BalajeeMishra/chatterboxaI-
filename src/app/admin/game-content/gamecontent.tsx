@@ -36,6 +36,7 @@ import {
 import { fetchGameContent } from "./gamecontentApi";
 import { Games } from "./addgamecontent";
 import { fetchAllGames } from "../newgame/gamesApi";
+import toast from "react-hot-toast";
 
 // Define the game data structure
 export interface Game {
@@ -155,7 +156,7 @@ export const GameContentTable: React.FC<NewGameContentFormProps> = ({
 
       // Log the response for debugging
       console.log("Delete Response:", response.json());
-      alert("Game Deleted successfully");
+      toast.success("Game Deleted successfully");
       // Check if the response is successful before proceeding
 
       // If delete was successful, fetch updated game content

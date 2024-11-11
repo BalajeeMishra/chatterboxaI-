@@ -37,6 +37,7 @@ import {
 import { fetchAllGames } from "./gamesApi";
 import { GameDialog } from "./icondialouge";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 // Define the game data structure without id
 interface Game {
@@ -101,7 +102,7 @@ export const NewGameTable: React.FC<NewGameTableProps> = ({
   setEditGameIcon,
   setEditStatus,
   setEditDescription,
-  
+
   setEditorder,
 }) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -174,7 +175,7 @@ export const NewGameTable: React.FC<NewGameTableProps> = ({
       setData(gamesData);
 
       // Notify the user that the game was deleted successfully
-      alert(`Game with ID ${gameid} deleted successfully.`);
+      toast.success(`Game with ID ${gameid} deleted successfully.`);
     } catch (error) {
       // Handle and log any errors
       if (axios.isAxiosError(error)) {
@@ -291,52 +292,61 @@ export const NewGameTable: React.FC<NewGameTableProps> = ({
   //     throw error;
   //   }
   // };
-  
-  const changeStatus = async (gameid: string)=> {
+
+  const changeStatus = async (gameid: string) => {
     try {
       // Log the game ID for debugging
       console.log("Changing status of game with ID:", gameid);
-  
+
       // Construct the PATCH request URL
       const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/game/changestatus/${gameid}`;
       console.log("API URL:", apiUrl);
-  
+
       // Make the PATCH request using axios
-      const response = await axios.patch(apiUrl, {
-        status: "inactive",  // The body data being sent
-      }, {
-        headers: {
-          "Content-Type": "application/json",  // Ensure proper content type
-          // "Authorization": `Bearer ${yourToken}`, // Uncomment if you need authentication
+      const response = await axios.patch(
+        apiUrl,
+        {
+          status: "inactive", // The body data being sent
         },
-      });
-  
+        {
+          headers: {
+            "Content-Type": "application/json", // Ensure proper content type
+            // "Authorization": `Bearer ${yourToken}`, // Uncomment if you need authentication
+          },
+        }
+      );
+
       // Log the response data
       console.log("Response from server:", response.data);
-  
+
       // Fetch updated list of games after status change (Assuming fetchAllGames is another function)
       const gamesData = await fetchAllGames();
-  
+
       // Update the UI or state with the new games data
       setData(gamesData);
-  
+
       // Notify the user that the game's status was changed successfully
-      alert(`Game with ID ${gameid} status changed to inactive successfully.`);
-  
+      toast.success(
+        `Game with ID ${gameid} status changed to inactive successfully.`
+      );
     } catch (error) {
       // Handle and log any errors
       if (axios.isAxiosError(error)) {
         // Axios error, handle it accordingly
         console.error("Axios error:", error);
-        alert(`Failed to change game status: ${error.response?.data?.message || error.message}`);
+        toast.error(
+          `Failed to change game status: ${
+            error.response?.data?.message || error.message
+          }`
+        );
       } else {
         // Non-Axios error
         console.error("Unexpected error:", error);
-        alert("Failed to change game status. Please try again.");
+        toast.error("Failed to change game status. Please try again.");
       }
     }
   };
-  
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
 

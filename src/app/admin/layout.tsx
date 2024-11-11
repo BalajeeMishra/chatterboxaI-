@@ -1,6 +1,6 @@
 import { ProfileDropdownMenu } from "@/components/ui/profiledropdown";
 import { Icon } from "@iconify/react/dist/iconify.js";
-
+import { Toaster } from 'react-hot-toast';
 const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="min-h-screen h-full flex flex-col">
@@ -60,6 +60,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
           {children}
         </main>
       </div>
+      <Toaster position="top-center" reverseOrder={false} />
     </div>
   );
 };

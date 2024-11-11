@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/table";
 import { DialogCloseButton } from "./userlogDialogue";
 import { fetchAllUsers } from "./fetchuserApi";
+import toast from "react-hot-toast";
 
 // Define the user data structure
 interface User {
@@ -120,9 +121,9 @@ export function UserTable() {
       setLoading(false);
     }
   };
-  const updatePlayingStatus = async (userId: string) => {
+  const updatePlayingStatus = async (userId: string, status: boolean) => {
     const requestBody = {
-      playingstatus: "false",
+      playingstatus: status === true ? "false" : "true",
     };
 
     try {
@@ -142,8 +143,8 @@ export function UserTable() {
       }
 
       const data = await response.json();
-      loadUsers();
-      alert("Successfully updated playing status");
+      await loadUsers();
+      toast.success("Successfully updated playing status");
 
       return data;
     } catch (error: any) {
@@ -256,7 +257,12 @@ export function UserTable() {
 
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
-                          onClick={() => updatePlayingStatus(row.original._id)}
+                          onClick={() =>
+                            updatePlayingStatus(
+                              row.original._id,
+                              row.original.playingstatus
+                            )
+                          }
                         >
                           Change Status
                         </DropdownMenuItem>
