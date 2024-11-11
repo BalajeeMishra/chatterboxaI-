@@ -42,12 +42,14 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   SpeechToText _speechToText = SpeechToText();
   bool _speechEnabled = false;
   String _lastWords = '';
-
+  String _previousWords = '';
   String ques = "";
   String sessionId = "";
   bool isLoading = false;
   bool apiCalled = false;
   bool isFirstTime = false;
+  bool isMuted = false;
+  String currentSpeechText = "";
 
   //Screen2 data
   double speechRate = 0.4;
@@ -95,6 +97,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   }
 
   void _initSpeech() async {
+    _previousWords ="";
     _speechEnabled = await _speechToText.initialize();
     if (_speechEnabled) {
       setState(() {
@@ -105,38 +108,81 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     }
   }
 
-  void _startListening() async {
-    // isLoading = true;
-
-    await _speechToText.listen(localeId: 'en_US', onResult: _onSpeechResult);
-    setState(() {});
-  }
-
-  /// Stop listening to speech
   void _stopListening() async {
     await _speechToText.stop();
     setState(() {
       startListening = false;
-
-
     });
   }
 
-  /// Process speech result
   void _onSpeechResult(SpeechRecognitionResult result) {
 
     setState(() {
-      isLoading = true;
-      _lastWords = result.recognizedWords;
-     if( _lastWords.isNotEmpty ){
-       isLoading= false;
-       setState(() {
+      _startListening();
 
-       });
-     }
+      isLoading = true;
+
+      _lastWords = result.recognizedWords;
+      if (_lastWords.isNotEmpty) {
+        isLoading = false;
+      }
+      if (result.finalResult) {
+        if (_previousWords.isEmpty) {
+
+          _previousWords = result.recognizedWords;
+        } else {
+          _previousWords += ' ' + result.recognizedWords;
+        }
+
+        _lastWords = _previousWords;
+
+        setState(() {
+
+        });
+
+        _startListening();
+      }
     });
   }
 
+  void _startListening() async {
+    await _speechToText.listen(
+        localeId: 'en_US',
+        listenFor: Duration(seconds: 30),
+        pauseFor: Duration(seconds: 10),
+        listenOptions: SpeechListenOptions(
+            listenMode: ListenMode.deviceDefault,
+            autoPunctuation: true,
+            partialResults: true,
+            cancelOnError: false,
+            enableHapticFeedback: true,
+            onDevice: true),
+        onResult: _onSpeechResult);
+    setState(() {});
+  }
+
+  /// Stop listening to speech
+  // void _stopListening() async {
+  //   await _speechToText.stop();
+  //   setState(() {
+  //     startListening = false;
+  //   });
+  // }
+
+  /// Process speech result
+  // void _onSpeechResult(SpeechRecognitionResult result) {
+  //   setState(() {
+  //     isLoading = true;
+  //     _lastWords = result.recognizedWords;
+  //     if (_lastWords.isNotEmpty) {
+  //       isLoading = false;
+  //       setState(() {
+  //
+  //       });
+  //     }
+  //   });
+  // }
+  //
   Future<void> configureTts() async {
     setTtsLanguage(selectedLanguage);
     await flutterTts.setVolume(1.0);
@@ -225,8 +271,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     await flutterTts.setSpeechRate(speechRate);
     await flutterTts.speak(ques);
     isSpeaking = false;
-    // isLoading = true;
-
   }
 
   Future<void> adjustSpeechRate(double change) async {
@@ -243,7 +287,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
       String remainingText = _getRemainingText();
 
       Future.delayed(Duration(milliseconds: 200), () async {
-        // isLoading =false;
         if (remainingText.isNotEmpty) {
           await flutterTts.setSpeechRate(speechRate);
           await speakText(remainingText);
@@ -536,6 +579,37 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  isMuted = !isMuted;
+                                  if (isMuted) {
+                                    stopSpeaking();
+                                  } else if (_lastWords.isNotEmpty &&
+                                      _lastSpokenIndex < _lastWords.length) {
+                                    speakText(
+                                        _lastWords.substring(_lastSpokenIndex));
+                                  }
+                                });
+                              },
+                              child: Column(
+                                children: [
+                                  Icon(
+                                    !isMuted
+                                        ? Icons.volume_off
+                                        : Icons.volume_up,
+                                    size: 36,
+                                  ),
+                                  MyText(
+                                    text: !isMuted ? "Mute" : "Unmute",
+                                    fontSize: 12,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              width: !isMuted ? 47 : 40,
+                            ),
+                            GestureDetector(
                               onTap: () async {
                                 stopSpeaking();
                                 final bool? res = await TaboogamechatPage(
@@ -568,7 +642,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                 _initSpeech();
                                 apiCalled = false;
                                 isFirstTime = true;
-
 
                                 _lastWords = "";
                                 setState(() {});
