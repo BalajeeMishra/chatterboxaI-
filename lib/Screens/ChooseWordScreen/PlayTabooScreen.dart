@@ -124,7 +124,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
       _lastWords = result.recognizedWords;
       if (_lastWords.isNotEmpty) {
-        isLoading = false;
+
       }
       if (result.finalResult) {
         if (_previousWords.isEmpty) {
@@ -137,7 +137,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
         _lastWords = _previousWords;
 
         setState(() {
-
+          isLoading = false;
         });
 
         _startListening();
@@ -508,7 +508,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                         height: 180,
                         fit: BoxFit.contain,
                       ).center().visible(isLoading),
-                      if (!apiCalled)
+                      if (!apiCalled && !isLoading)
                         Row(
                           children: [
                             Expanded(
