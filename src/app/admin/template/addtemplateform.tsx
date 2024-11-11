@@ -81,11 +81,7 @@ const AddTemplate: React.FC<AddTemplateFormProps> = ({
       }
 
       const data = await response.json();
-<<<<<<< HEAD
       toast.success("Template added successfully");
-=======
-      alert("Prompt Template added successfully");
->>>>>>> f9645bb7cb05276d9e460efc77b659957c6ad75e
 
       // Fetch updated game list
       const updatedGamesContent = await fetchAllGames();
