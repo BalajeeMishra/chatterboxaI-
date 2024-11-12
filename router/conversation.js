@@ -82,7 +82,7 @@ Game 1, Step 6: Track progress
 Previous conversation:
 {chat_history}
 
-details: {maincontent} {detailOfContent} {nativeLanguage} {human_input}
+details: {maincontent} {detailOfContent} {nativeLanguage} {question}
 
 Note: Only do the needfull. Don't include any points from above instructions in response. 
 `
@@ -91,7 +91,7 @@ Note: Only do the needfull. Don't include any points from above instructions in 
 
 
 const prompt = new PromptTemplate({
-  inputVariables: ["nativeLanguage","maincontent","detailOfContent","chat_history","human_input"],
+  inputVariables: ["question","nativeLanguage","maincontent","detailOfContent","chat_history","human_input"],
   template: template,
 });
 
@@ -121,10 +121,15 @@ router.post("/play",jwtHelper.verifyToken, async (req, res) => {
 
   let {sessionId,mainContent,question} = req.body;
   const userId = req.userId;
+  let history = "";
 
   const user = await User.findById(userId); 
 
-  let userdatalog;
+  
+  let userdatalog = await UserDataLog.findOne({ userId, sessionId: sessionId });
+  if(!userdatalog){
+    delete userSessions[sessionId];
+  }
   // const usedTabooWord = tabooWords.find((word) => question.includes(word));
   // if (usedTabooWord) {
   //   return res.json({ message: `You used a taboo word: ${usedTabooWord}` });
@@ -139,15 +144,16 @@ router.post("/play",jwtHelper.verifyToken, async (req, res) => {
 
     const nativeLanguage = user.nativeLanguage;
 
-    
-
-    const response = await userSession.chain.invoke({"maincontent":maincontent,"detailOfContent":detailOfContent,"nativeLanguage":nativeLanguage,"chat_history":"","human_input":""});
-  
-
-    userdatalog = await UserDataLog.findOne({ userId, sessionId: sessionId });
+    const response = await userSession.chain.invoke({"question":question,"maincontent":maincontent,"detailOfContent":detailOfContent,"nativeLanguage":nativeLanguage,"chat_history":userSession.history??"","human_input":""});
+   
+    await userSession.memory.saveContext({ input: question}, { output: response.text });
+    history = await userSession.memory.loadMemoryVariables({});
+    userSession.history = history.history;
+    console.log(userSession.history)
     if (userdatalog) {
       userdatalog.userResponse = [...userdatalog.userResponse,question];
       userdatalog.aiResponse = [...userdatalog.aiResponse, response.text];
+     
     } else {
       userdatalog = new UserDataLog({
         userResponse: [`Main content is ${maincontent} and Detailofcontent is [${detailOfContent}]`],
