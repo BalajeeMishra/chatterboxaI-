@@ -4,13 +4,14 @@ import { LLMChain } from "langchain/chains";
 import { BufferMemory } from "langchain/memory";
 
 
+
 import { Router } from "express";
 import fs from "fs";
 import UserDataLog from "../model/Userdata.js";
-import jwtHelper from "../helper/jwt_helper.js";
 import GameContent from "../model/GameContent.js";
 import User from "../model/User.js";
-
+import jwtHelper from "../helper/jwt_helper.js";
+import { ConsoleCallbackHandler } from "langchain/callbacks";
 
 const router = Router();
 
@@ -81,20 +82,26 @@ Game 1, Step 6: Track progress
 Previous conversation:
 {chat_history}
 
-details: {question}
+details: {maincontent} {detailOfContent} {nativeLanguage} {human_input}
 
 Note: Only do the needfull. Don't include any points from above instructions in response. 
 `
 
-const prompt = PromptTemplate.fromTemplate(template);
+// const prompt = PromptTemplate.fromTemplate(template);
+
+
+const prompt = new PromptTemplate({
+  inputVariables: ["nativeLanguage","maincontent","detailOfContent","chat_history","human_input"],
+  template: template,
+});
 
 
 const userSessions = {};
 function getUserSession(session) {
   if (!userSessions[session]) {
     // Initialize a new session for the user with persistent memory
-    const memory = new BufferMemory({ memoryKey: "chat_history" });
-
+    const memory = new BufferMemory({ memory_key: "chat_history",human_input:"human_input" });
+    // 
     userSessions[session] = {
       memory,
       chain: new LLMChain({
@@ -108,9 +115,13 @@ function getUserSession(session) {
   return userSessions[session];
 }
 
-router.post("/play", async (req, res) => {
+router.post("/play",jwtHelper.verifyToken, async (req, res) => {
   // nativelanguage, listofword, firstword
-  let { question, userId, session,firstword } = req.body;
+  // let { question, userId, session,firstword } = req.body;
+
+  let {sessionId,mainContent,question} = req.body;
+  const userId = req.userId;
+
   const user = await User.findById(userId); 
 
   let userdatalog;
@@ -119,29 +130,36 @@ router.post("/play", async (req, res) => {
   //   return res.json({ message: `You used a taboo word: ${usedTabooWord}` });
   // }
   try {
-    const userSession = getUserSession(session);
-    const allgamecontent = await GameContent.find({});
-    const listofword= allgamecontent.map(e=>e.mainContent);
+    const userSession = getUserSession(sessionId);
+    const gamecontent = await GameContent.findOne({mainContent});
+    
+    const maincontent = gamecontent.mainContent;
+    const detailOfContent = gamecontent.detailOfContent;
+    // const detailOfContent = "";
+
     const nativeLanguage = user.nativeLanguage;
-    question = `nativeLanguage of user is ${nativeLanguage}, list of guess word for next round is ${listofword},  Guess word for 1st level ${firstword} and user Reply is ${question}   `;
-    console.log(question,"balajee")
-    const response = await userSession.chain.invoke({question});
-    userdatalog = await UserDataLog.findOne({ userId, sessionId: session });
+
+    
+
+    const response = await userSession.chain.invoke({"maincontent":maincontent,"detailOfContent":detailOfContent,"nativeLanguage":nativeLanguage,"chat_history":"","human_input":""});
+  
+
+    userdatalog = await UserDataLog.findOne({ userId, sessionId: sessionId });
     if (userdatalog) {
-      userdatalog.userResponse = [...userdatalog.userResponse, question];
+      userdatalog.userResponse = [...userdatalog.userResponse,question];
       userdatalog.aiResponse = [...userdatalog.aiResponse, response.text];
     } else {
       userdatalog = new UserDataLog({
-        userResponse: [question],
+        userResponse: [`Main content is ${maincontent} and Detailofcontent is [${detailOfContent}]`],
         aiResponse: [response.text],
         userId,
-        sessionId: session
+        sessionId: sessionId
       });
     }
     await userdatalog.save();
     return res.status(200).json({ response: userdatalog });
   } catch (error) {
-    console.log(error);
+    console.log(error)
     res.status(500).json({ error: "Something went wrong" });
   }
 });
@@ -150,8 +168,8 @@ router.post("/play", async (req, res) => {
 
 router.get("/allconversation", async (req, res) => {
   try {
-    const { session } = req.query;
-    const completeConversation = await UserDataLog.findOne({ sessionId: session });
+    const { sessionId } = req.query;
+    const completeConversation = await UserDataLog.findOne({ sessionId: sessionId });
     return res.status(200).json({ completeConversation });
   } catch (err) {
     throw err;
