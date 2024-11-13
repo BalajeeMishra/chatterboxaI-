@@ -2,7 +2,13 @@ import {Router} from "express";
 import Game from "../model/Game.js";
 import GameContent from "../model/GameContent.js";
 import Template from "../model/Template.js";
+import striptags from 'striptags';
+import he from'he';
+
+
+
 const router = Router();
+
 
 router.post("/new-game",async(req,res,next)=>{
   try{
@@ -144,10 +150,14 @@ router.post("/game-template/:id",async(req,res,next)=>{
   try{
   const {id}= req.params;
   const {engprolevel,content} = req.body;
+
+  let plainText = striptags(content);
+  plainText = he.decode(plainText);
+
   const template = new Template({
     gameId:id,
     engprolevel,
-    content,
+    content:plainText,
   });
   await template.save();
   return res.status(200).json({template});
@@ -194,8 +204,5 @@ router.get("/game-template/:id",async(req,res,next)=>{
     throw err; 
   }
 })
-
-
-
 
 export default router;
