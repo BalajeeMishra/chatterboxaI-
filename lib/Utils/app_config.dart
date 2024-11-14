@@ -4,7 +4,9 @@ const APP_NAME = "JabberAI";
 
 //region baseurl
 /// Note: /Add your domain is www.abc.com
-const mBackendURL = "http://148.113.37.187:3000";
+const mBackendURL ="http://148.113.37.187:3000";
+// const mBackendURL = "https://appadmin.talkyplay.com";
+
 //endregion
 
 //region Default Language Code

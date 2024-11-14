@@ -98,7 +98,8 @@ class _ChooseWordScreen extends State<ChooseWordScreen> {
                                                   builder: (context) =>
                                                       PlayTabooScreen(
                                                           vm.homePageModel,
-                                                          index,Uuid().v4())));
+                                                          index,Uuid().v4(),
+                                                      )));
                                         },
                                         child: Container(
                                             width: MediaQuery.of(context)

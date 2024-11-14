@@ -15,7 +15,7 @@ import '../Utils/ShowSnackBar.dart';
 class PlayTabooScreenVM extends ChangeNotifier {
   /// Calling Repository =====================================
   TabooGameChatPageRepository _tabooGameChatPageRepository =
-      TabooGameChatPageRepository();
+      TabooGameChatPageRepository(); 
 
   BuildContext context;
 
@@ -27,6 +27,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
   TabooGameChatPageModel tabooGameChatPageModel = TabooGameChatPageModel();
   bool apiHitStatus = false;
   List<Map<String, dynamic>> dynamicDta = [];
+  bool isFirstCall = true; // Track the first API call
 
   var dataToPass;
 
@@ -106,13 +107,16 @@ class PlayTabooScreenVM extends ChangeNotifier {
     try {
       var data = {
         "question": dataToAdd,
-        "userId": userStore.userId,
-        "session": sessionId,
-        "firstword": allGameModel.allGame![index].mainContent
+        // "userId": userStore.userId,
+        "sessionId": sessionId,
+        'gameId':allGameModel.allGame![index].gameId,
+        "mainContent": allGameModel.allGame![index].mainContent
       };
+      print("DAT"+data.toString());
       ApiResponse<TabooGameChatPageModel> response =
           await _tabooGameChatPageRepository
               .tabooGameChatPageApiCallFunction(data);
+      // print("RES{PONS"+response.status.toString());
       switch (response.status) {
         case ApiResponseStatus.success:
           dataGet = "";
@@ -124,9 +128,13 @@ class PlayTabooScreenVM extends ChangeNotifier {
           apiHitStatus = true;
           tabooGameChatPageModel = response.data!;
           notifyListeners();
-
+          if (!isFirstCall) {
+            speakText(response.data!.response!.aiResponse!.last);
+          } else {
+            isFirstCall = false;
+          }
           // EasyLoading.dismiss();
-          speakText(response.data!.response!.aiResponse!.last);
+          // speakText(response.data!.response!.aiResponse!.last);
           // Navigator.push(context, MaterialPageRoute(builder: (context)=>PlayTabooScreenTwo(response.data!.response!.aiResponse!.last)));
           break;
         // tabooGameChatPageModel = response.data!;

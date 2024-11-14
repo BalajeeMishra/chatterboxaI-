@@ -2,6 +2,7 @@ import 'package:balajiicode/Constants/ImageConstant.dart';
 import 'package:balajiicode/Constants/constantRow.dart';
 import 'package:balajiicode/Model/TabooGameChatPageModel.dart';
 import 'package:balajiicode/Widget/text_widget.dart';
+import 'package:balajiicode/extensions/extension_util/context_extensions.dart';
 import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
 import 'package:balajiicode/extensions/shared_pref.dart';
 import 'package:balajiicode/extensions/text_styles.dart';
@@ -63,7 +64,23 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   void initState() {
     super.initState();
     appStore.setLoading(false);
+    print("Session  Id " + widget.sessionId.toString());
+    print("gameId  Id " + widget.allGameModel.allGame!.first.gameId  .toString());
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<PlayTabooScreenVM>(context, listen: false)
+          .seInitialValue(widget.allGameModel, widget.index, widget.sessionId);
+
+      Provider.of<PlayTabooScreenVM>(context, listen: false).chatPageAPI(
+        context,
+       "Hi, Let's play the game!",
+        widget.sessionId,
+        widget.allGameModel,
+        widget.index,
+      );
+    });
     startListening = false;
+    apiCalled = true;
     if (getStringAsync(USER_NATIVE_LANGUAGE).isNotEmpty) {
       selectedLanguage = getStringAsync(USER_NATIVE_LANGUAGE);
     }
@@ -415,94 +432,94 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                       SizedBox(
                         height: 15,
                       ),
-                      if (!apiCalled && !isFirstTime)
-                        Padding(
-                          padding: EdgeInsets.only(left: 20.0),
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: MyText(
-                                      text: "Your Word:",
-                                      color: Color(0xff000000),
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: MyText(
-                                      text:
-                                          '\"${widget.allGameModel.allGame![widget.index].mainContent}"',
-                                      color: Colors.black,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  )
-                                ],
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: MyText(
-                                      text: "Taboo Words:",
-                                      color: Color(0xff000000),
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width,
-                                height: 50,
-                                child: ListView.builder(
-                                    physics: AlwaysScrollableScrollPhysics(),
-                                    itemCount: widget
-                                        .allGameModel
-                                        .allGame![widget.index]
-                                        .detailOfContent!
-                                        .length,
-                                    shrinkWrap: true,
-                                    scrollDirection: Axis.horizontal,
-                                    itemBuilder: (context, index) {
-                                      var data = widget
-                                          .allGameModel
-                                          .allGame![widget.index]
-                                          .detailOfContent![index];
-                                      return MyText(
-                                        text: '${data},',
-                                        color: Colors.black,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      );
-                                    }),
-                              ),
-                              SizedBox(
-                                height: 5.0,
-                              ),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: MyText(
-                                      text: "Go ahead and give your clue!",
-                                      color: Color(0xff000000),
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
+                      // if (!apiCalled && !isFirstTime)
+                      //   Padding(
+                      //     padding: EdgeInsets.only(left: 20.0),
+                      //     child: Column(
+                      //       children: [
+                      //         // Row(
+                      //         //   children: [
+                      //         //     Expanded(
+                      //         //       child: MyText(
+                      //         //         text: "Your Word:",
+                      //         //         color: Color(0xff000000),
+                      //         //         fontSize: 14,
+                      //         //         fontWeight: FontWeight.w400,
+                      //         //       ),
+                      //         //     ),
+                      //         //   ],
+                      //         // ),
+                      //         Row(
+                      //           children: [
+                      //             Expanded(
+                      //               child: MyText(
+                      //                 text:
+                      //                     '\"${widget.allGameModel.allGame![widget.index].mainContent}"',
+                      //                 color: Colors.black,
+                      //                 fontSize: 18,
+                      //                 fontWeight: FontWeight.bold,
+                      //               ),
+                      //             )
+                      //           ],
+                      //         ),
+                      //         SizedBox(
+                      //           height: 10,
+                      //         ),
+                      //         Row(
+                      //           children: [
+                      //             Expanded(
+                      //               child: MyText(
+                      //                 text: "Taboo Words:",
+                      //                 color: Color(0xff000000),
+                      //                 fontSize: 14,
+                      //                 fontWeight: FontWeight.w400,
+                      //               ),
+                      //             ),
+                      //           ],
+                      //         ),
+                      //         SizedBox(
+                      //           width: MediaQuery.of(context).size.width,
+                      //           height: 50,
+                      //           child: ListView.builder(
+                      //               physics: AlwaysScrollableScrollPhysics(),
+                      //               itemCount: widget
+                      //                   .allGameModel
+                      //                   .allGame![widget.index]
+                      //                   .detailOfContent!
+                      //                   .length,
+                      //               shrinkWrap: true,
+                      //               scrollDirection: Axis.horizontal,
+                      //               itemBuilder: (context, index) {
+                      //                 var data = widget
+                      //                     .allGameModel
+                      //                     .allGame![widget.index]
+                      //                     .detailOfContent![index];
+                      //                 return MyText(
+                      //                   text: '${data},',
+                      //                   color: Colors.black,
+                      //                   fontSize: 18,
+                      //                   fontWeight: FontWeight.bold,
+                      //                 );
+                      //               }),
+                      //         ),
+                      //         SizedBox(
+                      //           height: 5.0,
+                      //         ),
+                      //         Row(
+                      //           children: [
+                      //             Expanded(
+                      //               child: MyText(
+                      //                 text: "Go ahead and give your clue!",
+                      //                 color: Color(0xff000000),
+                      //                 fontSize: 14,
+                      //                 fontWeight: FontWeight.w400,
+                      //               ),
+                      //             ),
+                      //           ],
+                      //         ),
+                      //       ],
+                      //     ),
+                      //   ),
                       Lottie.asset(
                         'assets/lottiefile/loader.json',
                         height: 180,
@@ -554,15 +571,20 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                                               .last ==
                                                           "")
                                                   ? Text("")
-                                                  : Text(
-                                                      vm
-                                                          .tabooGameChatPageModel
-                                                          .response!
-                                                          .aiResponse!
-                                                          .last,
-                                                      style: primaryTextStyle(
-                                                          size: 16),
+                                                  : SizedBox(
+                                            height:  context.height() * 0.498,
+                                                    child: SingleChildScrollView(
+                                                      child: Text(
+                                                          vm
+                                                              .tabooGameChatPageModel
+                                                              .response!
+                                                              .aiResponse!
+                                                              .last,
+                                                          style: primaryTextStyle(
+                                                              size: 16),
+                                                        ),
                                                     ),
+                                                  ),
                                         )
                                       ],
                                     ),

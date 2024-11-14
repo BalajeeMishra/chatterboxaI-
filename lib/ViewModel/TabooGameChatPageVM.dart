@@ -85,10 +85,12 @@ class TabooGameChatPageVM extends ChangeNotifier {
 
     try {
       var data = {
-        "userId": getStringAsync(USER_ID),
-        "session": sessionId,
+        'gameId':allGameModel.allGame![index].gameId,
+
+        // "userId": getStringAsync(USER_ID),
+        "sessionId": sessionId,
         "question": messageText,
-        "firstword":allGameModel.allGame![index].mainContent
+        "mainContent":allGameModel.allGame![index].mainContent
       };
 
 

@@ -152,7 +152,7 @@ class _TaboogamechatPage extends State<TaboogamechatPage> with WidgetsBindingObs
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // resizeToAvoidBottomInset: false, // Add this line
+      // resizeToAvoidBottomInset: false,
 
       appBar: backCustomAppBar(
         backButtonshow: true,
@@ -402,6 +402,9 @@ class _TaboogamechatPage extends State<TaboogamechatPage> with WidgetsBindingObs
                 chatPageVM.chatPageAPI(context, widget.sessionId, messageText,
                     widget.allGameModel, widget.index);
                 isFirst = false;
+                setState(() {
+
+                });
               } else {
                 chatPageVM.chatPageAPI(context, widget.sessionId, messageText,
                     widget.allGameModel, widget.index);

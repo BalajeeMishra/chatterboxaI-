@@ -3,6 +3,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:balajiicode/Utils/app_constants.dart';
+import 'package:balajiicode/extensions/shared_pref.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 
@@ -20,7 +22,7 @@ class ApiClass {
       "Content-Type": "application/json",
       ...(isHeader != null
           ? {
-              'token': 'Bearer ${userStore.token}',
+              'Authorization': 'Bearer ${getStringAsync(TOKEN)}',
             }
           : {})
     });
@@ -40,11 +42,13 @@ class ApiClass {
     }
     return response;
   }
+  
 
   /// POST Method With Header Checks
   static Future<Response> post(String endPoint, Map<String, dynamic> object, {bool isHeader = true}) async {
     final headers = await getHeaders(isHeader: isHeader);
     var response;
+    print("Headers: $headers");
 
     try {
       response = await http
