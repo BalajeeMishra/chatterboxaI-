@@ -33,16 +33,16 @@ class TabooGameChatPageVM extends ChangeNotifier {
   List<Map<String, dynamic>> dynamicData = [];
 
   // Initialize values
-  void setInitialValue(AllGameModel allGameModel, int index) {
-    String data = allGameModel.allGame![index].detailOfContent!.join(", ");
-    initialdata = {
-      "Guess Word": "${allGameModel.allGame![index].mainContent}",
-      "Taboo Words": data,
-    };
-    apiHitStatus = false;
-    tabooGameChatPageModel = TabooGameChatPageModel();
-    notifyListeners();
-  }
+  // void setInitialValue(AllGameModel allGameModel, int index) {
+  //   // String data = allGameModel.allGame![index].detailOfContent!.join(", ");
+  //   // initialdata = {
+  //   //   "Guess Word": "${allGameModel.allGame![index].mainContent}",
+  //   //   "Taboo Words": data,
+  //   // };
+  //   apiHitStatus = false;
+  //   tabooGameChatPageModel = TabooGameChatPageModel();
+  //   notifyListeners();
+  // }
   // void updateTransactionData(List<Map<String, dynamic>> transactions) {
   //
   //   dynamicData = transactions;
@@ -51,17 +51,17 @@ class TabooGameChatPageVM extends ChangeNotifier {
   void updateTransactionData(List<Map<String, dynamic>> transactions, AllGameModel allGameModel, int index) {
     // Set initialdata with Guess Word and Taboo Words
     String data = allGameModel.allGame![index].detailOfContent!.join(", ");
-    initialdata = {
-      "Guess Word": "${allGameModel.allGame![index].mainContent}",
-      "Taboo Words": data,
-    };
+    // initialdata = {
+    //   "Guess Word": "${allGameModel.allGame![index].mainContent}",
+    //   "Taboo Words": data,
+    // };
 
     // Add initialdata to dynamicData as the first message
     dynamicData = [
-      {
-        "server": 1,  // Or any identifier you want for system messages
-        "data": "Guess Word: ${initialdata['Guess Word']},\nTaboo Words: ${initialdata['Taboo Words']}"
-      },
+      // {
+      //   "server": 1,  // Or any identifier you want for system messages
+      //   "data": "Guess Word: ${initialdata['Guess Word']},\nTaboo Words: ${initialdata['Taboo Words']}"
+      // },
       ...transactions  // Add all other messages from transactions
     ];
 

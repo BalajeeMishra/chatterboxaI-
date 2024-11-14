@@ -45,8 +45,8 @@ class _TaboogamechatPage extends State<TaboogamechatPage> with WidgetsBindingObs
         .dynamicData
         .clear();
 
-    Provider.of<TabooGameChatPageVM>(context, listen: false)
-        .setInitialValue(widget.allGameModel, widget.index);
+    // Provider.of<TabooGameChatPageVM>(context, listen: false)
+    //     .setInitialValue(widget.allGameModel, widget.index);
     allConversationApiCall();
 
   }

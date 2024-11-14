@@ -27,7 +27,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
   TabooGameChatPageModel tabooGameChatPageModel = TabooGameChatPageModel();
   bool apiHitStatus = false;
   List<Map<String, dynamic>> dynamicDta = [];
-  bool isFirstCall = true; // Track the first API call
+  bool isFirstCall = true;
 
   var dataToPass;
 
@@ -86,7 +86,9 @@ class PlayTabooScreenVM extends ChangeNotifier {
   }
 
   Future<void> chatPageAPI(BuildContext context, String dataGet,
-      String sessionId, AllGameModel allGameModel, int index) async {
+      String sessionId, AllGameModel allGameModel, int index,bool isFirst) async {
+
+    isFirstCall =isFirst;
     if (dataGet == "" || dataGet == null) {
       MySnackBar.showSnackBar(context, "Please speak first!");
       return;
@@ -133,8 +135,8 @@ class PlayTabooScreenVM extends ChangeNotifier {
           } else {
             isFirstCall = false;
           }
+          print("Is First call" + isFirstCall.toString());
           // EasyLoading.dismiss();
-          // speakText(response.data!.response!.aiResponse!.last);
           // Navigator.push(context, MaterialPageRoute(builder: (context)=>PlayTabooScreenTwo(response.data!.response!.aiResponse!.last)));
           break;
         // tabooGameChatPageModel = response.data!;

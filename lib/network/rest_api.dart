@@ -16,7 +16,7 @@ Future<RegisterResponse> registerApi(Map req) async {
 
 Future<AllConversationResponse> allConversationApi(String sessionId) async {
   return AllConversationResponse.fromJson(await handleResponse(
-      await buildHttpResponse('allconversation?session=$sessionId',
+      await buildHttpResponse('allconversation?sessionId=$sessionId',
           method: HttpMethod.GET)));
 }
 

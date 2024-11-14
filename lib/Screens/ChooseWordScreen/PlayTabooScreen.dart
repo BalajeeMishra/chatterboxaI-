@@ -77,6 +77,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
         widget.sessionId,
         widget.allGameModel,
         widget.index,
+        true,
       );
     });
     startListening = false;
@@ -350,7 +351,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     Provider.of<PlayTabooScreenVM>(context, listen: false)
         .seInitialValue(widget.allGameModel, widget.index, widget.sessionId);
     Provider.of<PlayTabooScreenVM>(context, listen: false).chatPageAPI(
-        context, ques, widget.sessionId, widget.allGameModel, widget.index);
+        context, ques, widget.sessionId, widget.allGameModel, widget.index,false);
     configureTts();
     apiCalled = true;
     _lastWords = appStore.lastWords;
