@@ -92,7 +92,7 @@ const prompt = new PromptTemplate({
       userdatalog.aiResponse = [...userdatalog.aiResponse, response.text];
     } else {
       userdatalog = new UserDataLog({
-        userResponse: [`Main content is ${maincontent} and Detailofcontent is [${detailOfContent}]`],
+        userResponse: [question],
         aiResponse: [response.text],
         userId,
         sessionId: sessionId
