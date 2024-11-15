@@ -24,6 +24,7 @@
     "mongoose-sequence": "^6.0.1",
     "openai": "^4.67.1",
     "pdf-parse": "^1.1.1",
-    "striptags": "^3.2.0"
+    "striptags": "^3.2.0",
+    "validator": "^13.12.0"
   }
 }
