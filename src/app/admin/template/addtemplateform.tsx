@@ -21,7 +21,6 @@ const AddTemplate: React.FC<AddTemplateFormProps> = ({
 
   edittemplate,
   editEnglishProficiency,
- 
 }) => {
   const [template, setTemplate] = useState<string>(edittemplate || "");
   const [englishProficiency, setEnglishProficiency] = useState<string>(
@@ -81,11 +80,7 @@ const AddTemplate: React.FC<AddTemplateFormProps> = ({
       }
 
       const data = await response.json();
-<<<<<<< HEAD
       toast.success("Template added successfully");
-=======
-      alert("Prompt Template added successfully");
->>>>>>> f9645bb7cb05276d9e460efc77b659957c6ad75e
 
       // Fetch updated game list
       const updatedGamesContent = await fetchAllGames();
@@ -117,7 +112,7 @@ const AddTemplate: React.FC<AddTemplateFormProps> = ({
             value={template}
             onChange={(e) => setTemplate(e.target.value)}
             height="200px"
-            className="border border-gray-300 rounded-md"
+            className="border  border-gray-300 rounded-md"
           />
           {errors.template && (
             <div className="text-red-600 text-sm">{errors.template}</div>
@@ -155,7 +150,7 @@ const AddTemplate: React.FC<AddTemplateFormProps> = ({
             >
               Game
             </label>
-            {newgameData.length > 0 ? (
+            {newgameData && newgameData?.length > 0 ? (
               <select
                 id="game"
                 value={game}

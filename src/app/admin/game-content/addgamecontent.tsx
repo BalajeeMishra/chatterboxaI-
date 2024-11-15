@@ -268,7 +268,9 @@ const NewGameContentForm: React.FC<NewGameContentFormProps> = ({
               >
                 Game Name
               </label>
-              {newgameData.length > 0 ? (
+              {newgameData &&
+              newgameData?.length !== 0 &&
+              newgameData.length > 0 ? (
                 <select
                   id="selectgameId"
                   value={newgameId}

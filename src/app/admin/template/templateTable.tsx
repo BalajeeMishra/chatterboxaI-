@@ -173,11 +173,7 @@ export const NewGameTable: React.FC<NewGameTableProps> = ({
       const templateContent = await fetchGameTemplateContent(selectgameId);
       console.log(templateContent);
       setData(templateContent);
-<<<<<<< HEAD
       toast.success(`Template with ID ${templateid} deleted successfully.`);
-=======
-      alert(`Prompt Template with ID ${templateid} deleted successfully.`);
->>>>>>> f9645bb7cb05276d9e460efc77b659957c6ad75e
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error(
@@ -190,6 +186,7 @@ export const NewGameTable: React.FC<NewGameTableProps> = ({
   };
 
   if (loading) return <div>Loading...</div>;
+  // if (!data || data.length === 0) return <div> No results.</div>;
   if (error) return <div>{error}</div>;
   console.log(data);
   return (
@@ -198,10 +195,10 @@ export const NewGameTable: React.FC<NewGameTableProps> = ({
         <Input
           placeholder="Filter by Prompt Template..."
           value={
-            (table.getColumn("template")?.getFilterValue() as string) ?? ""
+            (table.getColumn("content")?.getFilterValue() as string) ?? ""
           }
           onChange={(event) =>
-            table.getColumn("template")?.setFilterValue(event.target.value)
+            table.getColumn("content")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />

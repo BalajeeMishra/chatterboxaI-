@@ -37,6 +37,7 @@ import {
 import { DialogCloseButton } from "./userlogDialogue";
 import { fetchAllUsers } from "./fetchuserApi";
 import toast from "react-hot-toast";
+import { all } from "axios";
 
 // Define the user data structure
 interface User {
@@ -168,7 +169,7 @@ export function UserTable() {
       rowSelection,
     },
   });
-
+  if (!allUser || allUser?.length === 0) return <div> No results.</div>;
   return (
     <div className="w-full">
       <div className="flex items-center py-4">

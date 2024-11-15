@@ -348,6 +348,7 @@ export const NewGameTable: React.FC<NewGameTableProps> = ({
   };
 
   if (loading) return <div>Loading...</div>;
+  if (!data || data.length === 0) return <div> No results.</div>;
   if (error) return <div>{error}</div>;
 
   return (

@@ -132,6 +132,7 @@ export const GameContentTable: React.FC<NewGameContentFormProps> = ({
       } catch (err) {
         console.log(err);
         setError("Failed to load games");
+        
       } finally {
         setLoading(false);
       }
@@ -163,6 +164,7 @@ export const GameContentTable: React.FC<NewGameContentFormProps> = ({
       const updatedContent = await fetchGameContent(selectgameId);
       setData(updatedContent);
       console.log(updatedContent);
+      
       // Return the updated content or handle it as needed
       // return updatedContent;
     } catch (error) {
@@ -200,6 +202,7 @@ export const GameContentTable: React.FC<NewGameContentFormProps> = ({
   });
 
   if (loading) return <div>Loading...</div>;
+  if (!data || data?.length === 0) return <div> No results.</div>;
   if (error) return <div>{error}</div>;
 
   return (
@@ -225,11 +228,13 @@ export const GameContentTable: React.FC<NewGameContentFormProps> = ({
             <option key="2" value="">
               Select a game
             </option>
-            {newgameData?.map((game) => (
-              <option key={game._id} value={game._id}>
-                {game.gameName}
-              </option>
-            ))}
+            {newgameData &&
+              newgameData?.length !== 0 &&
+              newgameData?.map((game) => (
+                <option key={game._id} value={game._id}>
+                  {game.gameName}
+                </option>
+              ))}
           </select>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

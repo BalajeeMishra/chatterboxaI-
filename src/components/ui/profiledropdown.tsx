@@ -15,6 +15,15 @@ import {
 import { Icon } from "@iconify/react/dist/iconify.js";
 
 export function ProfileDropdownMenu() {
+  const logout = () => {
+    // Remove tokens from localStorage
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+
+    // Redirect to the login page
+
+    window.location.href = "/adminlogin"; // Redirect to the login page
+  };
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
@@ -26,16 +35,16 @@ export function ProfileDropdownMenu() {
       <DropdownMenuContent className="w-40 mr-4 bg-white">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuGroup>
+        {/* <DropdownMenuGroup>
           <DropdownMenuItem>
             <User className="mr-2 h-4 w-4" />
             <span>Profile</span>
             <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
           </DropdownMenuItem>
-        </DropdownMenuGroup>
+        </DropdownMenuGroup> */}
 
         {/* <DropdownMenuSeparator /> */}
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={logout}>
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>
           <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
