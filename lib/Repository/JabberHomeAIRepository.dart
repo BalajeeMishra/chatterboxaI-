@@ -14,7 +14,7 @@ class JabberHomeAIRepository{
   Future<ApiResponse<HomePageModel>> homePageApiCallFunction() async {
     try {
       final response = await ApiClass.get(homepageAPI, isHeader: true);
-      final ApiResponseStatus status = mapStatusCode(response.statusCode!);
+      final ApiResponseStatus status = mapStatusCode(response.statusCode);
       final Map<String, dynamic> responseData = jsonDecode(response.body);
       if (status == ApiResponseStatus.success) {
         final data = HomePageModel.fromJson(responseData);
@@ -24,7 +24,7 @@ class JabberHomeAIRepository{
         return ApiResponse.error(status, error: error);
       }
     } catch (e) {
-      throw "${e.toString()}";
+      throw e.toString();
     }
   }
 

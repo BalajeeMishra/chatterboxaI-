@@ -13,7 +13,7 @@ import '../main.dart';
 
 class AllGameVm extends ChangeNotifier {
   /// Calling Repository =====================================
-  AllGameRepository _allGameRepository = AllGameRepository();
+  final AllGameRepository _allGameRepository = AllGameRepository();
 
   BuildContext context;
 

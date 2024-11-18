@@ -13,7 +13,7 @@ import '../extensions/loader_widget.dart';
 
 class JabberHomeAIvm extends ChangeNotifier {
   /// Calling Repository =====================================
-  JabberHomeAIRepository _jabberHomeAIRepository = JabberHomeAIRepository();
+  final JabberHomeAIRepository _jabberHomeAIRepository = JabberHomeAIRepository();
 
   BuildContext context;
 

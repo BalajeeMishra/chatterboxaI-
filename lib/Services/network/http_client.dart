@@ -12,7 +12,7 @@ import '../../Constants/ApiURLConstant.dart';
 import '../../main.dart';
 
 class ApiClass {
-  static String _baseUrl = baseUrl;
+  static final String _baseUrl = baseUrl;
 
   /// Creating Header With Authenticated Data
   static Future<Map<String, String>> getHeaders({isHeader = false}) async {
@@ -32,7 +32,7 @@ class ApiClass {
   static Future<Response> get(String endPoint, {bool isHeader = true}) async {
     final headers = await getHeaders(isHeader: isHeader);
 
-    var response;
+    http.Response response;
     try {
       response = await http.get(Uri.parse("$_baseUrl$endPoint"), headers: headers).timeout(const Duration(seconds: 30));
     } on SocketException {
@@ -47,7 +47,7 @@ class ApiClass {
   /// POST Method With Header Checks
   static Future<Response> post(String endPoint, Map<String, dynamic> object, {bool isHeader = true}) async {
     final headers = await getHeaders(isHeader: isHeader);
-    var response;
+    http.Response response;
     print("Headers: $headers");
 
     try {
@@ -65,7 +65,7 @@ class ApiClass {
   /// PATCH Method With Header Checks
   static Future<Response> patch(String endPoint, Object object, {bool isHeader = true}) async {
     final headers = await getHeaders(isHeader: isHeader);
-    var response;
+    http.Response response;
     try {
       response = await http
           .patch(Uri.parse("$_baseUrl$endPoint"), body: object, headers: headers)
@@ -81,7 +81,7 @@ class ApiClass {
   /// DELETE Method With Header Checks
   static Future<Response> delete(String endPoint, {bool isHeader = true}) async {
     Map<String, String> headers = isHeader ? await getHeaders() : {};
-    var response;
+    http.Response response;
     try {
       response =
           await http.delete(Uri.parse("$_baseUrl$endPoint"), headers: headers).timeout(const Duration(seconds: 30));

@@ -5,16 +5,16 @@ class CheckPhoneNumberResponse {
   CheckPhoneNumberResponse({this.user, this.accessToken});
 
   CheckPhoneNumberResponse.fromJson(Map<String, dynamic> json) {
-    user = json['user'] != null ? new User.fromJson(json['user']) : null;
+    user = json['user'] != null ? User.fromJson(json['user']) : null;
     accessToken = json['accessToken'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.user != null) {
-      data['user'] = this.user!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (user != null) {
+      data['user'] = user!.toJson();
     }
-    data['accessToken'] = this.accessToken;
+    data['accessToken'] = accessToken;
     return data;
   }
 }
@@ -57,17 +57,17 @@ class User {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['_id'] = this.sId;
-    data['mobileNo'] = this.mobileNo;
-    data['name'] = this.name;
-    data['age'] = this.age;
-    data['nativeLanguage'] = this.nativeLanguage;
-    data['verified'] = this.verified;
-    data['role'] = this.role;
-    data['country'] = this.country;
-    data['playingstatus'] = this.playingstatus;
-    data['__v'] = this.iV;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['_id'] = sId;
+    data['mobileNo'] = mobileNo;
+    data['name'] = name;
+    data['age'] = age;
+    data['nativeLanguage'] = nativeLanguage;
+    data['verified'] = verified;
+    data['role'] = role;
+    data['country'] = country;
+    data['playingstatus'] = playingstatus;
+    data['__v'] = iV;
     return data;
   }
 }

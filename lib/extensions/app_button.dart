@@ -29,7 +29,7 @@ class AppButton extends StatefulWidget {
   final bool? enabled;
   final bool? enableScaleAnimation;
 
-  AppButton({
+  const AppButton({
     this.onTap,
     this.text,
     this.width,
@@ -48,8 +48,8 @@ class AppButton extends StatefulWidget {
     this.hoverColor,
     this.splashColor,
     this.enableScaleAnimation,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   _AppButtonState createState() => _AppButtonState();

@@ -5,14 +5,14 @@ class AllConversationResponse {
 
   AllConversationResponse.fromJson(Map<String, dynamic> json) {
     completeConversation = json['completeConversation'] != null
-        ? new CompleteConversation.fromJson(json['completeConversation'])
+        ? CompleteConversation.fromJson(json['completeConversation'])
         : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.completeConversation != null) {
-      data['completeConversation'] = this.completeConversation!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (completeConversation != null) {
+      data['completeConversation'] = completeConversation!.toJson();
     }
     return data;
   }
@@ -44,13 +44,13 @@ class CompleteConversation {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['_id'] = this.sId;
-    data['userId'] = this.userId;
-    data['userResponse'] = this.userResponse;
-    data['aiResponse'] = this.aiResponse;
-    data['sessionId'] = this.sessionId;
-    data['__v'] = this.iV;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['_id'] = sId;
+    data['userId'] = userId;
+    data['userResponse'] = userResponse;
+    data['aiResponse'] = aiResponse;
+    data['sessionId'] = sessionId;
+    data['__v'] = iV;
     return data;
   }
 }

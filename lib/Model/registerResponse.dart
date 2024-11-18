@@ -7,14 +7,14 @@ class RegisterResponse {
   RegisterResponse.fromJson(Map<String, dynamic> json) {
     accessToken = json['accessToken'];
     newUser =
-    json['newUser'] != null ? new NewUser.fromJson(json['newUser']) : null;
+    json['newUser'] != null ? NewUser.fromJson(json['newUser']) : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['accessToken'] = this.accessToken;
-    if (this.newUser != null) {
-      data['newUser'] = this.newUser!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['accessToken'] = accessToken;
+    if (newUser != null) {
+      data['newUser'] = newUser!.toJson();
     }
     return data;
   }
@@ -55,16 +55,16 @@ class NewUser {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['mobileNo'] = this.mobileNo;
-    data['name'] = this.name;
-    data['age'] = this.age;
-    data['nativeLanguage'] = this.nativeLanguage;
-    data['verified'] = this.verified;
-    data['role'] = this.role;
-    data['country'] = this.country;
-    data['_id'] = this.userId;
-    data['__v'] = this.iV;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['mobileNo'] = mobileNo;
+    data['name'] = name;
+    data['age'] = age;
+    data['nativeLanguage'] = nativeLanguage;
+    data['verified'] = verified;
+    data['role'] = role;
+    data['country'] = country;
+    data['_id'] = userId;
+    data['__v'] = iV;
     return data;
   }
 }

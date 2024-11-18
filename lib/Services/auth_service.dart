@@ -1,14 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../../extensions/extension_util/string_extensions.dart';
 import '../../extensions/extension_util/widget_extensions.dart';
 import '../Screens/otp_screen.dart';
-import '../extensions/constants.dart';
 import '../extensions/shared_pref.dart';
 import '../extensions/system_utils.dart';
 import '../main.dart';
-import '../network/rest_api.dart';
 import '../utils/app_common.dart';
 import '../utils/app_constants.dart';
 

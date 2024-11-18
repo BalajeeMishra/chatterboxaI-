@@ -229,7 +229,8 @@ Route<T> buildPageRoute<T>(
         pageBuilder: (c, a1, a2) => child,
         transitionsBuilder: (c, anim, a2, child) {
           return RotationTransition(
-              child: child, turns: ReverseAnimation(anim));
+              turns: ReverseAnimation(anim),
+              child: child);
         },
         transitionDuration: duration ?? pageRouteTransitionDurationGlobal,
       );
@@ -237,7 +238,7 @@ Route<T> buildPageRoute<T>(
       return PageRouteBuilder(
         pageBuilder: (c, a1, a2) => child,
         transitionsBuilder: (c, anim, a2, child) {
-          return ScaleTransition(child: child, scale: anim);
+          return ScaleTransition(scale: anim, child: child);
         },
         transitionDuration: duration ?? pageRouteTransitionDurationGlobal,
       );
@@ -246,11 +247,11 @@ Route<T> buildPageRoute<T>(
         pageBuilder: (c, a1, a2) => child,
         transitionsBuilder: (c, anim, a2, child) {
           return SlideTransition(
-            child: child,
             position: Tween(
               begin: Offset(1.0, 0.0),
               end: Offset(0.0, 0.0),
             ).animate(anim),
+            child: child,
           );
         },
         transitionDuration: duration ?? pageRouteTransitionDurationGlobal,
@@ -260,11 +261,11 @@ Route<T> buildPageRoute<T>(
         pageBuilder: (c, a1, a2) => child,
         transitionsBuilder: (c, anim, a2, child) {
           return SlideTransition(
-            child: child,
             position: Tween(
               begin: Offset(0.0, 1.0),
               end: Offset(0.0, 0.0),
             ).animate(anim),
+            child: child,
           );
         },
         transitionDuration: duration ?? pageRouteTransitionDurationGlobal,
@@ -306,21 +307,21 @@ Uri mailTo({
   List<String> cc = const [],
   List<String> bcc = const [],
 }) {
-  String _subject = '';
-  if (subject.isNotEmpty) _subject = '&subject=$subject';
+  String subject0 = '';
+  if (subject.isNotEmpty) subject0 = '&subject=$subject';
 
-  String _body = '';
-  if (body.isNotEmpty) _body = '&body=$body';
+  String body0 = '';
+  if (body.isNotEmpty) body0 = '&body=$body';
 
-  String _cc = '';
-  if (cc.isNotEmpty) _cc = '&cc=${cc.join(',')}';
+  String cc0 = '';
+  if (cc.isNotEmpty) cc0 = '&cc=${cc.join(',')}';
 
-  String _bcc = '';
-  if (bcc.isNotEmpty) _bcc = '&bcc=${bcc.join(',')}';
+  String bcc0 = '';
+  if (bcc.isNotEmpty) bcc0 = '&bcc=${bcc.join(',')}';
 
   return Uri(
     scheme: 'mailto',
-    query: 'to=${to.join(',')}$_subject$_body$_cc$_bcc',
+    query: 'to=${to.join(',')}$subject0$body0$cc0$bcc0',
   );
 }
 

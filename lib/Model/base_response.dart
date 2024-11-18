@@ -8,8 +8,8 @@ class ChatterboxAiBaseResponse {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['message'] = this.message;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['message'] = message;
     return data;
   }
 }
@@ -25,8 +25,8 @@ class ChatterboxAiErrorBaseResponse {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['error'] = this.error;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['error'] = error;
     return data;
   }
 }

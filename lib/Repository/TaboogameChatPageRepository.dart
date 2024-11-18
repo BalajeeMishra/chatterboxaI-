@@ -17,7 +17,7 @@ class TabooGameChatPageRepository {
       print("Payload: $data");
 
       final response = await ApiClass.post(tabooGameChatPage, data, isHeader: true);
-      final ApiResponseStatus status = mapStatusCode(response.statusCode!);
+      final ApiResponseStatus status = mapStatusCode(response.statusCode);
       final Map<String, dynamic> responseData = jsonDecode(response.body);
 
       if (status == ApiResponseStatus.success) {
@@ -28,7 +28,7 @@ class TabooGameChatPageRepository {
         return ApiResponse.error(status, error: error);
       }
     } catch (e) {
-      throw "${e.toString()}";
+      throw e.toString();
     }
   }
 }

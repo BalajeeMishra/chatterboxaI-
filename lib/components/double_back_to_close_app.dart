@@ -6,10 +6,10 @@ class DoubleBackToCloseApp extends StatefulWidget {
   final Widget child;
 
   const DoubleBackToCloseApp({
-    Key? key,
+    super.key,
     required this.snackBar,
     required this.child,
-  }) : super(key: key);
+  });
 
   @override
   _DoubleBackToCloseAppState createState() => _DoubleBackToCloseAppState();

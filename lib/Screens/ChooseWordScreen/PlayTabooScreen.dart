@@ -32,7 +32,7 @@ class PlayTabooScreen extends StatefulWidget {
   int index;
   String sessionId;
 
-  PlayTabooScreen(this.allGameModel, this.index, this.sessionId);
+  PlayTabooScreen(this.allGameModel, this.index, this.sessionId, {super.key});
 
   @override
   State<StatefulWidget> createState() => _PlayTabooScreen();
@@ -40,7 +40,7 @@ class PlayTabooScreen extends StatefulWidget {
 
 class _PlayTabooScreen extends State<PlayTabooScreen> {
   bool startListening = false;
-  SpeechToText _speechToText = SpeechToText();
+  final SpeechToText _speechToText = SpeechToText();
   bool _speechEnabled = false;
   String _lastWords = '';
   String _previousWords = '';
@@ -64,8 +64,8 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   void initState() {
     super.initState();
     appStore.setLoading(false);
-    print("Session  Id " + widget.sessionId.toString());
-    print("gameId  Id " + widget.allGameModel.allGame!.first.gameId  .toString());
+    print("Session  Id ${widget.sessionId}");
+    print("gameId  Id ${widget.allGameModel.allGame!.first.gameId}");
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<PlayTabooScreenVM>(context, listen: false)
@@ -134,6 +134,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   }
 
   void _onSpeechResult(SpeechRecognitionResult result) {
+    print("Result is ==>$result");
 
     setState(() {
       _startListening();
@@ -149,7 +150,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
           _previousWords = result.recognizedWords;
         } else {
-          _previousWords += ' ' + result.recognizedWords;
+          _previousWords += ' ${result.recognizedWords}';
         }
 
         _lastWords = _previousWords;
@@ -164,17 +165,18 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   }
 
   void _startListening() async {
+    print("Listen calked");
     await _speechToText.listen(
         localeId: 'en_US',
-        listenFor: Duration(seconds: 30),
-        pauseFor: Duration(seconds: 10),
-        listenOptions: SpeechListenOptions(
-            listenMode: ListenMode.deviceDefault,
-            autoPunctuation: true,
-            partialResults: true,
-            cancelOnError: false,
-            enableHapticFeedback: true,
-            onDevice: true),
+        // listenFor: Duration(seconds: 30),
+        // pauseFor: Duration(seconds: 10),
+        // listenOptions: SpeechListenOptions(
+        //     listenMode: ListenMode.deviceDefault,
+        //     autoPunctuation: true,
+        //     partialResults: true,
+        //     cancelOnError: false,
+        //     enableHapticFeedback: true,
+        //     onDevice: true),
         onResult: _onSpeechResult);
     setState(() {});
   }
@@ -200,7 +202,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   //     }
   //   });
   // }
-  //
+
   Future<void> configureTts() async {
     setTtsLanguage(selectedLanguage);
     await flutterTts.setVolume(1.0);
@@ -564,16 +566,10 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                                               .response!
                                                               .aiResponse!
                                                               .last ==
-                                                          null ||
-                                                      vm
-                                                              .tabooGameChatPageModel
-                                                              .response!
-                                                              .aiResponse!
-                                                              .last ==
                                                           "")
                                                   ? Text("")
                                                   : SizedBox(
-                                            height:  context.height() * 0.498,
+                                            height:  context.height() * 0.450,
                                                     child: SingleChildScrollView(
                                                       child: Text(
                                                           vm

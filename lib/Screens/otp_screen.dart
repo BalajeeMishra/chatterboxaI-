@@ -28,7 +28,7 @@ class OtpScreen extends StatefulWidget {
   final String mobileNumber;
   final String? verificationId;
 
-  OtpScreen({required this.country, required this.mobileNumber,this.verificationId, super.key});
+  const OtpScreen({required this.country, required this.mobileNumber,this.verificationId, super.key});
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
@@ -67,7 +67,7 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
         String sms = message.body.toString();
 
         if (message.body!.contains('yourFirebaseProjectName.firebaseapp.com')) {
-          String otpcode = sms.replaceAll(new RegExp(r'[^0-9]'), '');
+          String otpcode = sms.replaceAll(RegExp(r'[^0-9]'), '');
           // _otpController.set(otpcode.split(""));
           Future.delayed(Duration(milliseconds: 100), () {
             otpTextFieldKey.currentState?.updateOTP(otpcode);
@@ -157,7 +157,7 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
     await resendOTP(
       context,
       number,
-      widget.mobileNumber!,
+      widget.mobileNumber,
     ).then((value) {}).catchError((e) {
       toast(e.toString());
       appStore.setLoading(false);
@@ -280,13 +280,13 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
                     child: Column(
                       children: [
                         CircleAvatar(
+                          backgroundColor: Colors.black,
+                          radius: 30,
                           child: Icon(
                             Icons.password,
                             size: 26,
                             color: Colors.white,
                           ),
-                          backgroundColor: Colors.black,
-                          radius: 30,
                         ),
                         16.height,
                         Text(

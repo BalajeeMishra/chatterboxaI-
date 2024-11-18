@@ -14,7 +14,7 @@ class AllGameRepository{
   Future<ApiResponse<AllGameModel>> allGameApiCallFunction(String dataId) async {
     try {
       final response = await ApiClass.get(allgame+dataId, isHeader: true);
-      final ApiResponseStatus status = mapStatusCode(response.statusCode!);
+      final ApiResponseStatus status = mapStatusCode(response.statusCode);
       final Map<String, dynamic> responseData = jsonDecode(response.body);
       if (status == ApiResponseStatus.success) {
         final data = AllGameModel.fromJson(responseData);
@@ -24,7 +24,7 @@ class AllGameRepository{
         return ApiResponse.error(status, error: error);
       }
     } catch (e) {
-      throw "${e.toString()}";
+      throw e.toString();
     }
   }
 }

@@ -3,6 +3,8 @@ import 'package:balajiicode/extensions/text_styles.dart';
 import 'package:flutter/material.dart';
 
 class LoadingScreen extends StatefulWidget {
+  const LoadingScreen({super.key});
+
   @override
   _LoadingScreenState createState() => _LoadingScreenState();
 }
@@ -31,7 +33,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
 class LoadingWidget extends StatelessWidget {
   final String message;
 
-  const LoadingWidget({Key? key, required this.message}) : super(key: key);
+  const LoadingWidget({super.key, required this.message});
 
   @override
   Widget build(BuildContext context) {

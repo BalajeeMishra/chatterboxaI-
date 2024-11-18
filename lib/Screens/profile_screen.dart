@@ -23,7 +23,7 @@ import 'JabberAIHomePage/JabberAIHomepage.dart';
 class ProfileScreen extends StatefulWidget {
   final String country;
   final String mobileNumber;
-  ProfileScreen({required this.country, required this.mobileNumber, super.key});
+  const ProfileScreen({required this.country, required this.mobileNumber, super.key});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -266,8 +266,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       DropdownButtonFormField(
                         items: englishLevelList
                             .map((value) => DropdownMenuItem<String>(
-                                  child: Text(value, style: primaryTextStyle()),
                                   value: value,
+                                  child: Text(value, style: primaryTextStyle()),
                                 ))
                             .toList(),
                         isExpanded: false,
@@ -278,11 +278,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         onChanged: (String? value) {
                           setState(() {
                             englishLevel = value!;
-                            if (selectedLanguage.isNotEmpty)
+                            if (selectedLanguage.isNotEmpty) {
                               toastLeft(
                                   bgColor: primaryColor,
                                   textColor: Colors.white,
                                   "You have chosen $englishLevel.\nAI will talk in your Native language & share few references in $selectedLanguage");
+                            }
                           });
                         },
                         focusNode: englishLevelFocus,

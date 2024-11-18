@@ -15,7 +15,7 @@ import '../main.dart';
 
 class TabooGameChatPageVM extends ChangeNotifier {
   /// Calling Repository =====================================
-  TabooGameChatPageRepository _tabooGameChatPageRepository = TabooGameChatPageRepository();
+  final TabooGameChatPageRepository _tabooGameChatPageRepository = TabooGameChatPageRepository();
 
   BuildContext context;
 

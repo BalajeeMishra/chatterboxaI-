@@ -111,13 +111,13 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Column(
                           children: [
                             CircleAvatar(
+                              backgroundColor: Colors.black,
+                              radius: 30,
                               child: Icon(
                                 Icons.login,
                                 size: 26,
                                 color: Colors.white,
                               ),
-                              backgroundColor: Colors.black,
-                              radius: 30,
                             ),
                             16.height,
                             Text(

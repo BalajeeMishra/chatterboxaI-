@@ -15,7 +15,7 @@ import 'package:uuid/uuid.dart';
 
 class ChooseWordScreen extends StatefulWidget {
   String dataId;
-  ChooseWordScreen(this.dataId);
+  ChooseWordScreen(this.dataId, {super.key});
 
   @override
   State<StatefulWidget> createState() => _ChooseWordScreen();

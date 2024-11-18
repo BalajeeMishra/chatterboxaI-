@@ -187,6 +187,7 @@ class TokenException implements Exception {
 
   const TokenException([this.message = ""]);
 
+  @override
   String toString() => "FormatException: $message";
 }
 //endregion
@@ -203,14 +204,14 @@ Future<String?> isJsonValid(json) async {
 
 Future<MultipartRequest> getMultiPartRequest(String endPoint,
     {String? baseUrl}) async {
-  String url = '${baseUrl ?? buildBaseUrl(endPoint).toString()}';
+  String url = baseUrl ?? buildBaseUrl(endPoint).toString();
   log(url);
   return MultipartRequest('POST', Uri.parse(url));
 }
 
 Future<MultipartRequest> getPutMultiPartRequest(String endPoint,
     {String? baseUrl}) async {
-  String url = '${baseUrl ?? buildBaseUrl(endPoint).toString()}';
+  String url = baseUrl ?? buildBaseUrl(endPoint).toString();
   log(url);
   return MultipartRequest('PUT', Uri.parse(url));
 }
