@@ -59,13 +59,16 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   String message = '';
   int _lastSpokenIndex = 0;
   String selectedLanguage = 'English';
+  bool _isListening = false;
+  Duration _listenForDuration = Duration(seconds: 60);
+  Duration _pauseForDuration = Duration(seconds: 20);
 
   @override
   void initState() {
     super.initState();
     appStore.setLoading(false);
     print("Session  Id " + widget.sessionId.toString());
-    print("gameId  Id " + widget.allGameModel.allGame!.first.gameId  .toString());
+    print("gameId  Id " + widget.allGameModel.allGame!.first.gameId.toString());
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<PlayTabooScreenVM>(context, listen: false)
@@ -73,7 +76,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
       Provider.of<PlayTabooScreenVM>(context, listen: false).chatPageAPI(
         context,
-       "Hi, Let's play the game!",
+        "Hi, Let's play the game!",
         widget.sessionId,
         widget.allGameModel,
         widget.index,
@@ -115,7 +118,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   }
 
   void _initSpeech() async {
-    _previousWords ="";
+    _previousWords = "";
     _speechEnabled = await _speechToText.initialize();
     if (_speechEnabled) {
       setState(() {
@@ -125,28 +128,95 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
       stopSpeaking();
     }
   }
+  void _startListening() async {
+    await _speechToText.listen(
+      localeId: 'en_US',
+      listenFor: _listenForDuration,
+      pauseFor: _pauseForDuration,
+      listenOptions: SpeechListenOptions(
+        listenMode: ListenMode.deviceDefault,
+        autoPunctuation: true,
+        partialResults: true,
+        cancelOnError: false,
+        enableHapticFeedback: true,
+        onDevice: true,
+      ),
+      onResult: _onSpeechResult,
+    );
 
-  void _stopListening() async {
-    await _speechToText.stop();
-    setState(() {
-      startListening = false;
+    Future.delayed(Duration(seconds: 7), () {
+      if (!_speechToText.isListening) {
+        _startListening();
+      }
     });
+
+    Future.delayed(Duration(seconds: 10), () {
+      if (!_speechToText.isListening) {
+        _stopListening();
+        startListening = false;
+        setState(() {
+
+        });
+
+      }
+    });
+
+    setState(() {});
   }
 
-  void _onSpeechResult(SpeechRecognitionResult result) {
+  // void _startListening() async {
+  //   await _speechToText.listen(
+  //     localeId: 'en_US',
+  //     listenFor: Duration(seconds: 60),
+  //     pauseFor: Duration(seconds: 20),
+  //     listenOptions: SpeechListenOptions(
+  //         listenMode: ListenMode.deviceDefault,
+  //         autoPunctuation: true,
+  //         partialResults: true,
+  //         cancelOnError: false,
+  //         enableHapticFeedback: true,
+  //         onDevice: true),
+  //     onResult: _onSpeechResult,
+  //   );
+  //
+  //   Future.delayed(Duration(seconds: 7), () {
+  //     print("Restarting listening session after pause...");
+  //     _startListening(); // Restart the listening session after the pause duration
+  //   });
+  //   // Future.delayed(Duration(seconds: 10), () {
+  //   //   print("Stopping the listening session after 60 seconds...");
+  //   //   _stopListening();
+  //   // });
+  //   setState(() {});
+  // }
 
+  /// Stop listening to speech
+  void _stopListening() {
+    if (_isListening) {
+      _speechToText.stop();
+      _isListening = false;
+      setState(() {});
+      print("Listening session stopped.");
+    }
+  }
+  // void _stopListening() async {
+  //   await _speechToText.stop();
+  //   setState(() {
+  //     startListening = false;
+  //   });
+  // }
+
+  /// Process speech result
+  void _onSpeechResult(SpeechRecognitionResult result) {
     setState(() {
       _startListening();
 
       isLoading = true;
 
       _lastWords = result.recognizedWords;
-      if (_lastWords.isNotEmpty) {
-
-      }
+      if (_lastWords.isNotEmpty) {}
       if (result.finalResult) {
         if (_previousWords.isEmpty) {
-
           _previousWords = result.recognizedWords;
         } else {
           _previousWords += ' ' + result.recognizedWords;
@@ -163,44 +233,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     });
   }
 
-  void _startListening() async {
-    await _speechToText.listen(
-        localeId: 'en_US',
-        listenFor: Duration(seconds: 30),
-        pauseFor: Duration(seconds: 10),
-        listenOptions: SpeechListenOptions(
-            listenMode: ListenMode.deviceDefault,
-            autoPunctuation: true,
-            partialResults: true,
-            cancelOnError: false,
-            enableHapticFeedback: true,
-            onDevice: true),
-        onResult: _onSpeechResult);
-    setState(() {});
-  }
-
-  /// Stop listening to speech
-  // void _stopListening() async {
-  //   await _speechToText.stop();
-  //   setState(() {
-  //     startListening = false;
-  //   });
-  // }
-
-  /// Process speech result
-  // void _onSpeechResult(SpeechRecognitionResult result) {
-  //   setState(() {
-  //     isLoading = true;
-  //     _lastWords = result.recognizedWords;
-  //     if (_lastWords.isNotEmpty) {
-  //       isLoading = false;
-  //       setState(() {
-  //
-  //       });
-  //     }
-  //   });
-  // }
-  //
   Future<void> configureTts() async {
     setTtsLanguage(selectedLanguage);
     await flutterTts.setVolume(1.0);
@@ -284,12 +316,12 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   }
 
   /// Submit and call next function
-  submitNext(String ques) async {
-    isSpeaking = true;
-    await flutterTts.setSpeechRate(speechRate);
-    await flutterTts.speak(ques);
-    isSpeaking = false;
-  }
+  // submitNext(String ques) async {
+  //   isSpeaking = true;
+  //   await flutterTts.setSpeechRate(speechRate);
+  //   await flutterTts.speak(ques);
+  //   isSpeaking = false;
+  // }
 
   Future<void> adjustSpeechRate(double change) async {
     _lastWords = appStore.lastWords;
@@ -350,12 +382,12 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
     Provider.of<PlayTabooScreenVM>(context, listen: false)
         .seInitialValue(widget.allGameModel, widget.index, widget.sessionId);
-    Provider.of<PlayTabooScreenVM>(context, listen: false).chatPageAPI(
-        context, ques, widget.sessionId, widget.allGameModel, widget.index,false);
+    Provider.of<PlayTabooScreenVM>(context, listen: false).chatPageAPI(context,
+        ques, widget.sessionId, widget.allGameModel, widget.index, false);
     configureTts();
     apiCalled = true;
     _lastWords = appStore.lastWords;
-
+    startListening = false;
     Future.delayed(Duration(seconds: 2), () {
       setState(() {
         message = 'Thinking...';
@@ -573,19 +605,22 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                                           "")
                                                   ? Text("")
                                                   : SizedBox(
-                                            height:  context.height() * 0.498,
-                                                    child: SingleChildScrollView(
-                                                      child: Text(
+                                                      height: context.height() *
+                                                          0.498,
+                                                      child:
+                                                          SingleChildScrollView(
+                                                        child: Text(
                                                           vm
                                                               .tabooGameChatPageModel
                                                               .response!
                                                               .aiResponse!
                                                               .last,
-                                                          style: primaryTextStyle(
-                                                              size: 16),
+                                                          style:
+                                                              primaryTextStyle(
+                                                                  size: 16),
                                                         ),
+                                                      ),
                                                     ),
-                                                  ),
                                         )
                                       ],
                                     ),
