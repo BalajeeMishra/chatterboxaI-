@@ -55,6 +55,8 @@ Future<void> main() async {
 class MyApp extends StatefulWidget {
   static String tag = '/MyApp';
 
+  const MyApp({super.key});
+
   @override
   MyAppState createState() => MyAppState();
 }

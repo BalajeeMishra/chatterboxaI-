@@ -9,15 +9,15 @@ class HomePageModel {
     if (json['allGame'] != null) {
       allGame = <AllGame>[];
       json['allGame'].forEach((v) {
-        allGame!.add(new AllGame.fromJson(v));
+        allGame!.add(AllGame.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.allGame != null) {
-      data['allGame'] = this.allGame!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (allGame != null) {
+      data['allGame'] = allGame!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -52,14 +52,14 @@ class AllGame {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['_id'] = this.sId;
-    data['gameName'] = this.gameName;
-    data['gameIcon'] = this.gameIcon;
-    data['description'] = this.description;
-    data['status'] = this.status;
-    data['order'] = this.order;
-    data['__v'] = this.iV;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['_id'] = sId;
+    data['gameName'] = gameName;
+    data['gameIcon'] = gameIcon;
+    data['description'] = description;
+    data['status'] = status;
+    data['order'] = order;
+    data['__v'] = iV;
     return data;
   }
 }

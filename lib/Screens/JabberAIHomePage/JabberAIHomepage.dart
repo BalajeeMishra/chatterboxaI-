@@ -23,6 +23,8 @@ import '../../main.dart';
 import '../../network/rest_api.dart';
 
 class JabberAIHomepage extends StatefulWidget {
+  const JabberAIHomepage({super.key});
+
   @override
   State<StatefulWidget> createState() => _JabberAIHomepage();
 }
@@ -234,7 +236,7 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
                                                             ],
                                                           ),
                                                         ),
-                                                        Container(
+                                                        SizedBox(
                                                             height: 100,
                                                             width: 100,
                                                             child: cachedImage(

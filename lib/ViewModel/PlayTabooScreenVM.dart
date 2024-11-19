@@ -14,7 +14,7 @@ import '../Utils/ShowSnackBar.dart';
 
 class PlayTabooScreenVM extends ChangeNotifier {
   /// Calling Repository =====================================
-  TabooGameChatPageRepository _tabooGameChatPageRepository =
+  final TabooGameChatPageRepository _tabooGameChatPageRepository =
       TabooGameChatPageRepository(); 
 
   BuildContext context;
@@ -41,9 +41,9 @@ class PlayTabooScreenVM extends ChangeNotifier {
     for (var i = 0;
         i < allGameModel.allGame![index].detailOfContent!.length;
         i++) {
-      data = (data.length > 0)
-          ? data + "," + allGameModel.allGame![index].detailOfContent![i]
-          : data + " " + allGameModel.allGame![index].detailOfContent![i];
+      data = (data.isNotEmpty)
+          ? "$data,${allGameModel.allGame![index].detailOfContent![i]}"
+          : "$data ${allGameModel.allGame![index].detailOfContent![i]}";
     }
     // dataToPass =
     //     "Guess word is ${allGameModel.allGame![index].mainContent} and taboo words are [${data}] and user hint is an";
@@ -89,12 +89,12 @@ class PlayTabooScreenVM extends ChangeNotifier {
       String sessionId, AllGameModel allGameModel, int index,bool isFirst) async {
 
     isFirstCall =isFirst;
-    if (dataGet == "" || dataGet == null) {
+    if (dataGet == "") {
       MySnackBar.showSnackBar(context, "Please speak first!");
       return;
     }
 
-    var dataToAdd = dynamicDta.length > 0 ? "$dataGet" : "$dataToPass $dataGet";
+    var dataToAdd = dynamicDta.isNotEmpty ? dataGet : "$dataToPass $dataGet";
 
     var dataAdd = {
       "server": 0,
@@ -114,7 +114,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
         'gameId':allGameModel.allGame![index].gameId,
         "mainContent": allGameModel.allGame![index].mainContent
       };
-      print("DAT"+data.toString());
+      print("DAT$data");
       ApiResponse<TabooGameChatPageModel> response =
           await _tabooGameChatPageRepository
               .tabooGameChatPageApiCallFunction(data);
@@ -135,7 +135,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
           } else {
             isFirstCall = false;
           }
-          print("Is First call" + isFirstCall.toString());
+          print("Is First call$isFirstCall");
           // EasyLoading.dismiss();
           // Navigator.push(context, MaterialPageRoute(builder: (context)=>PlayTabooScreenTwo(response.data!.response!.aiResponse!.last)));
           break;

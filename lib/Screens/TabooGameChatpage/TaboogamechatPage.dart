@@ -22,7 +22,7 @@ class TaboogamechatPage extends StatefulWidget {
   final int index;
   final String sessionId;
 
-  TaboogamechatPage(this.allGameModel, this.index, this.sessionId);
+  const TaboogamechatPage(this.allGameModel, this.index, this.sessionId, {super.key});
 
   @override
   State<StatefulWidget> createState() => _TaboogamechatPage();
@@ -52,7 +52,7 @@ class _TaboogamechatPage extends State<TaboogamechatPage> with WidgetsBindingObs
   }
   void allConversationApiCall() async {
     await allConversationApi(widget.sessionId).then((value) async {
-      if (widget.allGameModel == null || widget.index == null) {
+      if (widget.index == null) {
         return;
       }
       if (value.completeConversation != null) {

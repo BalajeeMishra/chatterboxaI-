@@ -18,15 +18,15 @@ class OTPTextField extends StatefulWidget {
 
   final double fieldWidth;
 
-  OTPTextField({
+  const OTPTextField({
     this.pinLength = 4,
     this.fieldWidth = 40,
     this.onChanged,
     this.onCompleted,
     this.showUnderline = false,
     this.decoration,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   OTPTextFieldState createState() => OTPTextFieldState();
@@ -57,13 +57,13 @@ class OTPTextFieldState extends State<OTPTextField>  {
   String get concatText {
     String text = '';
 
-    list.forEach((element) {
+    for (var element in list) {
       if (text.isEmpty) {
         text = element.textEditingController!.text;
       } else {
         text = '$text${element.textEditingController!.text}';
       }
-    });
+    }
 
     return text;
   }
@@ -103,10 +103,10 @@ class OTPTextFieldState extends State<OTPTextField>  {
   @override
   void dispose() {
     super.dispose();
-    list.forEach((element) {
+    for (var element in list) {
       element.textEditingController?.dispose();
       element.focusNode?.dispose();
-    });
+    }
   }
 
   @override

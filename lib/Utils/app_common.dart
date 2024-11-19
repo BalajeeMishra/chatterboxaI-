@@ -47,14 +47,6 @@ class DiagonalPathClipperTwo extends CustomClipper<Path> {
 Widget outlineIconButton(BuildContext context,
     {required String text, String? icon, Function()? onTap, Color? textColor}) {
   return OutlinedButton(
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        // if (icon != null) ImageIcon(AssetImage(icon), color: appStore.isDarkMode ? Colors.white : primaryColor, size: 24),
-        if (icon != null) SizedBox(width: 8),
-        Text(text, style: primaryTextStyle(color: textColor ?? null, size: 14)),
-      ],
-    ),
     onPressed: onTap ?? () {},
     style: OutlinedButton.styleFrom(
       // side: BorderSide(color: textColor ?? (appStore.isDarkMode ? Colors.white38 : primaryColor), style: BorderStyle.solid),
@@ -64,6 +56,14 @@ Widget outlineIconButton(BuildContext context,
       ),
       backgroundColor: Colors.transparent,
       elevation: 0,
+    ),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // if (icon != null) ImageIcon(AssetImage(icon), color: appStore.isDarkMode ? Colors.white : primaryColor, size: 24),
+        if (icon != null) SizedBox(width: 8),
+        Text(text, style: primaryTextStyle(color: textColor ?? null, size: 14)),
+      ],
     ),
   );
 }

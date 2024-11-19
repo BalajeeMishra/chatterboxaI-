@@ -8,12 +8,12 @@ class DoublePressBackWidget extends StatelessWidget {
   final String? message;
   final WillPopCallback? onWillPop;
 
-  DoublePressBackWidget({
-    Key? key,
+  const DoublePressBackWidget({
+    super.key,
     required this.child,
     this.message,
     this.onWillPop,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

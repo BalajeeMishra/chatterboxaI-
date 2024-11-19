@@ -5,14 +5,14 @@ class ChangeStatusModel {
 
   ChangeStatusModel.fromJson(Map<String, dynamic> json) {
     updateduser = json['updateduser'] != null
-        ? new Updateduser.fromJson(json['updateduser'])
+        ? Updateduser.fromJson(json['updateduser'])
         : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.updateduser != null) {
-      data['updateduser'] = this.updateduser!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (updateduser != null) {
+      data['updateduser'] = updateduser!.toJson();
     }
     return data;
   }
@@ -56,17 +56,17 @@ class Updateduser {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['_id'] = this.sId;
-    data['mobileNo'] = this.mobileNo;
-    data['name'] = this.name;
-    data['age'] = this.age;
-    data['nativeLanguage'] = this.nativeLanguage;
-    data['verified'] = this.verified;
-    data['role'] = this.role;
-    data['country'] = this.country;
-    data['playingstatus'] = this.playingstatus;
-    data['__v'] = this.iV;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['_id'] = sId;
+    data['mobileNo'] = mobileNo;
+    data['name'] = name;
+    data['age'] = age;
+    data['nativeLanguage'] = nativeLanguage;
+    data['verified'] = verified;
+    data['role'] = role;
+    data['country'] = country;
+    data['playingstatus'] = playingstatus;
+    data['__v'] = iV;
     return data;
   }
 }

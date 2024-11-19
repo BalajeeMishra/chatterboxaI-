@@ -7,14 +7,14 @@ class TabooGameChatPageModel {
 
   TabooGameChatPageModel.fromJson(Map<String, dynamic> json) {
     response = json['response'] != null
-        ? new Response.fromJson(json['response'])
+        ? Response.fromJson(json['response'])
         : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.response != null) {
-      data['response'] = this.response!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (response != null) {
+      data['response'] = response!.toJson();
     }
     return data;
   }
@@ -46,13 +46,13 @@ class Response {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['userId'] = this.userId;
-    data['userResponse'] = this.userResponse;
-    data['aiResponse'] = this.aiResponse;
-    data['session'] = this.session;
-    data['_id'] = this.sId;
-    data['__v'] = this.iV;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['userId'] = userId;
+    data['userResponse'] = userResponse;
+    data['aiResponse'] = aiResponse;
+    data['session'] = session;
+    data['_id'] = sId;
+    data['__v'] = iV;
     return data;
   }
 }

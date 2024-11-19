@@ -8,8 +8,8 @@ class CheckStatusModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['playingstatus'] = this.playingstatus;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['playingstatus'] = playingstatus;
     return data;
   }
 }

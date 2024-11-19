@@ -9,7 +9,7 @@ import 'dart:collection';
 /// By using it, You can emit values to any stream with data value from anywhere in the application.
 /// Observers will receive data events when the value of subscribed stream is updated.
 class LiveStream {
-  _DataStore? _mStorage = _DataStore.getInstance();
+  final _DataStore? _mStorage = _DataStore.getInstance();
 
   /// Sets a new value [value] to the data stream [stream].
   /// If there are active subscribers, the value will be dispatched to them.
@@ -45,7 +45,7 @@ class _DataStore {
   static _DataStore? _instance;
 
   // Map instance to store data values with data stream.
-  HashMap<String, _DataItem>? _mDataItemsMap = HashMap();
+  final HashMap<String, _DataItem>? _mDataItemsMap = HashMap();
 
   // Sets/Adds the new value to the given key.
   void setValue(String key, var value) {

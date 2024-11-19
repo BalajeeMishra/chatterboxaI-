@@ -12,10 +12,10 @@ class ErrorModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['response_code'] = this.responseCode;
-    data['response_status'] = this.responseStatus;
-    data['response_msg'] = this.responseMsg;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['response_code'] = responseCode;
+    data['response_status'] = responseStatus;
+    data['response_msg'] = responseMsg;
     return data;
   }
 }

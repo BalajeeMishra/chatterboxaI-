@@ -79,7 +79,7 @@ class AppTextField extends StatefulWidget {
   final String? errorInvalidURL;
   final String? errorInvalidUsername;
 
-  AppTextField({
+  const AppTextField({
     this.controller,
     required this.textFieldType,
     this.decoration,
@@ -128,8 +128,8 @@ class AppTextField extends StatefulWidget {
     this.suffixPasswordVisibleWidget,
     this.suffixPasswordInvisibleWidget,
     this.contextMenuBuilder,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   _AppTextFieldState createState() => _AppTextFieldState();
@@ -245,6 +245,7 @@ class _AppTextFieldState extends State<AppTextField> {
     } else {
       return widget.suffix;
     }
+    return null;
   }
 
   Iterable<String>? applyAutofillHints() {

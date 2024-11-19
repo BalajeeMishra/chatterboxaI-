@@ -7,7 +7,7 @@ extension DateTimeExt on DateTime {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
 
-    return DateTime(this.year, this.month, this.day) == today;
+    return DateTime(year, month, day) == today;
   }
 
   /// Returns true if given date is yesterday
@@ -15,7 +15,7 @@ extension DateTimeExt on DateTime {
     final now = DateTime.now();
     final yesterday = DateTime(now.year, now.month, now.day - 1);
 
-    return DateTime(this.year, this.month, this.day) == yesterday;
+    return DateTime(year, month, day) == yesterday;
   }
 
   /// Returns true if given date is tomorrow
@@ -23,7 +23,7 @@ extension DateTimeExt on DateTime {
     final now = DateTime.now();
     final tomorrow = DateTime(now.year, now.month, now.day + 1);
 
-    return DateTime(this.year, this.month, this.day) == tomorrow;
+    return DateTime(year, month, day) == tomorrow;
   }
 }
 
@@ -40,9 +40,9 @@ bool leapYear(int year) {
   bool leapYear = false;
 
   bool leap = ((year % 100 == 0) && (year % 400 != 0));
-  if (leap == true)
+  if (leap == true) {
     leapYear = false;
-  else if (year % 4 == 0) leapYear = true;
+  } else if (year % 4 == 0) leapYear = true;
 
   return leapYear;
 }

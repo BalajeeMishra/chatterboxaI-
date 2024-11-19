@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import '../extensions/system_utils.dart';
-import '../main.dart';
 import '../extensions/colors.dart';
 import '../extensions/constants.dart';
 import '../utils/app_colors.dart';
 import 'package:mobx/mobx.dart';
-import '../extensions/shared_pref.dart';
-import '../utils/app_constants.dart';
 
 part 'app_store.g.dart';
 

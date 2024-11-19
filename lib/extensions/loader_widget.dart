@@ -15,15 +15,15 @@ class Loader extends StatefulWidget {
   final double? value;
   final Animation<Color?>? valueColor;
 
-  Loader({
+  const Loader({
     this.color,
     this.decoration,
     this.size,
     this.value,
     this.valueColor,
     this.accentColor,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   LoaderState createState() => LoaderState();
