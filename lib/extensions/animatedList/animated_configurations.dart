@@ -18,7 +18,7 @@ class AnimatedItemWidget extends StatelessWidget {
   final FlipConfiguration? flipConfiguration;
 
   AnimatedItemWidget({
-    super.key,
+    Key? key,
     required this.child,
     this.listAnimationType = ListAnimationType.Slide,
     SlideConfiguration? slideConfiguration,
@@ -28,16 +28,17 @@ class AnimatedItemWidget extends StatelessWidget {
   })  : slideConfiguration = slideConfiguration ?? SlideConfiguration(),
         fadeInConfiguration = fadeInConfiguration ?? FadeInConfiguration(),
         scaleConfiguration = scaleConfiguration ?? ScaleConfiguration(),
-        flipConfiguration = flipConfiguration ?? FlipConfiguration();
+        flipConfiguration = flipConfiguration ?? FlipConfiguration(),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
     if (listAnimationType == ListAnimationType.FadeIn) {
       return FadeInAnimationWidget(
+        child: child,
         duration: fadeInConfiguration!.duration,
         curve: fadeInConfiguration!.curve,
         delay: fadeInConfiguration!.delay,
-        child: child,
       );
     } else if (listAnimationType == ListAnimationType.Flip) {
       return FadeInAnimationWidget(
@@ -45,11 +46,11 @@ class AnimatedItemWidget extends StatelessWidget {
         curve: flipConfiguration!.curve,
         duration: flipConfiguration!.duration,
         child: FlipAnimationWidget(
+          child: child,
           delay: flipConfiguration!.delay,
           curve: flipConfiguration!.curve,
           duration: flipConfiguration!.duration,
           flipAxis: flipConfiguration!.flipAxis,
-          child: child,
         ),
       );
     } else if (listAnimationType == ListAnimationType.Slide) {
@@ -58,12 +59,12 @@ class AnimatedItemWidget extends StatelessWidget {
         curve: slideConfiguration!.curve,
         duration: slideConfiguration!.duration,
         child: SlideAnimationWidget(
+          child: child,
           delay: slideConfiguration!.delay,
           curve: slideConfiguration!.curve,
           duration: slideConfiguration!.duration,
           horizontalOffset: slideConfiguration!.horizontalOffset,
           verticalOffset: slideConfiguration!.verticalOffset,
-          child: child,
         ),
       );
     } else if (listAnimationType == ListAnimationType.Scale) {
@@ -72,11 +73,11 @@ class AnimatedItemWidget extends StatelessWidget {
         curve: scaleConfiguration!.curve,
         duration: scaleConfiguration!.duration,
         child: ScaleAnimationWidget(
+          child: child,
           delay: scaleConfiguration!.delay,
           curve: scaleConfiguration!.curve,
           duration: scaleConfiguration!.duration,
           scale: scaleConfiguration!.scale,
-          child: child,
         ),
       );
     } else {
@@ -163,9 +164,9 @@ class AnimationLimiterWidget extends StatefulWidget {
   ///
   /// The [child] argument must not be null.
   const AnimationLimiterWidget({
-    super.key,
+    Key? key,
     required this.child,
-  });
+  }) : super(key: key);
 
   @override
   _AnimationLimiterWidgetState createState() => _AnimationLimiterWidgetState();
@@ -202,10 +203,10 @@ class _AnimationLimiterWidgetState extends State<AnimationLimiterWidget> {
 class _AnimationLimiterProviderClass extends InheritedWidget {
   final bool? shouldRunAnimation;
 
-  const _AnimationLimiterProviderClass({
+  _AnimationLimiterProviderClass({
     this.shouldRunAnimation,
-    required super.child,
-  });
+    required Widget child,
+  }) : super(child: child);
 
   @override
   bool updateShouldNotify(InheritedWidget oldWidget) {
@@ -250,12 +251,13 @@ class AnimationConfigurationClass extends InheritedWidget {
   ///
   /// The [child] argument must not be null.
   const AnimationConfigurationClass.synchronized({
-    super.key,
+    Key? key,
     this.duration = const Duration(milliseconds: 40),
-    required super.child,
+    required Widget child,
   })  : position = 0,
         delay = Duration.zero,
-        columnCount = 1;
+        columnCount = 1,
+        super(key: key, child: child);
 
   /// Configure the children's animation to be staggered.
   ///
@@ -277,12 +279,13 @@ class AnimationConfigurationClass extends InheritedWidget {
   ///
   /// The [child] argument must not be null.
   const AnimationConfigurationClass.staggeredList({
-    super.key,
+    Key? key,
     required this.position,
     this.duration = const Duration(milliseconds: 225),
     this.delay,
-    required super.child,
-  })  : columnCount = 1;
+    required Widget child,
+  })  : columnCount = 1,
+        super(key: key, child: child);
 
   /// Configure the children's animation to be staggered.
   ///
@@ -306,13 +309,13 @@ class AnimationConfigurationClass extends InheritedWidget {
   ///
   /// The [child] argument must not be null.
   const AnimationConfigurationClass.staggeredGrid({
-    super.key,
+    Key? key,
     required this.position,
     this.duration = const Duration(milliseconds: 225),
     this.delay,
     required this.columnCount,
-    required super.child,
-  });
+    required Widget child,
+  }) : super(key: key, child: child);
 
   @override
   bool updateShouldNotify(InheritedWidget oldWidget) {
@@ -353,16 +356,16 @@ class AnimationConfigurationClass extends InheritedWidget {
       children
           .asMap()
           .map((index, widget) {
-            return MapEntry(
-              index,
-              AnimationConfigurationClass.staggeredList(
-                position: index,
-                duration: duration ?? const Duration(milliseconds: 225),
-                delay: delay,
-                child: childAnimationBuilder(widget),
-              ),
-            );
-          })
+        return MapEntry(
+          index,
+          AnimationConfigurationClass.staggeredList(
+            position: index,
+            duration: duration ?? const Duration(milliseconds: 225),
+            delay: delay,
+            child: childAnimationBuilder(widget),
+          ),
+        );
+      })
           .values
           .toList();
 
@@ -377,11 +380,11 @@ class AnimationConfiguratorClass extends StatelessWidget {
   final Widget Function(Animation<double>) animatedChildBuilder;
 
   const AnimationConfiguratorClass({
-    super.key,
+    Key? key,
     this.duration,
     this.delay,
     required this.animatedChildBuilder,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -393,24 +396,24 @@ class AnimationConfiguratorClass extends StatelessWidget {
           ErrorSummary('Animation not wrapped in an AnimationConfiguration.'),
           ErrorDescription(
               'This error happens if you use an Animation that is not wrapped in an '
-              'AnimationConfiguration.'),
+                  'AnimationConfiguration.'),
           ErrorHint(
               'The solution is to wrap your Animation(s) with an AnimationConfiguration. '
-              'Reminder: an AnimationConfiguration provides the configuration '
-              'used as a base for every children Animation. Configuration made in AnimationConfiguration '
-              'can be overridden in Animation children if needed.'),
+                  'Reminder: an AnimationConfiguration provides the configuration '
+                  'used as a base for every children Animation. Configuration made in AnimationConfiguration '
+                  'can be overridden in Animation children if needed.'),
         ],
       );
     }
 
-    final position = animationConfiguration.position;
-    final duration = duration ?? animationConfiguration.duration;
-    final delay = delay ?? animationConfiguration.delay;
-    final columnCount = animationConfiguration.columnCount;
+    final _position = animationConfiguration.position;
+    final _duration = duration ?? animationConfiguration.duration;
+    final _delay = delay ?? animationConfiguration.delay;
+    final _columnCount = animationConfiguration.columnCount;
 
     return AnimationExecutorClass(
-      duration: duration,
-      delay: stagger(position, duration, delay, columnCount),
+      duration: _duration,
+      delay: stagger(_position, _duration, _delay, _columnCount),
       builder: (context, animationController) =>
           animatedChildBuilder(animationController!),
     );
@@ -419,21 +422,21 @@ class AnimationConfiguratorClass extends StatelessWidget {
   Duration stagger(
       int position, Duration duration, Duration? delay, int columnCount) {
     var delayInMilliseconds =
-        (delay == null ? duration.inMilliseconds ~/ 6 : delay.inMilliseconds);
+    (delay == null ? duration.inMilliseconds ~/ 6 : delay.inMilliseconds);
 
-    int computeStaggeredGridDuration() {
+    int _computeStaggeredGridDuration() {
       return (position ~/ columnCount + position % columnCount) *
           delayInMilliseconds;
     }
 
-    int computeStaggeredListDuration() {
+    int _computeStaggeredListDuration() {
       return position * delayInMilliseconds;
     }
 
     return Duration(
         milliseconds: columnCount > 1
-            ? computeStaggeredGridDuration()
-            : computeStaggeredListDuration());
+            ? _computeStaggeredGridDuration()
+            : _computeStaggeredListDuration());
   }
 }
 
@@ -446,11 +449,11 @@ class AnimationExecutorClass extends StatefulWidget {
   final AnimatedConfigBuilder builder;
 
   const AnimationExecutorClass({
-    super.key,
+    Key? key,
     required this.duration,
     this.delay = Duration.zero,
     required this.builder,
-  });
+  }) : super(key: key);
 
   @override
   _AnimationExecutorClassState createState() => _AnimationExecutorClassState();
@@ -513,12 +516,12 @@ class FadeInAnimationWidget extends StatelessWidget {
   ///
   /// The [child] argument must not be null.
   const FadeInAnimationWidget({
-    super.key,
+    Key? key,
     this.duration,
     this.delay,
     this.curve = Curves.ease,
     required this.child,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -530,7 +533,7 @@ class FadeInAnimationWidget extends StatelessWidget {
   }
 
   Widget _fadeInAnimation(Animation<double> animation) {
-    final opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+    final _opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: animation,
         curve: Interval(0.0, 1.0, curve: curve),
@@ -538,7 +541,7 @@ class FadeInAnimationWidget extends StatelessWidget {
     );
 
     return Opacity(
-      opacity: opacityAnimation.value,
+      opacity: _opacityAnimation.value,
       child: child,
     );
   }
@@ -576,13 +579,13 @@ class FlipAnimationWidget extends StatelessWidget {
   ///
   /// The [child] argument must not be null.
   const FlipAnimationWidget({
-    super.key,
+    Key? key,
     this.duration,
     this.delay,
     this.curve = Curves.ease,
     this.flipAxis = FlipAxisClass.x,
     required this.child,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -594,15 +597,15 @@ class FlipAnimationWidget extends StatelessWidget {
   }
 
   Widget _flipAnimation(Animation<double> animation) {
-    final flipAnimation = Tween<double>(begin: 0, end: 1).animate(
+    final _flipAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
         parent: animation,
         curve: Interval(0.0, 1.0, curve: curve),
       ),
     );
 
-    Matrix4 computeTransformationMatrix() {
-      var radians = (1 - flipAnimation.value) * pi / 2;
+    Matrix4 _computeTransformationMatrix() {
+      var radians = (1 - _flipAnimation.value) * pi / 2;
 
       switch (flipAxis) {
         case FlipAxisClass.y:
@@ -614,7 +617,7 @@ class FlipAnimationWidget extends StatelessWidget {
     }
 
     return Transform(
-      transform: computeTransformationMatrix(),
+      transform: _computeTransformationMatrix(),
       alignment: Alignment.center,
       child: child,
     );
@@ -644,13 +647,14 @@ class ScaleAnimationWidget extends StatelessWidget {
   ///
   /// The [child] argument must not be null.
   const ScaleAnimationWidget({
-    super.key,
+    Key? key,
     this.duration,
     this.delay,
     this.curve = Curves.ease,
     this.scale = 0.0,
     required this.child,
-  })  : assert(scale >= 0.0);
+  })  : assert(scale >= 0.0),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -662,7 +666,7 @@ class ScaleAnimationWidget extends StatelessWidget {
   }
 
   Widget _landingAnimation(Animation<double> animation) {
-    final landingAnimation = Tween<double>(begin: scale, end: 1.0).animate(
+    final _landingAnimation = Tween<double>(begin: scale, end: 1.0).animate(
       CurvedAnimation(
         parent: animation,
         curve: Interval(0.0, 1.0, curve: curve),
@@ -670,7 +674,7 @@ class ScaleAnimationWidget extends StatelessWidget {
     );
 
     return Transform.scale(
-      scale: landingAnimation.value,
+      scale: _landingAnimation.value,
       child: child,
     );
   }
@@ -704,7 +708,7 @@ class SlideAnimationWidget extends StatelessWidget {
   ///
   /// The [child] argument must not be null.
   const SlideAnimationWidget({
-    super.key,
+    Key? key,
     this.duration,
     this.delay,
     this.curve = Curves.ease,
@@ -712,7 +716,8 @@ class SlideAnimationWidget extends StatelessWidget {
     double? horizontalOffset,
     required this.child,
   })  : verticalOffset = verticalOffset ?? 50.0,
-        horizontalOffset = horizontalOffset ?? 0.0;
+        horizontalOffset = horizontalOffset ?? 0.0,
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
