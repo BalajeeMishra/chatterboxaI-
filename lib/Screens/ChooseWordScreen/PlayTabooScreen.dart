@@ -26,6 +26,7 @@ import '../../main.dart';
 import '../../network/rest_api.dart';
 import '../TabooGameChatpage/TaboogamechatPage.dart';
 import 'package:uuid/uuid.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class PlayTabooScreen extends StatefulWidget {
   AllGameModel allGameModel;
@@ -88,7 +89,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     if (getStringAsync(USER_NATIVE_LANGUAGE).isNotEmpty) {
       selectedLanguage = getStringAsync(USER_NATIVE_LANGUAGE);
     }
-
+    // requestMicrophonePermission();
     setState(() {});
   }
 
@@ -117,7 +118,16 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     });
   }
 
-  void _initSpeech() async {
+  Future<void> requestMicrophonePermission() async {
+    var status = await Permission.microphone.request();
+    if (status.isDenied || status.isPermanentlyDenied) {
+      toast('Microphone permission is required for speech recognition.');
+      openAppSettings();
+    }
+  }
+
+  Future<void> _initSpeech() async {
+    print("INIT");
     _previousWords = "";
     _speechEnabled = await _speechToText.initialize();
     if (_speechEnabled) {
@@ -128,7 +138,8 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
       stopSpeaking();
     }
   }
-  void _startListening() async {
+  Future<void> _startListening() async {
+    print("Start");
     await _speechToText.listen(
       localeId: 'en_US',
       listenFor: _listenForDuration,
@@ -154,9 +165,9 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
       if (!_speechToText.isListening) {
         _stopListening();
         startListening = false;
-        setState(() {
-
-        });
+        // setState(() {
+        //
+        // });
 
       }
     });
@@ -208,6 +219,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
   /// Process speech result
   void _onSpeechResult(SpeechRecognitionResult result) {
+    print("Result");
     setState(() {
       _startListening();
 
@@ -400,6 +412,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   void dispose() {
     super.dispose();
     stopSpeaking();
+    _startListening();
   }
 
   @override
