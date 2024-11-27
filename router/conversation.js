@@ -26,7 +26,7 @@ const userSessions = {};
 function getUserSession(session,prompt) {
   if (!userSessions[session]) {
     // Initialize a new session for the user with persistent memory
-    const memory = new BufferMemory({ memory_key: "chat_history",human_input:"human_input" });
+    const memory = new BufferMemory({ memory_key: "chat_history"});
     // 
     userSessions[session] = {
       memory,
@@ -60,7 +60,7 @@ const template = `User native language is {nativeLanguage} {maincontent} {detail
 {chat_history} current question is {question} `
  
 const prompt = new PromptTemplate({
-  inputVariables: ["question","nativeLanguage","maincontent","detailOfContent","chat_history","human_input"],
+  inputVariables: ["question","nativeLanguage","maincontent","detailOfContent","chat_history"],
   template: template,
 });
   
