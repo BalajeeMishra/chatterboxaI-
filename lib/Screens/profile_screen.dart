@@ -23,7 +23,8 @@ import 'JabberAIHomePage/JabberAIHomepage.dart';
 class ProfileScreen extends StatefulWidget {
   final String country;
   final String mobileNumber;
-  const ProfileScreen({required this.country, required this.mobileNumber, super.key});
+  const ProfileScreen(
+      {required this.country, required this.mobileNumber, super.key});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -42,18 +43,105 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final dropDownKey = GlobalKey<DropdownSearchState>();
 
   final List<String> languageList = [
-    'Hindi',
-    'English',
+    'Afrikaans',
+    'Amharic',
+    'Assamese',
+    'Aymara',
+    'Azerbaijani',
+    'Bahasa Indonesia',
+    'Balochi',
+    'Bashkir',
     'Bengali',
+    'Bhojpuri',
+    'Bulgarian',
+    'Burmese',
+    'Catalan',
+    'Cebuano',
+    'Chewa',
+    'Czech',
+    'Danish',
+    'Deccan',
+    'Dhundhari',
+    'Dutch',
+    'Eastern Min',
+    'English',
+    'Farsi',
+    'Finnish',
+    'French',
+    'Fula',
+    'German',
+    'Greek',
+    'Gujarati',
+    'Haitian Creole',
+    'Hakka',
+    'Haryanvi',
+    'Hausa',
+    'Hebrew',
+    'Hiligaynon',
+    'Hindi',
+    'Hmong',
+    'Hungarian',
+    'Igbo',
+    'Italian',
+    'Japanese',
+    'Javanese',
     'Kannada',
+    'Khmer',
+    'Kinyarwanda',
+    'Korean',
+    'Kurdish',
+    'Lithuanian',
+    'Madurese',
+    'Magahi',
+    'Maithili',
+    'Malagasy',
+    'Malay/Indonesian',
     'Malayalam',
+    'Mandarin Chinese',
     'Marathi',
+    'Min Nan',
+    'Mossi',
     'Nepali',
+    'Norwegian',
+    'Odia',
+    'Oriya',
+    'Persian',
+    'Polish',
+    'Portuguese',
     'Punjabi',
+    'Romanian',
+    'Russian',
+    'Serbian',
+    'Shona',
+    'Sindhi',
+    'Sinhala',
+    'Sinhalese',
+    'Slovak',
+    'Somali',
+    'Spanish',
+    'Sudanese Arabic',
+    'Sunda',
+    'Swahili',
+    'Swedish',
+    'Tagalog',
     'Tamil',
     'Telugu',
+    'Thai',
+    'Tigrinya',
+    'Turkish',
+    'Turkmen',
+    'Twi',
+    'Ukrainian',
     'Urdu',
-    'Gujarati'
+    'Uyghur',
+    'Uzbek',
+    'Vietnamese',
+    'Western Punjabi',
+    'Xiang',
+    'Yoruba',
+    'Yue Chinese (Cantonese)',
+    'Zhuang',
+    'Zulu'
   ];
   final List<String> englishLevelList = [
     'Beginner',
@@ -93,6 +181,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               USER_NATIVE_LANGUAGE, value.newUser!.nativeLanguage.toString());
           userStore
               .setUserNativeLanguage(value.newUser!.nativeLanguage.toString());
+          setValue(
+              USER_ENGLISH_PROFICIENCY, value.newUser!.engprolevel.toString());
+          userStore
+              .setUserEnglishProficiency(value.newUser!.engprolevel.toString());
           await userStore.setLogin(true);
           JabberAIHomepage().launch(context);
         } else {
@@ -244,7 +336,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         onChanged: (String? value) {
                           setState(() {
                             selectedLanguage = value!;
-
                           });
                         },
                         decoratorProps: DropDownDecoratorProps(
@@ -280,6 +371,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             englishLevel = value!;
                             if (selectedLanguage.isNotEmpty) {
                               toastLeft(
+                                  durationInSeconds: 7,
                                   bgColor: primaryColor,
                                   textColor: Colors.white,
                                   "You have chosen $englishLevel.\nAI will talk in your Native language & share few references in $selectedLanguage");
@@ -289,7 +381,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         focusNode: englishLevelFocus,
                       ).paddingSymmetric(horizontal: 16, vertical: 4),
                       40.height,
-
                     ],
                   );
                 },

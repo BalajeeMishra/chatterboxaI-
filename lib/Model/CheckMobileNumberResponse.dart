@@ -29,6 +29,7 @@ class User {
   String? role;
   String? country;
   bool? playingstatus;
+  String? engprolevel;
   int? iV;
 
   User(
@@ -41,6 +42,7 @@ class User {
         this.role,
         this.country,
         this.playingstatus,
+        this.engprolevel,
         this.iV});
 
   User.fromJson(Map<String, dynamic> json) {
@@ -53,6 +55,7 @@ class User {
     role = json['role'];
     country = json['country'];
     playingstatus = json['playingstatus'];
+    engprolevel=  json['engprolevel'];
     iV = json['__v'];
   }
 
@@ -67,6 +70,7 @@ class User {
     data['role'] = role;
     data['country'] = country;
     data['playingstatus'] = playingstatus;
+    data['engprolevel']= engprolevel;
     data['__v'] = iV;
     return data;
   }

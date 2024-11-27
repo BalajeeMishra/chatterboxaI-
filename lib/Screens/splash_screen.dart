@@ -52,7 +52,7 @@ class _SplashScreenState extends State<SplashScreen> {
                         height: 260,
                       ),
                       40.height,
-                      Text("Jabber AI",
+                      Text("Zap AI",
                           style: boldTextStyle(
                               size: 32,
                               color: Colors.white,

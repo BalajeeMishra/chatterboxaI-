@@ -7,6 +7,7 @@ import 'package:balajiicode/providers/providers.dart';
 import 'package:balajiicode/store/UserStore/UserStore.dart';
 import 'package:balajiicode/store/app_store.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -106,7 +107,10 @@ class MyAppState extends State<MyApp> {
         home: getStringAsync(TOKEN).toString().isEmpty
             ? SplashScreen()
             : JabberAIHomepage(),
-        // home: SplashScreen(),
+        localizationsDelegates: [
+          CountryLocalizations.delegate,
+        ],
+        // home: LoginScreen(),
         // home:ExpiredScreen(),
         // home: ProfileScreen(country: "", mobileNumber: ""),
         scrollBehavior: SBehavior(),
@@ -201,5 +205,27 @@ class MyAppState extends State<MyApp> {
 //       ..userInteractions = false
 //       ..dismissOnTap = false;
 //     // ..customAnimation = CustomAnimation();
+//   }
+// }
+// import 'package:flutter/services.dart';
+//
+// class AudioManager {
+//   static const MethodChannel _channel = MethodChannel('custom_audio_manager');
+//
+//   static Future<void> muteSystemSounds() async {
+//     try {
+//       await _channel.invokeMethod('muteSystemSounds');
+//     } on PlatformException catch (e) {
+//       print("Failed to mute system sounds: '${e.message}'.");
+//     }
+//   }
+//
+//   static Future<void> unmuteSystemSounds() async {
+//
+//     try {
+//       await _channel.invokeMethod('unmuteSystemSounds');
+//     } on PlatformException catch (e) {
+//       print("Failed to unmute system sounds: '${e.message}'.");
+//     }
 //   }
 // }

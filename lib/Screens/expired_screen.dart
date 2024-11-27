@@ -4,6 +4,7 @@ import 'package:balajiicode/extensions/extension_util/int_extensions.dart';
 import 'package:flutter/material.dart';
 import '../Constants/ImageConstant.dart';
 import '../Utils/app_colors.dart';
+import '../Utils/app_common.dart';
 import '../extensions/app_button.dart';
 import '../extensions/text_styles.dart';
 
@@ -39,7 +40,7 @@ class _ExpiredScreenState extends State<ExpiredScreen> {
             Image(image: AssetImage(ImageConstant.micImage)),
             SizedBox(width: 5.0),
             Text(
-              "Jabber AI",
+              "Zap AI",
               style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w400,
@@ -119,7 +120,7 @@ class _ExpiredScreenState extends State<ExpiredScreen> {
                   ],
                 ),
                 onTap: () {
-                  // launchUrls(url);
+                  launchUrls('https://wa.me/918300111204');
                 },
               ),
             ),

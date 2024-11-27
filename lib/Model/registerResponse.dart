@@ -29,6 +29,8 @@ class NewUser {
   String? role;
   String? country;
   String? userId;
+  String? engprolevel;
+  bool? playingstatus;
   int? iV;
 
   NewUser(
@@ -51,6 +53,8 @@ class NewUser {
     role = json['role'];
     country = json['country'];
     userId = json['_id'];
+    playingstatus = json['playingstatus'];
+    engprolevel=  json['engprolevel'];
     iV = json['__v'];
   }
 
@@ -64,6 +68,8 @@ class NewUser {
     data['role'] = role;
     data['country'] = country;
     data['_id'] = userId;
+    data['playingstatus'] = playingstatus;
+    data['engprolevel']= engprolevel;
     data['__v'] = iV;
     return data;
   }

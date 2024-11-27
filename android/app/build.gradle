@@ -8,7 +8,7 @@ plugins {
 
 
 android {
-    namespace "com.talkyplay.jabberai"
+    namespace "com.talkyplay.zapai"
     compileSdk 34
     ndkVersion = "26.1.10909125"
 
@@ -28,7 +28,7 @@ android {
 //    }
 
     defaultConfig {
-        applicationId "com.talkyplay.jabberai"
+        applicationId "com.talkyplay.zapai"
         minSdk 23
         targetSdkVersion 34
         multiDexEnabled true

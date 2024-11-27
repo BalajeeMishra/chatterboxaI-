@@ -4,6 +4,7 @@ import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
 import 'package:balajiicode/extensions/text_styles.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:lottie/lottie.dart';
@@ -39,7 +40,6 @@ class _TaboogamechatPage extends State<TaboogamechatPage> with WidgetsBindingObs
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-
     _scrollController = ScrollController();
     Provider.of<TabooGameChatPageVM>(context, listen: false)
         .dynamicData
@@ -50,6 +50,7 @@ class _TaboogamechatPage extends State<TaboogamechatPage> with WidgetsBindingObs
     allConversationApiCall();
 
   }
+
   void allConversationApiCall() async {
     await allConversationApi(widget.sessionId).then((value) async {
       if (widget.index == null) {
@@ -189,90 +190,96 @@ class _TaboogamechatPage extends State<TaboogamechatPage> with WidgetsBindingObs
                     padding: const EdgeInsets.all(10.0),
                     child: Column(
                       children: [
-                        if (isFirst)
-                          Padding(
-                            padding: EdgeInsets.only(left: 5, right: 50),
-                            child: Consumer<TabooGameChatPageVM>(
-                              builder: (context, vm, child) {
-                                return Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                            width: 2,
-                                            color: primaryColor,
-                                          ),
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(10.0),
-                                          ),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 10.0,
-                                            vertical: 10.0,
-                                          ),
-                                          child: Column(
-
-                                            children: [
-                                              Row(
-                                                crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                                children: [
-                                                  MyText(
-                                                    text:
-                                                        "${vm.initialdata.keys.first}:",
-                                                    fontWeight: FontWeight.w600,
-                                                    fontSize: 15,
-                                                  ),
-                                                  SizedBox(width: 2),
-                                                  Expanded(
-                                                    child: MyText(
-                                                      text:
-                                                          "${vm.initialdata.values.first}",
-                                                      fontWeight: FontWeight.w400,
-                                                      fontSize: 15,
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
-                                              Row(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  MyText(
-                                                    text:
-                                                        "${vm.initialdata.keys.last}:",
-                                                    fontWeight: FontWeight.w600,
-                                                    fontSize: 15,
-                                                  ),
-                                                  SizedBox(width: 2),
-                                                  Flexible(
-                                                    child: Text(
-                                                      "${vm.initialdata.values.last}"
-                                                          .replaceAll(
-                                                              '\u200b', ""),
-                                                      style: primaryTextStyle(
-                                                        weight: FontWeight.w400,
-                                                        size: 15,
-                                                      ),
-                                                      maxLines: null,
-                                                    ),
-                                                  ),
-                                                ],
-                                              )
-
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            ),
-                          ),
+                        // if (isFirst)
+                        //   Padding(
+                        //     padding: EdgeInsets.only(left: 5, right: 50),
+                        //     child: Consumer<TabooGameChatPageVM>(
+                        //       builder: (context, vm, child) {
+                        //         return Row(
+                        //           crossAxisAlignment: CrossAxisAlignment.start,
+                        //           children: [
+                        //
+                        //             // Expanded(
+                        //             //   child: Container(
+                        //             //     decoration: BoxDecoration(
+                        //             //       border: Border.all(
+                        //             //         width: 2,
+                        //             //         color: primaryColor,
+                        //             //       ),
+                        //             //       borderRadius: BorderRadius.all(
+                        //             //         Radius.circular(10.0),
+                        //             //       ),
+                        //             //     ),
+                        //             //     child: Padding(
+                        //             //       padding: const EdgeInsets.symmetric(
+                        //             //         horizontal: 10.0,
+                        //             //         vertical: 10.0,
+                        //             //       ),
+                        //             //       child: Column(
+                        //             //
+                        //             //         children: [
+                        //             //           if (vm.initialdata != null && vm.initialdata!.isNotEmpty)
+                        //             //
+                        //             //             Row(
+                        //             //             crossAxisAlignment:
+                        //             //             CrossAxisAlignment.start,
+                        //             //             children: [
+                        //             //               MyText(
+                        //             //                 text:
+                        //             //                     "${vm.initialdata.keys.first}:",
+                        //             //                 fontWeight: FontWeight.w600,
+                        //             //                 fontSize: 15,
+                        //             //               ),
+                        //             //               SizedBox(width: 2),
+                        //             //               Expanded(
+                        //             //                 child: MyText(
+                        //             //                   text:
+                        //             //                       "${vm.initialdata.values.first}",
+                        //             //                   fontWeight: FontWeight.w400,
+                        //             //                   fontSize: 15,
+                        //             //                 ),
+                        //             //               )
+                        //             //             ],
+                        //             //           ),
+                        //             //           if (vm.initialdata != null && vm.initialdata!.isNotEmpty)
+                        //             //
+                        //             //             Row(
+                        //             //             crossAxisAlignment:
+                        //             //                 CrossAxisAlignment.start,
+                        //             //             children: [
+                        //             //               MyText(
+                        //             //                 text:
+                        //             //                     "${vm.initialdata.keys.last}:",
+                        //             //                 fontWeight: FontWeight.w600,
+                        //             //                 fontSize: 15,
+                        //             //               ),
+                        //             //               SizedBox(width: 2),
+                        //             //               Flexible(
+                        //             //                 child: Text(
+                        //             //                   "${vm.initialdata.values.last}"
+                        //             //                       .replaceAll(
+                        //             //                           '\u200b', ""),
+                        //             //                   style: primaryTextStyle(
+                        //             //                     weight: FontWeight.w400,
+                        //             //                     size: 15,
+                        //             //                   ),
+                        //             //                   maxLines: null,
+                        //             //                 ),
+                        //             //               ),
+                        //             //             ],
+                        //             //           )
+                        //             //
+                        //             //         ],
+                        //             //       ),
+                        //             //     ),
+                        //             //   ),
+                        //             // ),
+                        //             //
+                        //           ],
+                        //         );
+                        //       },
+                        //     ),
+                        //   ),
                         SizedBox(height: 10),
                         Expanded(
                           child: Consumer<TabooGameChatPageVM>(
@@ -343,11 +350,26 @@ class _TaboogamechatPage extends State<TaboogamechatPage> with WidgetsBindingObs
                 : Border.all(color: primaryColor, width: 2),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: MyText(
-            text: message,
-            fontWeight: FontWeight.w400,
-            fontSize: 15,
-          ),
+          child:
+
+          RichText(
+
+            text: TextSpan(
+              children: _buildBoldText(message),
+              style: TextStyle(
+                height: 1.4,
+                fontWeight: FontWeight.w400,
+                fontSize: 15,
+                fontFamily: "roboto",
+                color: Colors.black, // Ensure proper color in RichText
+              ),
+            ),
+          )
+          // ;MyText(
+          //   text: message,
+          //   fontWeight: FontWeight.w400,
+          //   fontSize: 15,
+          // ),
         ),
       ),
     );
@@ -425,4 +447,22 @@ class _TaboogamechatPage extends State<TaboogamechatPage> with WidgetsBindingObs
       ),
     );
   }
+}
+
+List<TextSpan> _buildBoldText(String response) {
+  List<String> parts = response.split("**");
+  List<TextSpan> textSpans = [];
+  for (int i = 0; i < parts.length; i++) {
+    if (i % 2 == 0) {
+      // Normal text
+      textSpans.add(TextSpan(text: parts[i]));
+    } else {
+      // Bold text
+      textSpans.add(TextSpan(
+        text: parts[i],
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ));
+    }
+  }
+  return textSpans;
 }

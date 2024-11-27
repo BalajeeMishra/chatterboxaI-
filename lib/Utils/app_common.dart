@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -147,21 +148,30 @@ toast(String? value,
     fontSize: 16.0,
   );
 }
-toastLeft(String? value,
-    {ToastGravity? gravity,
-      length = Toast.LENGTH_SHORT,
+void toastLeft(
+    String? value, {
+      ToastGravity? gravity,
+      int durationInSeconds = 1,
       Color? bgColor,
-      Color? textColor}) {
-  Fluttertoast.showToast(
-    msg: value.validate(),
-    toastLength: length,
-    gravity: ToastGravity.BOTTOM,
-    timeInSecForIosWeb: 1,
-    backgroundColor: bgColor,
-    textColor: textColor,
-    fontSize: 16.0,
-    webPosition: "left",
-  );
+      Color? textColor,
+    }) {
+  int repeatCount = (durationInSeconds / 2).ceil();
+  Timer.periodic(Duration(seconds: 2), (timer) {
+    if (repeatCount > 0) {
+      Fluttertoast.showToast(
+        msg: value ?? '',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: gravity ?? ToastGravity.BOTTOM,
+        backgroundColor: bgColor,
+        textColor: textColor,
+        fontSize: 16.0,
+        webPosition: "left",
+      );
+      repeatCount--;
+    } else {
+      timer.cancel();
+    }
+  });
 }
 
 setLogInValue() {

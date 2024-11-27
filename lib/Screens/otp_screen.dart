@@ -233,6 +233,8 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
         userStore.setUserID(value.user!.sId.toString());
         setValue(USER_NATIVE_LANGUAGE, value.user!.nativeLanguage.toString());
         userStore.setUserNativeLanguage(value.user!.nativeLanguage.toString());
+        setValue(USER_ENGLISH_PROFICIENCY, value.user!.engprolevel.toString());
+        userStore.setUserEnglishProficiency(value.user!.engprolevel.toString());
         await userStore.setLogin(true);
         JabberAIHomepage().launch(context);
         setState(() {});

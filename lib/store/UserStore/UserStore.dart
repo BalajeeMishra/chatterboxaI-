@@ -19,6 +19,9 @@ abstract class UserStoreBase with Store {
 
   @observable
   String userNativeLanguage = '';
+  @observable
+  String userEnglishProficiency = '';
+
 
   @observable
   String email = '';
@@ -96,6 +99,11 @@ abstract class UserStoreBase with Store {
   Future<void> setUserNativeLanguage(String val, {bool isInitialization = false}) async {
     userNativeLanguage = val;
     if (!isInitialization) await setValue(USER_NATIVE_LANGUAGE, val);
+  }
+  @action
+  Future<void> setUserEnglishProficiency(String val, {bool isInitialization = false}) async {
+    userEnglishProficiency = val;
+    if (!isInitialization) await setValue(USER_ENGLISH_PROFICIENCY, val);
   }
 
   @action

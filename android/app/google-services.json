@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "573742835177",
-    "project_id": "jabber-ai",
-    "storage_bucket": "jabber-ai.firebasestorage.app"
+    "project_number": "349682106028",
+    "project_id": "zap-ai-1a07d",
+    "storage_bucket": "zap-ai-1a07d.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:573742835177:android:26c34e5e8cf7db76c69778",
+        "mobilesdk_app_id": "1:349682106028:android:4527c36ba0244d5ee1e909",
         "android_client_info": {
-          "package_name": "com.talkyplay.jabberai"
+          "package_name": "com.talkyplay.zapai"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDmEnlZPd6q-glKKlXbkAXTLRWSuzstkGQ"
+          "current_key": "AIzaSyCY5DQ73GU_NMCjfdABkf_f172EJ_K5Y9s"
         }
       ],
       "services": {

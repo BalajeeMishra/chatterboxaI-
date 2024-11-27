@@ -1,4 +1,4 @@
-# Jabber AI APP Project
+# Zap AI APP Project
 
 A new Flutter project.
 

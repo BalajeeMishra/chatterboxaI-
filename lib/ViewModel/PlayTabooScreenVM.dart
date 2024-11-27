@@ -1,6 +1,7 @@
 import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
 import 'package:balajiicode/extensions/loader_widget.dart';
 import 'package:balajiicode/main.dart';
+import 'package:emoji_regex/emoji_regex.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_tts/flutter_tts.dart';
@@ -11,11 +12,13 @@ import '../Model/TabooGameChatPageModel.dart';
 import '../Repository/TaboogameChatPageRepository.dart';
 import '../Services/ApiResponseStatus.dart';
 import '../Utils/ShowSnackBar.dart';
+import '../Utils/app_constants.dart';
+import '../extensions/shared_pref.dart';
 
 class PlayTabooScreenVM extends ChangeNotifier {
   /// Calling Repository =====================================
   final TabooGameChatPageRepository _tabooGameChatPageRepository =
-      TabooGameChatPageRepository(); 
+      TabooGameChatPageRepository();
 
   BuildContext context;
 
@@ -28,6 +31,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
   bool apiHitStatus = false;
   List<Map<String, dynamic>> dynamicDta = [];
   bool isFirstCall = true;
+  String selectedLanguage = 'English';
 
   var dataToPass;
 
@@ -65,8 +69,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
   }
 
   void updateResponse(CompleteConversation completeConversation) {
-    tabooGameChatPageModel.response = convertToResponse(
-        completeConversation);
+    tabooGameChatPageModel.response = convertToResponse(completeConversation);
     // if (completeConversation.aiResponse != null && completeConversation.aiResponse != null) {
     //   // var data = {
     //   //   "server": 1,
@@ -85,10 +88,14 @@ class PlayTabooScreenVM extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> chatPageAPI(BuildContext context, String dataGet,
-      String sessionId, AllGameModel allGameModel, int index,bool isFirst) async {
-
-    isFirstCall =isFirst;
+  Future<void> chatPageAPI(
+      BuildContext context,
+      String dataGet,
+      String sessionId,
+      AllGameModel allGameModel,
+      int index,
+      bool isFirst) async {
+    isFirstCall = isFirst;
     if (dataGet == "") {
       MySnackBar.showSnackBar(context, "Please speak first!");
       return;
@@ -104,21 +111,17 @@ class PlayTabooScreenVM extends ChangeNotifier {
     dynamicDta.add(dataAdd);
     notifyListeners();
     appStore.setLoading(true);
-    // Loader().center();
-    // EasyLoading.show(status: ConstText.get_LoaderMessage);
+
     try {
       var data = {
         "question": dataToAdd,
-        // "userId": userStore.userId,
         "sessionId": sessionId,
-        'gameId':allGameModel.allGame![index].gameId,
+        'gameId': allGameModel.allGame![index].gameId,
         "mainContent": allGameModel.allGame![index].mainContent
       };
-      print("DAT$data");
       ApiResponse<TabooGameChatPageModel> response =
           await _tabooGameChatPageRepository
               .tabooGameChatPageApiCallFunction(data);
-      // print("RES{PONS"+response.status.toString());
       switch (response.status) {
         case ApiResponseStatus.success:
           dataGet = "";
@@ -136,9 +139,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
             isFirstCall = false;
           }
           print("Is First call$isFirstCall");
-          // EasyLoading.dismiss();
-          // Navigator.push(context, MaterialPageRoute(builder: (context)=>PlayTabooScreenTwo(response.data!.response!.aiResponse!.last)));
-          break;
+            break;
         // tabooGameChatPageModel = response.data!;
         // notifyListeners();
         // EasyLoading.dismiss();
@@ -178,7 +179,6 @@ class PlayTabooScreenVM extends ChangeNotifier {
     } catch (e) {
       appStore.setLoading(false);
 
-
       // EasyLoading.dismiss();
       // MySnackBar.showSnackBar(context, e.toString());
     }
@@ -186,16 +186,75 @@ class PlayTabooScreenVM extends ChangeNotifier {
   }
 
   FlutterTts flutterTts = FlutterTts();
+  Future<void> setTtsLanguage(String language) async {
+    String ttsLanguage;
+
+    switch (language) {
+      case 'Hindi':
+        ttsLanguage = 'hi-IN';
+        break;
+      case 'English':
+        ttsLanguage = 'en-US';
+        break;
+      case 'Bengali':
+        ttsLanguage = 'bn-IN';
+        break;
+      case 'Kannada':
+        ttsLanguage = 'kn-IN';
+        break;
+      case 'Malayalam':
+        ttsLanguage = 'ml-IN';
+        break;
+      case 'Marathi':
+        ttsLanguage = 'mr-IN';
+        break;
+      case 'Nepali':
+        ttsLanguage = 'ne-NP';
+        break;
+      case 'Punjabi':
+        ttsLanguage = 'pa-IN';
+        break;
+      case 'Tamil':
+        ttsLanguage = 'ta-IN';
+        break;
+      case 'Telugu':
+        ttsLanguage = 'te-IN';
+        break;
+      case 'Urdu':
+        ttsLanguage = 'ur-IN';
+        break;
+      case 'Gujarati':
+        ttsLanguage = 'gu-IN';
+        break;
+      default:
+        ttsLanguage = 'en-US';
+        break;
+    }
+
+    await flutterTts.setLanguage(ttsLanguage);
+  }
 
   Future<void> configureTts() async {
-    await flutterTts.setLanguage('en-US');
+    if (getStringAsync(USER_NATIVE_LANGUAGE).isNotEmpty) {
+      selectedLanguage = getStringAsync(USER_NATIVE_LANGUAGE);
+    }
+    print("Selectd Language is ==>"+selectedLanguage.toString());
+    setTtsLanguage(selectedLanguage);
+    // await flutterTts.setLanguage('en-US');
     await flutterTts.setSpeechRate(0.4);
     await flutterTts.setVolume(1.0);
   }
 
   void speakText(String text) async {
+    String updatedText = cleanTextForTTS(text);
     appStore.setLastWords(text);
 
-    await flutterTts.speak(text);
+    await flutterTts.speak(updatedText);
   }
+}
+
+String cleanTextForTTS(String text) {
+  String textWithoutEmojis = text.replaceAll(emojiRegex(), "");
+
+  return textWithoutEmojis.replaceAll('**', '');
 }

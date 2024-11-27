@@ -1,4 +1,5 @@
 import 'package:balajiicode/Constants/ImageConstant.dart';
+import 'package:balajiicode/Screens/contact_us_screen.dart';
 import 'package:balajiicode/Screens/expired_screen.dart';
 import 'package:balajiicode/Utils/app_common.dart';
 import 'package:balajiicode/Screens/ChooseWordScreen/ChooseWords.dart';
@@ -31,41 +32,7 @@ class JabberAIHomepage extends StatefulWidget {
 
 class _JabberAIHomepage extends State<JabberAIHomepage> {
   bool isStatus = false;
-  // List<Map<String, dynamic>> datalist = [
-  //   {
-  //     "title": "Taboo",
-  //     "subtitle":
-  //         "Make AI guess same word multiple times using different hints",
-  //     "image": ImageConstant.tabooimage
-  //   },
-  //   {
-  //     "title": "Who wants to be a Shakespeare",
-  //     "subtitle":
-  //         "9 Levels. Win each level by using a flashed word in an appropriate setence",
-  //     "image": ImageConstant.shakespere
-  //   },
-  //   {
-  //     "title": "Co-script a story",
-  //     "subtitle":
-  //         "Two charaters experience something spooky. Help AI complete the plot",
-  //     "image": ImageConstant.scripstory
-  //   },
-  //   {
-  //     "title": "Roleplays",
-  //     "subtitle": "Practice real life conversation",
-  //     "image": ImageConstant.roleplay
-  //   },
-  //   {
-  //     "title": "Guess the word",
-  //     "subtitle": "You guess a word by asking AI questions",
-  //     "image": ImageConstant.guessworld
-  //   },
-  //   {
-  //     "title": "Debate challenge",
-  //     "subtitle": "You vs AI.One winner",
-  //     "image": ImageConstant.debatechallenge
-  //   },
-  // ];
+
   @override
   void initState() {
     super.initState();
@@ -76,8 +43,7 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
   }
 
   Future<void> checkStatus() async {
-
-    await statusCheckApi( userId: getStringAsync(USER_ID)).then((value) async {
+    await statusCheckApi(userId: getStringAsync(USER_ID)).then((value) async {
       isStatus = value.playingstatus!;
     }).catchError((e) {
       appStore.setLoading(false);
@@ -104,22 +70,29 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
         center: true,
         showBack: false,
         color: primaryColor,
+        actions: [
+          IconButton(
+              onPressed: () {
+                ContactUsScreen().launch(context);
+              },
+              icon: Icon(
+                Icons.person,
+                color: Colors.white,
+                size: 30,
+              ))
+        ],
         '',
         context: context,
         titleWidget: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Image(image: AssetImage(ImageConstant.micImage)),
-            // SizedBox(
-            //   width: 5.0,
-            // ),
             Text(
-              "Jabber AI",
+              "Zap AI",
               style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w400,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600,
                   color: Colors.white),
-            )
+            ).paddingLeft(48)
           ],
         ).center(),
       ),
