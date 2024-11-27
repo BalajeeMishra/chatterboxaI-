@@ -7,7 +7,6 @@ const templateSchema = new mongoose.Schema({
   engprolevel:{
     type:String, 
     enum: ["Beginner","Intermediate","Advanced"],
-    unique:true
   },
   content:String
 });

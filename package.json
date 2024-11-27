@@ -11,7 +11,9 @@
   "license": "ISC",
   "dependencies": {
     "@langchain/openai": "^0.3.5",
+    "@types/bcryptjs": "^2.4.6",
     "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
@@ -24,6 +26,7 @@
     "mongoose-sequence": "^6.0.1",
     "openai": "^4.67.1",
     "pdf-parse": "^1.1.1",
-    "striptags": "^3.2.0"
+    "striptags": "^3.2.0",
+    "validator": "^13.12.0"
   }
 }

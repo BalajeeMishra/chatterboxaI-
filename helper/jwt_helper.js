@@ -13,10 +13,10 @@ export default {
       };
       JWT.sign(payload, secret, options, (err, token) => {
         if (err) {
-         // logger.error(
-           // `${err.status} - ${err.message} - inside signAccessToken of jwt helper`,
-          //);
-          reject(new Error("Something went wrong", 500));
+          // logger.error(
+          //   `${err.status} - ${err.message} - inside signAccessToken of jwt helper`,
+          // );
+          reject(new Error("Something went wrong!", 500));
           return;
         }
         resolve(token);
@@ -32,9 +32,9 @@ export default {
     const token = bearerToken[1];
     JWT.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, payload) => {
       if (err) {
-       // logger.error(
-         // `${err.status} - ${err.message} - ${req.originalUrl} - ${req.method} inside verifyToken of jwt helper`,
-       // );
+        // logger.error(
+        //   `${err.status} - ${err.message} - ${req.originalUrl} - ${req.method} inside verifyToken of jwt helper`,
+        // );
         const message =
           err.name === "JsonWebTokenError" ? "Unauthorized" : err.message;
         return next(
@@ -48,8 +48,6 @@ export default {
       req.userId = payload.aud;
       const user = await User.findById(req.userId);
       next();
-   });
+    });
   },
-
- 
 };

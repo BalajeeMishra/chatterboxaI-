@@ -4,6 +4,7 @@ import connectDB from "./config/database/db.js"
 import Game from "./router/game.js";
 import User from "./router/user.js";
 import ConverSation from "./router/conversation.js"
+import Admin from "./router/admin.js";
 import cors from "cors";
 
 const app = express();
@@ -20,6 +21,7 @@ app.use(express.json());
 app.use("/api/game", Game);
 app.use("/api/user", User);
 app.use("/api", ConverSation);
+app.use("/api/auth", Admin);
 app.get("/", async (_, res) => res.send("Server is running"));
 app.use(async (err, req, res, next) => {
   if (!err?.status) {
