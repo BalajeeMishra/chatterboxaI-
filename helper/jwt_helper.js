@@ -13,10 +13,10 @@ export default {
       };
       JWT.sign(payload, secret, options, (err, token) => {
         if (err) {
-          logger.error(
-            `${err.status} - ${err.message} - inside signAccessToken of jwt helper`,
-          );
-          reject(new AppError(error["500"], 500));
+          // logger.error(
+          //   `${err.status} - ${err.message} - inside signAccessToken of jwt helper`,
+          // );
+          reject(new Error("Something went wrong!", 500));
           return;
         }
         resolve(token);
@@ -26,20 +26,20 @@ export default {
 
   verifyToken: async (req, res, next) => {
     if (!req.headers["authorization"])
-      return next(new AppError(error["401"], 401));
+      return next(new Error("Unauthorized", 401));
     const authHeader = req.headers["authorization"];
     const bearerToken = authHeader.split(" ");
     const token = bearerToken[1];
     JWT.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, payload) => {
       if (err) {
-        logger.error(
-          `${err.status} - ${err.message} - ${req.originalUrl} - ${req.method} inside verifyToken of jwt helper`,
-        );
+        // logger.error(
+        //   `${err.status} - ${err.message} - ${req.originalUrl} - ${req.method} inside verifyToken of jwt helper`,
+        // );
         const message =
           err.name === "JsonWebTokenError" ? "Unauthorized" : err.message;
         return next(
-          new AppError(
-            err.message == "jwt expired" ? error["401"] : message,
+          new Error(
+            err.message == "jwt expired" ? "Unauthorized" : message,
             401,
           ),
         );
@@ -50,98 +50,4 @@ export default {
       next();
     });
   },
-
-  signRefreshToken: (userId) => {
-    return new Promise((resolve, reject) => {
-      const payload = {};
-      const secret = process.env.REFRESH_TOKEN_SECRET;
-
-      const expiry = Date.now() + 10 * 24 * 60 * 60 * 1000;
-      const options = {
-        expiresIn: "10 days",
-        issuer: "Kingstarludo",
-        audience: userId,
-      };
-      JWT.sign(payload, secret, options, async (err, token) => {
-        if (err) {
-          logger.error(
-            `${err.status} - ${err.message} - inside signrefreshtoken of jwt_helper`,
-          );
-          reject(new AppError(error["401"], 401));
-        }
-
-        // { $set: { "userKyc.proofOfAddress.url": imageName } },
-        const user = await User.findByIdAndUpdate(
-          userId,
-          {
-            $set: {
-              "refreshTokenDetail.token": token,
-              "refreshTokenDetail.expiresAt": expiry,
-            },
-          },
-          { new: true },
-        );
-        if (!user) {
-          reject(new AppError(error["500"], 500));
-        }
-        resolve(token);
-        // client.SET(userId, token, "EX", 365 * 24 * 60 * 60, (err, reply) => {
-        //   if (err) {
-        //     console.log(err.message);
-        //     reject(createError.InternalServerError());
-        //     return;
-        //   }
-        //   resolve(token);
-        // });
-      });
-    });
-  },
-
-  verifyRefreshToken: (refreshToken) => {
-    return new Promise((resolve, reject) => {
-      JWT.verify(
-        refreshToken,
-        process.env.REFRESH_TOKEN_SECRET,
-        async (err, payload) => {
-          if (err) {
-            logger.error(
-              `${err.status} - ${err.message} - inside verifyrefreshtoken of jwt_helper`,
-            );
-            return reject(new AppError(error["401"], 401));
-          }
-
-          const userId = payload.aud;
-
-          const user = await User.findById(userId);
-          if (!user) {
-            reject(new AppError(error["500"], 500));
-          }
-          if (
-            user.refreshTokenDetail.expiresAt > Date.now() &&
-            user.refreshTokenDetail.token == refreshToken
-          ) {
-            user.refreshTokenDetail.token = null;
-            user.refreshTokenDetail.expiresAt = null;
-            return resolve(userId);
-          }
-          if (user.refreshTokenDetail.expiresAt < Date.now()) {
-            reject(new AppError(error["401"], 401));
-          }
-
-          reject(new AppError(error["401"], 401));
-
-          // client.GET(userId, (err, result) => {
-          //   if (err) {
-          //     console.log(err.message);
-          //     reject(createError.InternalServerError());
-          //     return;
-          //   }
-          //   if (refreshToken === result) return resolve(userId);
-          //   reject(createError.Unauthorized());
-          // });
-        },
-      );
-    });
-  },
-  
 };
