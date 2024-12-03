@@ -1,5 +1,5 @@
-import Link from 'next/link';
-import React from 'react';
+import Link from "next/link";
+import React from "react";
 
 interface PageHeadDescProps {
   title: string;
@@ -14,9 +14,7 @@ const PageHeadDesc: React.FC<PageHeadDescProps> = ({ title, desc }) => {
         <ol className="list-none p-0 inline-flex">
           <li className="flex items-center">
             <Link href="/admin/newgame">
-              <div className="text-gray-500 hover:text-gray-700">
-                Dashboard
-              </div>
+              <div className="text-gray-500 hover:text-gray-700">Dashboard</div>
             </Link>
             <span className="mx-2 text-gray-400">/</span>
           </li>
