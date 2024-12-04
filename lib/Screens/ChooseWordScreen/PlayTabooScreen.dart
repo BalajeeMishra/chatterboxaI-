@@ -40,8 +40,9 @@ class PlayTabooScreen extends StatefulWidget {
   AllGameModel allGameModel;
   int index;
   String sessionId;
+  String gameName;
 
-  PlayTabooScreen(this.allGameModel, this.index, this.sessionId);
+  PlayTabooScreen(this.allGameModel, this.index, this.sessionId, this.gameName);
 
   @override
   State<StatefulWidget> createState() => _PlayTabooScreen();
@@ -94,9 +95,10 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     startListening = false;
     apiCalled = true;
     if (getStringAsync(USER_NATIVE_LANGUAGE).isNotEmpty &&
-        getStringAsync(USER_ENGLISH_PROFICIENCY) != "Intermediate") {
+        getStringAsync(USER_ENGLISH_PROFICIENCY) == "Beginner") {
       selectedLanguage = getStringAsync(USER_NATIVE_LANGUAGE);
     }
+    appStore.setLastWords("");
     setState(() {});
   }
 
@@ -455,7 +457,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
             }
           }),
           title: Text(
-            'Taboo',
+            widget.gameName,
             style: const TextStyle(
                 fontSize: 18, fontWeight: FontWeight.w400, color: Colors.white),
           ),

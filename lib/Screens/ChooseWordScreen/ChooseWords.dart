@@ -15,7 +15,9 @@ import 'package:uuid/uuid.dart';
 
 class ChooseWordScreen extends StatefulWidget {
   String dataId;
-  ChooseWordScreen(this.dataId, {super.key});
+  String gameName;
+
+  ChooseWordScreen(this.dataId,this.gameName ,{super.key});
 
   @override
   State<StatefulWidget> createState() => _ChooseWordScreen();
@@ -38,7 +40,7 @@ class _ChooseWordScreen extends State<ChooseWordScreen> {
           onPressed: () {
             Navigator.pop(context);
           },
-          title: "Taboo"),
+          title: widget.gameName),
       body: RefreshIndicator(
         color: primaryColor,
         onRefresh: () async {
@@ -99,6 +101,7 @@ class _ChooseWordScreen extends State<ChooseWordScreen> {
                                                       PlayTabooScreen(
                                                           vm.homePageModel,
                                                           index,Uuid().v4(),
+                                                        widget.gameName,
                                                       )));
                                         },
                                         child: Container(

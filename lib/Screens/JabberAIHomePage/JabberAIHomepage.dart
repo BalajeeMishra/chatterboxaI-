@@ -157,7 +157,7 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
                                                       MaterialPageRoute(
                                                           builder: (context) =>
                                                               ChooseWordScreen(
-                                                                  data.sId!)));
+                                                                  data.sId!,data.gameName!)));
                                                 }
                                               },
                                               child: Container(
