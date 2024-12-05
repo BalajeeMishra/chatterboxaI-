@@ -19,7 +19,8 @@ const router = Router();
 const apiKey = fs.readFileSync("OpenAiKey.txt", "utf-8").trim();
 
 
-const llm = new ChatOpenAI({ temperature: 0, apiKey: apiKey, modelName: "gpt-4o" });
+
+const llm = new ChatOpenAI({ temperature: 0, apiKey: apiKey, modelName: "gpt-4o-mini" });
 
 
 const userSessions = {};
@@ -101,7 +102,7 @@ const prompt = new PromptTemplate({
     await userdatalog.save();
     return res.status(200).json({ response: userdatalog });
   } catch (error) {
-    console.log(error)
+   
     res.status(500).json({ error: "Something went wrong" });
   }
 });
