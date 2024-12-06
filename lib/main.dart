@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:balajiicode/Screens/expired_screen.dart';
 import 'package:balajiicode/Screens/login_screen.dart';
@@ -33,14 +34,20 @@ final navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await Firebase.initializeApp(
           name: 'jabber-ai',
-          options: const FirebaseOptions(
-              apiKey: FIREBASEAPIKEY,
-              appId: FIREBASEAPPID,
-              messagingSenderId: FIREBASEMESSAGINGSENDERID,
-              projectId: FIREBASEPROJECTID))
+          options: FirebaseOptions(
+              apiKey: Platform.isAndroid
+                  ? FIREBASEANDROIDAPIKEY
+                  : FIREBASEIOSAPIKEY,
+              appId:
+                  Platform.isAndroid ? FIREBASEANDROIDAPPID : FIREBASEIOSAPPID,
+              messagingSenderId: Platform.isAndroid
+                  ? FIREBASEANDROIDMESSAGINGSENDERID
+                  : FIREBASEIOSMESSAGINGSENDERID,
+              projectId: Platform.isAndroid
+                  ? FIREBASEANDROIDPROJECTID
+                  : FIREBASEIOSPROJECTID))
       .then((value) {
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
   });
