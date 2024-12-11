@@ -110,9 +110,9 @@ const AddTemplate: React.FC<AddTemplateFormProps> = ({
           </label>
           <Editor
             value={template}
-            onChange={(e) => setTemplate(e.target.value)}
-            height="200px"
-            className="border  border-gray-300 rounded-md"
+            onChange={(e: any) => setTemplate(e.target.value)}
+            style={{ height: "200px", overflowY: "auto" }}
+            className="border border-gray-300 rounded-md"
           />
           {errors.template && (
             <div className="text-red-600 text-sm">{errors.template}</div>
