@@ -27,6 +27,7 @@ import 'extensions/shared_pref.dart';
 import 'extensions/system_utils.dart';
 import 'package:firebase_core/firebase_core.dart';
 
+
 AppStore appStore = AppStore();
 UserStore userStore = UserStore();
 late SharedPreferences sharedPreferences;

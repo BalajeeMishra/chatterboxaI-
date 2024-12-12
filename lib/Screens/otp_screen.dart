@@ -35,6 +35,7 @@ class OtpScreen extends StatefulWidget {
 }
 
 class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
+  final FocusNode _focusNode = FocusNode();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   GlobalKey<OTPTextFieldState> otpTextFieldKey = GlobalKey<OTPTextFieldState>();
 
@@ -196,25 +197,36 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
     }
   }
 
+void _dismissKeyboard() {
+    if (_focusNode.hasFocus) {
+      _focusNode.unfocus();
+    }
+  }
+
   Widget otpInputField() {
-    return OTPTextField(
-      key: otpTextFieldKey,
-      pinLength: 6,
-      fieldWidth: context.width() * 0.1,
-      onChanged: (s) {
-        otpCode = s;
+    return GestureDetector(
+       onTap: _dismissKeyboard,
+      behavior: HitTestBehavior.opaque,
+      child: OTPTextField(
+        key: otpTextFieldKey,
+        pinLength: 6,
+        fieldWidth: context.width() * 0.1,
+        onChanged: (s) {
+          otpCode = s;
+      
+        },
+        onCompleted: (pin) {
+          otpCode = pin;
+          setState(() {
+      
+          },);
+          // submit();
+          // submit();
+          // UserDetails().launch(context);
+        },
+      ).center(),
+    );
 
-      },
-      onCompleted: (pin) {
-        otpCode = pin;
-        setState(() {
-
-        },);
-        // submit();
-        // submit();
-        // UserDetails().launch(context);
-      },
-    ).center();
   }
 
   Future<void> mobileNumberCheck() async {
@@ -252,6 +264,16 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
     }
   }
 
+  
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    // _isFabVisible.dispose();
+    super.dispose();
+  }
+
+  
   @override
   Widget build(BuildContext context) {
     return Observer(builder: (context) {
@@ -310,7 +332,7 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         50.height,
-                        Text('Verify Phone Number',
+                        Text('Verify Phone Number okk',
                             style: boldTextStyle(size: 22)),
                         Text('${'We have sent the code verification to'} ',
                             // ''
@@ -326,7 +348,7 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
                         //   },
                         // ),
                         otpInputField(),
-
+                            
                         20.height,
                         StatefulBuilder(builder: (context, setState) {
                           return Row(
@@ -358,7 +380,7 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
                                   }
                                 },
                               ),
-
+                            
                             ],
                           );
                         }),
