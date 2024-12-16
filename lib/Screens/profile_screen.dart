@@ -197,209 +197,218 @@ class _ProfileScreenState extends State<ProfileScreen> {
       setState(() {});
     }
   }
+ 
+  void _dismissKeyboard() {
+    FocusScope.of(context).unfocus();
+  }
+  
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: Form(
-        key: mFormKey,
-        child: SingleChildScrollView(
-          padding:
-              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-          child: Column(
-            children: [
-              Stack(
-                alignment: Alignment.topCenter,
-                children: [
-                  Container(
-                    height: context.height() * 0.28,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Color(0xff755be8),
-                          primaryColor,
-                        ],
-                        begin: Alignment.bottomLeft,
-                        end: Alignment.bottomRight,
+    return GestureDetector(
+       onTap: _dismissKeyboard,
+      behavior: HitTestBehavior.opaque,
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        body: Form(
+          key: mFormKey,
+          child: SingleChildScrollView(
+            padding:
+                EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+            child: Column(
+              children: [
+                Stack(
+                  alignment: Alignment.topCenter,
+                  children: [
+                    Container(
+                      height: context.height() * 0.28,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Color(0xff755be8),
+                            primaryColor,
+                          ],
+                          begin: Alignment.bottomLeft,
+                          end: Alignment.bottomRight,
+                        ),
                       ),
                     ),
-                  ),
-                  Positioned(
-                    top: context.height() * 0.07,
-                    child: Column(
-                      children: [
-                        CircleAvatar(
-                          backgroundColor: Colors.black,
-                          radius: 30,
-                          child: Icon(
-                            Icons.person,
-                            size: 26,
-                            color: Colors.white,
+                    Positioned(
+                      top: context.height() * 0.07,
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                            backgroundColor: Colors.black,
+                            radius: 30,
+                            child: Icon(
+                              Icons.person,
+                              size: 26,
+                              color: Colors.white,
+                            ),
                           ),
-                        ),
-                        16.height,
-                        Text(
-                          'Personalise your Learning',
-                          style: boldTextStyle(
-                            color: Colors.white,
-                            size: 26,
+                          16.height,
+                          Text(
+                            'Personalise your Learning',
+                            style: boldTextStyle(
+                              color: Colors.white,
+                              size: 26,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              26.height,
-              ListView.builder(
-                physics: NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: 1,
-                itemBuilder: (context, index) {
-                  return Column(
-                    children: [
-                      Row(
-                        children: [
-                          Text('First Name',
-                              style: secondaryTextStyle(
-                                  color: textPrimaryColorGlobal)),
-                          2.width,
-                          Text('*', style: secondaryTextStyle(color: redColor))
-                        ],
-                      ).paddingSymmetric(horizontal: 16, vertical: 4),
-                      4.height,
-                      AppTextField(
-                        focus: nameFocus,
-                        controller: mNameCont,
-                        nextFocus: ageFocus,
-                        textFieldType: TextFieldType.NAME,
-                        isValidationRequired: true,
-                        decoration: defaultInputDecoration(context,
-                            label: 'Enter name'),
-                      ).paddingSymmetric(horizontal: 16, vertical: 4),
-                      16.height,
-                      Row(
-                        children: [
-                          Text('Age',
-                              style: secondaryTextStyle(
-                                  color: textPrimaryColorGlobal)),
-                          2.width,
-                          Text('*', style: secondaryTextStyle(color: redColor))
-                        ],
-                      ).paddingSymmetric(horizontal: 16, vertical: 4),
-                      4.height,
-                      AppTextField(
-                        focus: ageFocus,
-                        nextFocus: languageFocus,
-                        controller: mAgeCont,
-                        textFieldType: TextFieldType.NAME,
-                        isValidationRequired: true,
-                        decoration: defaultInputDecoration(context,
-                            label: 'Enter your age'),
-                      ).paddingSymmetric(horizontal: 16, vertical: 4),
-                      16.height,
-                      Row(
-                        children: [
-                          Text('Your Native Language',
-                              style: secondaryTextStyle(
-                                  color: textPrimaryColorGlobal)),
-                          2.width,
-                          Text('*', style: secondaryTextStyle(color: redColor))
-                        ],
-                      ).paddingSymmetric(horizontal: 16, vertical: 4),
-                      4.height,
-                      DropdownSearch<String>(
-                        key: dropDownKey,
-                        items: (String filter, LoadProps? loadProps) async {
-                          if (filter.isEmpty) {
-                            return languageList;
-                          } else {
-                            return languageList
-                                .where((language) => language
-                                    .toLowerCase()
-                                    .contains(filter.toLowerCase()))
-                                .toList();
-                          }
-                        },
-                        selectedItem: selectedLanguage,
-                        popupProps: PopupProps.menu(
-                          showSearchBox: true,
-                          searchFieldProps: TextFieldProps(
-                            decoration:
-                                InputDecoration(hintText: 'Search Language'),
-                          ),
-                          emptyBuilder: (context, searchEntry) {
-                            return Text('No Language available').center();
-                          },
-                        ),
-                        onChanged: (String? value) {
-                          setState(() {
-                            selectedLanguage = value!;
-                          });
-                        },
-                        decoratorProps: DropDownDecoratorProps(
-                          decoration: defaultInputDecoration(
-                              context), // Applying the decoration here
-                        ),
-                      ).paddingSymmetric(horizontal: 16, vertical: 4),
-                      16.height,
-                      Row(
-                        children: [
-                          Text('Your English Proficiency',
-                              style: secondaryTextStyle(
-                                  color: textPrimaryColorGlobal)),
-                          2.width,
-                          Text('*', style: secondaryTextStyle(color: redColor))
-                        ],
-                      ).paddingSymmetric(horizontal: 16, vertical: 4),
-                      4.height,
-                      DropdownButtonFormField(
-                        items: englishLevelList
-                            .map((value) => DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Text(value, style: primaryTextStyle()),
-                                ))
-                            .toList(),
-                        isExpanded: false,
-                        isDense: true,
-                        borderRadius: radius(),
-                        decoration: defaultInputDecoration(context),
-                        value: englishLevel,
-                        onChanged: (String? value) {
-                          setState(() {
-                            englishLevel = value!;
-                            if (selectedLanguage.isNotEmpty) {
-                              toastLeft(
-                                  durationInSeconds: 7,
-                                  bgColor: primaryColor,
-                                  textColor: Colors.white,
-                                  "You have chosen $englishLevel.\nAI will talk in your Native language & share few references in $selectedLanguage");
+                  ],
+                ),
+                26.height,
+                ListView.builder(
+                  physics: NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: 1,
+                  itemBuilder: (context, index) {
+                    return Column(
+                      children: [
+                        Row(
+                          children: [
+                            Text('First Name',
+                                style: secondaryTextStyle(
+                                    color: textPrimaryColorGlobal)),
+                            2.width,
+                            Text('*', style: secondaryTextStyle(color: redColor))
+                          ],
+                        ).paddingSymmetric(horizontal: 16, vertical: 4),
+                        4.height,
+                        AppTextField(
+                          focus: nameFocus,
+                          controller: mNameCont,
+                          nextFocus: ageFocus,
+                          textFieldType: TextFieldType.NAME,
+                          isValidationRequired: true,
+                          decoration: defaultInputDecoration(context,
+                              label: 'Enter name'),
+                        ).paddingSymmetric(horizontal: 16, vertical: 4),
+                        16.height,
+                        Row(
+                          children: [
+                            Text('Age',
+                                style: secondaryTextStyle(
+                                    color: textPrimaryColorGlobal)),
+                            2.width,
+                            Text('*', style: secondaryTextStyle(color: redColor))
+                          ],
+                        ).paddingSymmetric(horizontal: 16, vertical: 4),
+                        4.height,
+                        AppTextField(
+                          focus: ageFocus,
+                          nextFocus: languageFocus,
+                          controller: mAgeCont,
+                          textFieldType: TextFieldType.NAME,
+                          isValidationRequired: true,
+                          decoration: defaultInputDecoration(context,
+                              label: 'Enter your age'),
+                        ).paddingSymmetric(horizontal: 16, vertical: 4),
+                        16.height,
+                        Row(
+                          children: [
+                            Text('Your Native Language',
+                                style: secondaryTextStyle(
+                                    color: textPrimaryColorGlobal)),
+                            2.width,
+                            Text('*', style: secondaryTextStyle(color: redColor))
+                          ],
+                        ).paddingSymmetric(horizontal: 16, vertical: 4),
+                        4.height,
+                        DropdownSearch<String>(
+                          key: dropDownKey,
+                          items: (String filter, LoadProps? loadProps) async {
+                            if (filter.isEmpty) {
+                              return languageList;
+                            } else {
+                              return languageList
+                                  .where((language) => language
+                                      .toLowerCase()
+                                      .contains(filter.toLowerCase()))
+                                  .toList();
                             }
-                          });
-                        },
-                        focusNode: englishLevelFocus,
-                      ).paddingSymmetric(horizontal: 16, vertical: 4),
-                      40.height,
-                    ],
-                  );
-                },
-              ),
-            ],
+                          },
+                          selectedItem: selectedLanguage,
+                          popupProps: PopupProps.menu(
+                            showSearchBox: true,
+                            searchFieldProps: TextFieldProps(
+                              decoration:
+                                  InputDecoration(hintText: 'Search Language'),
+                            ),
+                            emptyBuilder: (context, searchEntry) {
+                              return Text('No Language available').center();
+                            },
+                          ),
+                          onChanged: (String? value) {
+                            setState(() {
+                              selectedLanguage = value!;
+                            });
+                          },
+                          decoratorProps: DropDownDecoratorProps(
+                            decoration: defaultInputDecoration(
+                                context), // Applying the decoration here
+                          ),
+                        ).paddingSymmetric(horizontal: 16, vertical: 4),
+                        16.height,
+                        Row(
+                          children: [
+                            Text('Your English Proficiency',
+                                style: secondaryTextStyle(
+                                    color: textPrimaryColorGlobal)),
+                            2.width,
+                            Text('*', style: secondaryTextStyle(color: redColor))
+                          ],
+                        ).paddingSymmetric(horizontal: 16, vertical: 4),
+                        4.height,
+                        DropdownButtonFormField(
+                          items: englishLevelList
+                              .map((value) => DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value, style: primaryTextStyle()),
+                                  ))
+                              .toList(),
+                          isExpanded: false,
+                          isDense: true,
+                          borderRadius: radius(),
+                          decoration: defaultInputDecoration(context),
+                          value: englishLevel,
+                          onChanged: (String? value) {
+                            setState(() {
+                              englishLevel = value!;
+                              if (selectedLanguage.isNotEmpty) {
+                                toastLeft(
+                                    durationInSeconds: 7,
+                                    bgColor: primaryColor,
+                                    textColor: Colors.white,
+                                    "You have chosen $englishLevel.\nAI will talk in your Native language & share few references in $selectedLanguage");
+                              }
+                            });
+                          },
+                          focusNode: englishLevelFocus,
+                        ).paddingSymmetric(horizontal: 16, vertical: 4),
+                        40.height,
+                      ],
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
+        floatingActionButton: AppButton(
+          text: 'Confirm',
+          padding: EdgeInsetsDirectional.all(0),
+          width: context.width() * 0.68,
+          height: context.height() * 0.056,
+          color: primaryColor,
+          onTap: () {
+            save();
+          },
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       ),
-      floatingActionButton: AppButton(
-        text: 'Confirm',
-        padding: EdgeInsetsDirectional.all(0),
-        width: context.width() * 0.68,
-        height: context.height() * 0.056,
-        color: primaryColor,
-        onTap: () {
-          save();
-        },
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }

@@ -197,35 +197,27 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
     }
   }
 
-void _dismissKeyboard() {
-    if (_focusNode.hasFocus) {
-      _focusNode.unfocus();
-    }
-  }
+
 
   Widget otpInputField() {
-    return GestureDetector(
-       onTap: _dismissKeyboard,
-      behavior: HitTestBehavior.opaque,
-      child: OTPTextField(
-        key: otpTextFieldKey,
-        pinLength: 6,
-        fieldWidth: context.width() * 0.1,
-        onChanged: (s) {
-          otpCode = s;
-      
-        },
-        onCompleted: (pin) {
-          otpCode = pin;
-          setState(() {
-      
-          },);
-          // submit();
-          // submit();
-          // UserDetails().launch(context);
-        },
-      ).center(),
-    );
+    return OTPTextField(
+      key: otpTextFieldKey,
+      pinLength: 6,
+      fieldWidth: context.width() * 0.1,
+      onChanged: (s) {
+        otpCode = s;
+    
+      },
+      onCompleted: (pin) {
+        otpCode = pin;
+        setState(() {
+    
+        },);
+        // submit();
+        // submit();
+        // UserDetails().launch(context);
+      },
+    ).center();
 
   }
 
@@ -264,152 +256,151 @@ void _dismissKeyboard() {
     }
   }
 
-  
-
-  @override
-  void dispose() {
-    _focusNode.dispose();
-    // _isFabVisible.dispose();
-    super.dispose();
+  void _dismissKeyboard() {
+    FocusScope.of(context).unfocus();
+     
   }
-
   
   @override
   Widget build(BuildContext context) {
-    return Observer(builder: (context) {
-      return Scaffold(
-        resizeToAvoidBottomInset: false,
-        appBar: appBarWidget('', context: context),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              Stack(
-                alignment: Alignment.topCenter,
-                children: [
-                  Container(
-                    height: context.height() * 0.28,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Color(0xff755be8),
-                          primaryColor,
-                        ],
-                        begin: Alignment.bottomLeft,
-                        end: Alignment.bottomRight,
+    return GestureDetector(
+       onTap: _dismissKeyboard,
+      behavior: HitTestBehavior.opaque,
+      child: Observer(builder: (context) {
+        return Scaffold(
+          resizeToAvoidBottomInset: false,
+          appBar: appBarWidget('', context: context),
+          body: SingleChildScrollView(
+            child: Column(
+              children: [
+                Stack(
+                  alignment: Alignment.topCenter,
+                  children: [
+                    Container(
+                      height: context.height() * 0.28,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Color(0xff755be8),
+                            primaryColor,
+                          ],
+                          begin: Alignment.bottomLeft,
+                          end: Alignment.bottomRight,
+                        ),
                       ),
                     ),
-                  ),
-                  Positioned(
-                    top: context.height() * 0.07,
-                    child: Column(
-                      children: [
-                        CircleAvatar(
-                          backgroundColor: Colors.black,
-                          radius: 30,
-                          child: Icon(
-                            Icons.password,
-                            size: 26,
-                            color: Colors.white,
+                    Positioned(
+                      top: context.height() * 0.07,
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                            backgroundColor: Colors.black,
+                            radius: 30,
+                            child: Icon(
+                              Icons.password,
+                              size: 26,
+                              color: Colors.white,
+                            ),
                           ),
-                        ),
-                        16.height,
-                        Text(
-                          'Enter OTP',
-                          style: boldTextStyle(
-                            color: Colors.white,
-                            size: 26,
+                          16.height,
+                          Text(
+                            'Enter OTP',
+                            style: boldTextStyle(
+                              color: Colors.white,
+                              size: 26,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              Stack(
-                children: [
-                  SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        50.height,
-                        Text('Verify Phone Number okk',
-                            style: boldTextStyle(size: 22)),
-                        Text('${'We have sent the code verification to'} ',
-                            // ''
-                            // '${widget.phoneNumber!}',
-                            style: secondaryTextStyle()),
-                        20.height,
-                        // PinFieldAutoFill(
-                        //   codeLength: 6,
-                        //   onCodeChanged: (code) {
-                        //     setState(() {
-                        //       otpCode = code; // Update the 1 code manually if needed
-                        //     });
-                        //   },
-                        // ),
-                        otpInputField(),
-                            
-                        20.height,
-                        StatefulBuilder(builder: (context, setState) {
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Text("Didn't receive OTP?",
-                                  style: primaryTextStyle()),
-                              GestureDetector(
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      _canResendOTP ? 'Resend' : '',
-                                      style: primaryTextStyle(color: primaryColor),
-                                    ).paddingLeft(4),
-                                    if (!_canResendOTP)
-                                      Container(
-                                        width: 120,
-                                        alignment: Alignment.center,
-                                        child: Text('$_start seconds',
-                                            style: primaryTextStyle(
-                                                color: primaryColor)),
-                                      ),
-                                  ],
+                  ],
+                ),
+                Stack(
+                  children: [
+                    SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          50.height,
+                          Text('Verify Phone Number okk',
+                              style: boldTextStyle(size: 22)),
+                          Text('${'We have sent the code verification to'} ',
+                              // ''
+                              // '${widget.phoneNumber!}',
+                              style: secondaryTextStyle()),
+                          20.height,
+                          // PinFieldAutoFill(
+                          //   codeLength: 6,
+                          //   onCodeChanged: (code) {
+                          //     setState(() {
+                          //       otpCode = code; // Update the 1 code manually if needed
+                          //     });
+                          //   },
+                          // ),
+                          otpInputField(),
+                              
+                          20.height,
+                          StatefulBuilder(builder: (context, setState) {
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Text("Didn't receive OTP?",
+                                    style: primaryTextStyle()),
+                                GestureDetector(
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        _canResendOTP ? 'Resend' : '',
+                                        style: primaryTextStyle(color: primaryColor),
+                                      ).paddingLeft(4),
+                                      if (!_canResendOTP)
+                                        Container(
+                                          width: 120,
+                                          alignment: Alignment.center,
+                                          child: Text('$_start seconds',
+                                              style: primaryTextStyle(
+                                                  color: primaryColor)),
+                                        ),
+                                    ],
+                                  ),
+                                  onTap: () {
+                                    if (_canResendOTP) {
+                                      resendOtpFunction();
+                                      setState(() {});
+                                    }
+                                  },
                                 ),
-                                onTap: () {
-                                  if (_canResendOTP) {
-                                    resendOtpFunction();
-                                    setState(() {});
-                                  }
-                                },
-                              ),
-                            
-                            ],
-                          );
-                        }),
-                        90.height,
-                      ],
-                    ).paddingSymmetric(horizontal: 16),
-                  ),
-                  Observer(
-                    builder: (context) {
-                      return Loader().center().visible(appStore.isLoading);
-                    },
-                  )
-                ],
-              ),
-            ],
+                              
+                              ],
+                            );
+                          }),
+                          90.height,
+                        ],
+                      ).paddingSymmetric(horizontal: 16),
+                    ),
+                    Observer(
+                      builder: (context) {
+                        return Loader().center().visible(appStore.isLoading);
+                      },
+                    )
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
-        floatingActionButton: AppButton(
-          text: 'Confirm',
-          padding: EdgeInsetsDirectional.all(0),
-          width: context.width() * 0.68,
-          height: context.height() * 0.056,
-          color: primaryColor,
-          onTap: () {
-            submit();
-          },
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      );
-    });
+          floatingActionButton: AppButton(
+            text: 'Confirm',
+            padding: EdgeInsetsDirectional.all(0),
+            width: context.width() * 0.68,
+            height: context.height() * 0.056,
+            color: primaryColor,
+            onTap: () {
+              submit();
+            },
+          ),
+          floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        );
+      }),
+    );
   }
 }

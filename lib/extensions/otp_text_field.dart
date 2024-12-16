@@ -100,6 +100,8 @@ class OTPTextFieldState extends State<OTPTextField>  {
     );
   }
 
+
+
   @override
   void dispose() {
     super.dispose();
@@ -107,6 +109,7 @@ class OTPTextFieldState extends State<OTPTextField>  {
       element.textEditingController?.dispose();
       element.focusNode?.dispose();
     }
+    
   }
 
   @override
@@ -159,14 +162,14 @@ class OTPTextFieldState extends State<OTPTextField>  {
                 moveToNextFocus(index);
               }
               widget.onChanged?.call(concatText);
-
+    
               setState(() {});
             },
             onTap: () async {
               context.unFocus(list[index].focusNode!);
               await 1.milliseconds.delay;
               context.requestFocus(list[index].focusNode!);
-
+    
               setTextSelection(index);
             },
           ),

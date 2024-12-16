@@ -149,187 +149,194 @@ class _TaboogamechatPage extends State<TaboogamechatPage> with WidgetsBindingObs
     _previousMessageCount = messageCount;
   }
 
+ void _dismissKeyboard() {
+    FocusScope.of(context).unfocus();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // resizeToAvoidBottomInset: false,
-
-      appBar: backCustomAppBar(
-        backButtonshow: true,
-        centerTile: false,
-        onPressed: () {
-          Navigator.pop(context,true);
-        },
-        title: "Taboo",
-      ),
-      body: WillPopScope(
-        onWillPop: () async {
-
-          return true;
-        },
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Column(
-              children: [
-                // SizedBox(height: 10),
-                // EquiDistantRow(
-                //   playstatus: true,
-                //   feedbackstatus: false,
-                //   practicestatus: false,
-                // ),
-                // const SizedBox(height: 10),
-                // const Divider(
-                //   height: 1,
-                //   color: Color(0xffc1c1c1),
-                // ),
-                // const SizedBox(height: 10),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Column(
-                      children: [
-                        // if (isFirst)
-                        //   Padding(
-                        //     padding: EdgeInsets.only(left: 5, right: 50),
-                        //     child: Consumer<TabooGameChatPageVM>(
-                        //       builder: (context, vm, child) {
-                        //         return Row(
-                        //           crossAxisAlignment: CrossAxisAlignment.start,
-                        //           children: [
-                        //
-                        //             // Expanded(
-                        //             //   child: Container(
-                        //             //     decoration: BoxDecoration(
-                        //             //       border: Border.all(
-                        //             //         width: 2,
-                        //             //         color: primaryColor,
-                        //             //       ),
-                        //             //       borderRadius: BorderRadius.all(
-                        //             //         Radius.circular(10.0),
-                        //             //       ),
-                        //             //     ),
-                        //             //     child: Padding(
-                        //             //       padding: const EdgeInsets.symmetric(
-                        //             //         horizontal: 10.0,
-                        //             //         vertical: 10.0,
-                        //             //       ),
-                        //             //       child: Column(
-                        //             //
-                        //             //         children: [
-                        //             //           if (vm.initialdata != null && vm.initialdata!.isNotEmpty)
-                        //             //
-                        //             //             Row(
-                        //             //             crossAxisAlignment:
-                        //             //             CrossAxisAlignment.start,
-                        //             //             children: [
-                        //             //               MyText(
-                        //             //                 text:
-                        //             //                     "${vm.initialdata.keys.first}:",
-                        //             //                 fontWeight: FontWeight.w600,
-                        //             //                 fontSize: 15,
-                        //             //               ),
-                        //             //               SizedBox(width: 2),
-                        //             //               Expanded(
-                        //             //                 child: MyText(
-                        //             //                   text:
-                        //             //                       "${vm.initialdata.values.first}",
-                        //             //                   fontWeight: FontWeight.w400,
-                        //             //                   fontSize: 15,
-                        //             //                 ),
-                        //             //               )
-                        //             //             ],
-                        //             //           ),
-                        //             //           if (vm.initialdata != null && vm.initialdata!.isNotEmpty)
-                        //             //
-                        //             //             Row(
-                        //             //             crossAxisAlignment:
-                        //             //                 CrossAxisAlignment.start,
-                        //             //             children: [
-                        //             //               MyText(
-                        //             //                 text:
-                        //             //                     "${vm.initialdata.keys.last}:",
-                        //             //                 fontWeight: FontWeight.w600,
-                        //             //                 fontSize: 15,
-                        //             //               ),
-                        //             //               SizedBox(width: 2),
-                        //             //               Flexible(
-                        //             //                 child: Text(
-                        //             //                   "${vm.initialdata.values.last}"
-                        //             //                       .replaceAll(
-                        //             //                           '\u200b', ""),
-                        //             //                   style: primaryTextStyle(
-                        //             //                     weight: FontWeight.w400,
-                        //             //                     size: 15,
-                        //             //                   ),
-                        //             //                   maxLines: null,
-                        //             //                 ),
-                        //             //               ),
-                        //             //             ],
-                        //             //           )
-                        //             //
-                        //             //         ],
-                        //             //       ),
-                        //             //     ),
-                        //             //   ),
-                        //             // ),
-                        //             //
-                        //           ],
-                        //         );
-                        //       },
-                        //     ),
-                        //   ),
-                        SizedBox(height: 10),
-                        Expanded(
-                          child: Consumer<TabooGameChatPageVM>(
-                            builder: (context, vm, child) {
-                              WidgetsBinding.instance.addPostFrameCallback((_) {
-                                _scrollToBottomIfNeeded(vm.dynamicData.length);
-                              });
-
-                              return ListView.builder(
-                                controller: _scrollController,
-                                itemCount: vm.dynamicData.length,
-                                itemBuilder: (context, index) {
-                                  var data = vm.dynamicData[index];
-                                  return data['server'] == 0
-                                      ? Align(
-                                          alignment: Alignment.centerRight,
-                                          child: _buildMessageBubble(
-                                              data['data'], true),
-                                        )
-                                      : Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: _buildMessageBubble(
-                                              data['data'].toString(), false),
-                                        );
-                                },
-                              );
-                            },
+    return GestureDetector(
+      onTap: _dismissKeyboard,
+      behavior: HitTestBehavior.opaque,
+      child: Scaffold(
+        // resizeToAvoidBottomInset: false,
+      
+        appBar: backCustomAppBar(
+          backButtonshow: true,
+          centerTile: false,
+          onPressed: () {
+            Navigator.pop(context,true);
+          },
+          title: "Taboo",
+        ),
+        body: WillPopScope(
+          onWillPop: () async {
+      
+            return true;
+          },
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Column(
+                children: [
+                  // SizedBox(height: 10),
+                  // EquiDistantRow(
+                  //   playstatus: true,
+                  //   feedbackstatus: false,
+                  //   practicestatus: false,
+                  // ),
+                  // const SizedBox(height: 10),
+                  // const Divider(
+                  //   height: 1,
+                  //   color: Color(0xffc1c1c1),
+                  // ),
+                  // const SizedBox(height: 10),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Column(
+                        children: [
+                          // if (isFirst)
+                          //   Padding(
+                          //     padding: EdgeInsets.only(left: 5, right: 50),
+                          //     child: Consumer<TabooGameChatPageVM>(
+                          //       builder: (context, vm, child) {
+                          //         return Row(
+                          //           crossAxisAlignment: CrossAxisAlignment.start,
+                          //           children: [
+                          //
+                          //             // Expanded(
+                          //             //   child: Container(
+                          //             //     decoration: BoxDecoration(
+                          //             //       border: Border.all(
+                          //             //         width: 2,
+                          //             //         color: primaryColor,
+                          //             //       ),
+                          //             //       borderRadius: BorderRadius.all(
+                          //             //         Radius.circular(10.0),
+                          //             //       ),
+                          //             //     ),
+                          //             //     child: Padding(
+                          //             //       padding: const EdgeInsets.symmetric(
+                          //             //         horizontal: 10.0,
+                          //             //         vertical: 10.0,
+                          //             //       ),
+                          //             //       child: Column(
+                          //             //
+                          //             //         children: [
+                          //             //           if (vm.initialdata != null && vm.initialdata!.isNotEmpty)
+                          //             //
+                          //             //             Row(
+                          //             //             crossAxisAlignment:
+                          //             //             CrossAxisAlignment.start,
+                          //             //             children: [
+                          //             //               MyText(
+                          //             //                 text:
+                          //             //                     "${vm.initialdata.keys.first}:",
+                          //             //                 fontWeight: FontWeight.w600,
+                          //             //                 fontSize: 15,
+                          //             //               ),
+                          //             //               SizedBox(width: 2),
+                          //             //               Expanded(
+                          //             //                 child: MyText(
+                          //             //                   text:
+                          //             //                       "${vm.initialdata.values.first}",
+                          //             //                   fontWeight: FontWeight.w400,
+                          //             //                   fontSize: 15,
+                          //             //                 ),
+                          //             //               )
+                          //             //             ],
+                          //             //           ),
+                          //             //           if (vm.initialdata != null && vm.initialdata!.isNotEmpty)
+                          //             //
+                          //             //             Row(
+                          //             //             crossAxisAlignment:
+                          //             //                 CrossAxisAlignment.start,
+                          //             //             children: [
+                          //             //               MyText(
+                          //             //                 text:
+                          //             //                     "${vm.initialdata.keys.last}:",
+                          //             //                 fontWeight: FontWeight.w600,
+                          //             //                 fontSize: 15,
+                          //             //               ),
+                          //             //               SizedBox(width: 2),
+                          //             //               Flexible(
+                          //             //                 child: Text(
+                          //             //                   "${vm.initialdata.values.last}"
+                          //             //                       .replaceAll(
+                          //             //                           '\u200b', ""),
+                          //             //                   style: primaryTextStyle(
+                          //             //                     weight: FontWeight.w400,
+                          //             //                     size: 15,
+                          //             //                   ),
+                          //             //                   maxLines: null,
+                          //             //                 ),
+                          //             //               ),
+                          //             //             ],
+                          //             //           )
+                          //             //
+                          //             //         ],
+                          //             //       ),
+                          //             //     ),
+                          //             //   ),
+                          //             // ),
+                          //             //
+                          //           ],
+                          //         );
+                          //       },
+                          //     ),
+                          //   ),
+                          SizedBox(height: 10),
+                          Expanded(
+                            child: Consumer<TabooGameChatPageVM>(
+                              builder: (context, vm, child) {
+                                WidgetsBinding.instance.addPostFrameCallback((_) {
+                                  _scrollToBottomIfNeeded(vm.dynamicData.length);
+                                });
+      
+                                return ListView.builder(
+                                  controller: _scrollController,
+                                  itemCount: vm.dynamicData.length,
+                                  itemBuilder: (context, index) {
+                                    var data = vm.dynamicData[index];
+                                    return data['server'] == 0
+                                        ? Align(
+                                            alignment: Alignment.centerRight,
+                                            child: _buildMessageBubble(
+                                                data['data'], true),
+                                          )
+                                        : Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: _buildMessageBubble(
+                                                data['data'].toString(), false),
+                                          );
+                                  },
+                                );
+                              },
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                _buildMessageInput(context),
-              ],
-            ),
-            Positioned(
-              bottom: 20,
-              right: 220,
-              child: Observer(
-                builder: (context) {
-                  return Lottie.asset(
-                    'assets/lottiefile/loader.json',
-                    height: 180,
-                    fit: BoxFit.contain,
-                  ).center().visible(appStore.isLoading);
-                },
+                  _buildMessageInput(context),
+                ],
               ),
-            ),
-          ],
+              Positioned(
+                bottom: 20,
+                right: 220,
+                child: Observer(
+                  builder: (context) {
+                    return Lottie.asset(
+                      'assets/lottiefile/loader.json',
+                      height: 180,
+                      fit: BoxFit.contain,
+                    ).center().visible(appStore.isLoading);
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
