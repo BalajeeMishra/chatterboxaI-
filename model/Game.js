@@ -13,7 +13,8 @@ const gameSchema = new mongoose.Schema({
   },
   description:String,
   order:{
-    type:Number
+    type:Number,
+    unique:true
   },
   status:{
     type:String, 

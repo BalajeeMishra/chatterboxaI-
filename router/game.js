@@ -28,8 +28,8 @@ router.post("/new-game",async(req,res,next)=>{
 
 
 router.get("/allgame",async(req,res,next)=>{
-  try{
-  const allGame = await Game.find({status:"active"});
+  try{    
+  const allGame = await Game.find({status:"active"}).sort({ order: 1 });
   if(allGame.length == 0){
     return res.status(200).json({message:"No Game Found"})
   }
