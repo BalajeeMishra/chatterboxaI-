@@ -471,287 +471,299 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
           ),
         ),
       ),
-      body: Flex(
-        direction: Axis.vertical,
-        children: [
-          Expanded(
-              child: Padding(
-            padding: EdgeInsets.only(bottom: 15.0),
-            child: Column(
-              children: [
-                Expanded(
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 26,
-                      ),
-                      Row(
-                        mainAxisAlignment: !apiCalled
-                            ? MainAxisAlignment.center
-                            : MainAxisAlignment.spaceBetween,
-                        children: [
-                          if (apiCalled && !isKeyBoardTapped)
-                            Column(
-                              children: [
-                                IconButton(
-                                  icon: Icon(
-                                    Icons.fast_rewind,
-                                    size: 26,
-                                  ),
-                                  onPressed: () => _onDecreaseRatePressed(),
-                                ),
-                                Text(
-                                  "Slow",
-                                  style: secondaryTextStyle(size: 12),
-                                ).onTap(() {
-                                  _onDecreaseRatePressed();
-                                })
-                              ],
-                            ),
-                          if (!isKeyBoardTapped)
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(27),
-                              child: Image.asset(
-                                  fit: BoxFit.cover,
-                                  height: 195,
-                                  width: 246,
-                                  ic_transparent_girlImage2),
-                            ),
-                          if (apiCalled && !isKeyBoardTapped)
-                            Column(
-                              children: [
-                                IconButton(
-                                  icon: Icon(
-                                    Icons.fast_forward,
-                                    size: 26,
-                                  ),
-                                  onPressed: () => _onIncreaseRatePressed(),
-                                ),
-                                Text(
-                                  "Fast",
-                                  style: secondaryTextStyle(size: 12),
-                                ).onTap(() {
-                                  _onIncreaseRatePressed();
-                                })
-                              ],
-                            ),
-                        ],
-                      ).paddingOnly(left: 8, right: 8),
-                      SizedBox(
-                        height: 15,
-                      ),
-                      if (isKeyBoardTapped)
-                        _buildMessageInput(context).expand(),
-                      if (isFirstTime)
-                        LoadingWidget(
-                          message: "Listening...",
+      body: WillPopScope(
+        onWillPop: () async {
+          if (isKeyBoardTapped) {
+            isKeyBoardTapped = false;
+
+            setState(() {});
+          } else {
+            pop();
+          }
+          return false;
+        },
+        child: Flex(
+          direction: Axis.vertical,
+          children: [
+            Expanded(
+                child: Padding(
+              padding: EdgeInsets.only(bottom: 15.0),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: 26,
                         ),
-                      if (!apiCalled && !isLoading)
                         Row(
+                          mainAxisAlignment: !apiCalled
+                              ? MainAxisAlignment.center
+                              : MainAxisAlignment.spaceBetween,
                           children: [
-                            Expanded(
-                              child: MyText(
-                                text: _lastWords,
-                                color: Color(0xff000000),
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400,
+                            if (apiCalled && !isKeyBoardTapped)
+                              Column(
+                                children: [
+                                  IconButton(
+                                    icon: Icon(
+                                      Icons.fast_rewind,
+                                      size: 26,
+                                    ),
+                                    onPressed: () => _onDecreaseRatePressed(),
+                                  ),
+                                  Text(
+                                    "Slow",
+                                    style: secondaryTextStyle(size: 12),
+                                  ).onTap(() {
+                                    _onDecreaseRatePressed();
+                                  })
+                                ],
                               ),
-                            ),
+                            if (!isKeyBoardTapped)
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(27),
+                                child: Image.asset(
+                                    fit: BoxFit.cover,
+                                    height: 195,
+                                    width: 246,
+                                    ic_transparent_girlImage2),
+                              ),
+                            if (apiCalled && !isKeyBoardTapped)
+                              Column(
+                                children: [
+                                  IconButton(
+                                    icon: Icon(
+                                      Icons.fast_forward,
+                                      size: 26,
+                                    ),
+                                    onPressed: () => _onIncreaseRatePressed(),
+                                  ),
+                                  Text(
+                                    "Fast",
+                                    style: secondaryTextStyle(size: 12),
+                                  ).onTap(() {
+                                    _onIncreaseRatePressed();
+                                  })
+                                ],
+                              ),
                           ],
-                        ).paddingSymmetric(horizontal: 24, vertical: 14),
-                      if (apiCalled && !isKeyBoardTapped)
-                        Consumer<PlayTabooScreenVM>(
-                          builder: (context, vm, child) {
-                            return vm.tabooGameChatPageModel.response == null
-                                ? LoadingWidget(
-                                    message: message,
-                                  )
-                                : Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 28.0, vertical: 8),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                            child: startListening
-                                                ? MyText(
-                                                    text: _lastWords,
-                                                    color: Color(0xff000000),
-                                                    fontSize: 18,
-                                                    fontWeight: FontWeight.w400,
-                                                  )
-                                                : (vm
-                                                                .tabooGameChatPageModel
-                                                                .response!
-                                                                .aiResponse!
-                                                                .last ==
-                                                            null ||
-                                                        vm
-                                                                .tabooGameChatPageModel
-                                                                .response!
-                                                                .aiResponse!
-                                                                .last ==
-                                                            "")
-                                                    ? Text("")
-                                                    : SizedBox(
-                                                        height:
-                                                            context.height() *
-                                                                0.440,
-                                                        child:
-                                                            SingleChildScrollView(
-                                                          child:
-                                                              // Text(vm.tabooGameChatPageModel.response!.aiResponse!.last)
-                                                              RichText(
-                                                            text: TextSpan(
-                                                              children: _buildBoldText(vm
-                                                                  .tabooGameChatPageModel
-                                                                  .response!
-                                                                  .aiResponse!
-                                                                  .last),
-                                                              style:
-                                                                  primaryTextStyle(
-                                                                          size:
-                                                                              16)
-                                                                      .copyWith(
-                                                                height: 1.5,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      )),
-                                      ],
-                                    ),
-                                  );
-                          },
+                        ).paddingOnly(left: 8, right: 8),
+                        SizedBox(
+                          height: 15,
                         ),
-                    ],
-                  ),
-                ),
-                if (!isKeyBoardTapped)
-                  Center(
-                    child: startListening
-                        ? listeningWidget()
-                        : Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                        if (isKeyBoardTapped)
+                          _buildMessageInput(context).expand(),
+                        if (isFirstTime)
+                          LoadingWidget(
+                            message: "Listening...",
+                          ),
+                        if (!apiCalled && !isLoading)
+                          Row(
                             children: [
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    _lastWords = appStore.lastWords;
-
-                                    isMuted = !isMuted;
-                                    if (isMuted) {
-                                      stopSpeaking();
-                                    } else if (_lastWords.isNotEmpty &&
-                                        _lastSpokenIndex < _lastWords.length) {
-                                      speakText(_lastWords
-                                          .substring(_lastSpokenIndex));
-                                    }
-                                  });
-                                },
-                                child: Column(
-                                  children: [
-                                    Icon(
-                                      !isMuted
-                                          ? Icons.volume_off
-                                          : Icons.volume_up,
-                                      size: 36,
-                                    ),
-                                    MyText(
-                                      text: !isMuted ? "Mute" : "Unmute",
-                                      fontSize: 12,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(
-                                width: !isMuted ? 29 : 22,
-                              ),
-                              // GestureDetector(
-                              //   onTap: () {
-                              //     _initSpeech();
-                              //     apiCalled = false;
-                              //     isFirstTime = true;
-                              //
-                              //     _lastWords = "";
-                              //     setState(() {});
-                              //   },
-                              //   child: Column(
-                              //     children: [
-                              //       Icon(
-                              //         Icons.keyboard_voice,
-                              //         size: 36,
-                              //       ),
-                              //       MyText(
-                              //         text: "Speak",
-                              //         fontSize: 12,
-                              //       )
-                              //     ],
-                              //   ),
-                              // ),
-                              //
-                              // SizedBox(
-                              //   width: 24,
-                              // ),
-                              GestureDetector(
-                                onTap: () {
-                                  muteKeyboardSounds();
-                                  isKeyBoardTapped = true;
-
-                                  _focusNode.requestFocus();
-                                  stopSpeaking();
-
-                                  _lastWords = "";
-                                  setState(() {});
-                                },
-                                child: Column(
-                                  children: [
-                                    Icon(
-                                      Icons.keyboard_voice,
-                                      size: 44,
-                                      color: primaryColor,
-                                    ),
-                                    MyText(
-                                      text: "Keyboard Audio",
-                                      fontSize: 12,
-                                    )
-                                  ],
-                                ),
-                              ),
-                              SizedBox(
-                                width: 24,
-                              ),
-                              GestureDetector(
-                                onTap: () async {
-                                  stopSpeaking();
-                                  final bool? res = await TaboogamechatPage(
-                                    widget.allGameModel,
-                                    widget.index,
-                                    widget.sessionId,
-                                  ).launch(context);
-                                  if (res == true) {
-                                    allConversationApiCall();
-                                  } else {}
-                                },
-                                child: Column(
-                                  children: [
-                                    Icon(
-                                      Icons.chat,
-                                      size: 36,
-                                    ),
-                                    MyText(
-                                      text: "Write",
-                                      fontSize: 12,
-                                    )
-                                  ],
+                              Expanded(
+                                child: MyText(
+                                  text: _lastWords,
+                                  color: Color(0xff000000),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
                                 ),
                               ),
                             ],
-                          ).paddingSymmetric(horizontal: 20),
-                  )
-              ],
-            ),
-          )),
-        ],
+                          ).paddingSymmetric(horizontal: 24, vertical: 14),
+                        if (apiCalled && !isKeyBoardTapped)
+                          Consumer<PlayTabooScreenVM>(
+                            builder: (context, vm, child) {
+                              return vm.tabooGameChatPageModel.response == null
+                                  ? LoadingWidget(
+                                      message: message,
+                                    )
+                                  : Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 28.0, vertical: 8),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                              child: startListening
+                                                  ? MyText(
+                                                      text: _lastWords,
+                                                      color: Color(0xff000000),
+                                                      fontSize: 18,
+                                                      fontWeight: FontWeight.w400,
+                                                    )
+                                                  : (vm
+                                                                  .tabooGameChatPageModel
+                                                                  .response!
+                                                                  .aiResponse!
+                                                                  .last ==
+                                                              null ||
+                                                          vm
+                                                                  .tabooGameChatPageModel
+                                                                  .response!
+                                                                  .aiResponse!
+                                                                  .last ==
+                                                              "")
+                                                      ? Text("")
+                                                      : SizedBox(
+                                                          height:
+                                                              context.height() *
+                                                                  0.440,
+                                                          child:
+                                                              SingleChildScrollView(
+                                                            child:
+                                                                // Text(vm.tabooGameChatPageModel.response!.aiResponse!.last)
+                                                                RichText(
+                                                              text: TextSpan(
+                                                                children: _buildBoldText(vm
+                                                                    .tabooGameChatPageModel
+                                                                    .response!
+                                                                    .aiResponse!
+                                                                    .last),
+                                                                style:
+                                                                    primaryTextStyle(
+                                                                            size:
+                                                                                16)
+                                                                        .copyWith(
+                                                                  height: 1.5,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        )),
+                                        ],
+                                      ),
+                                    );
+                            },
+                          ),
+                      ],
+                    ),
+                  ),
+                  if (!isKeyBoardTapped)
+                    Center(
+                      child: startListening
+                          ? listeningWidget()
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      _lastWords = appStore.lastWords;
+
+                                      isMuted = !isMuted;
+                                      if (isMuted) {
+                                        stopSpeaking();
+                                      } else if (_lastWords.isNotEmpty &&
+                                          _lastSpokenIndex < _lastWords.length) {
+                                        speakText(_lastWords
+                                            .substring(_lastSpokenIndex));
+                                      }
+                                    });
+                                  },
+                                  child: Column(
+                                    children: [
+                                      Icon(
+                                        !isMuted
+                                            ? Icons.volume_off
+                                            : Icons.volume_up,
+                                        size: 36,
+                                      ),
+                                      MyText(
+                                        text: !isMuted ? "Mute" : "Unmute",
+                                        fontSize: 12,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: !isMuted ? 29 : 22,
+                                ),
+                                // GestureDetector(
+                                //   onTap: () {
+                                //     _initSpeech();
+                                //     apiCalled = false;
+                                //     isFirstTime = true;
+                                //
+                                //     _lastWords = "";
+                                //     setState(() {});
+                                //   },
+                                //   child: Column(
+                                //     children: [
+                                //       Icon(
+                                //         Icons.keyboard_voice,
+                                //         size: 36,
+                                //       ),
+                                //       MyText(
+                                //         text: "Speak",
+                                //         fontSize: 12,
+                                //       )
+                                //     ],
+                                //   ),
+                                // ),
+                                //
+                                // SizedBox(
+                                //   width: 24,
+                                // ),
+                                GestureDetector(
+                                  onTap: () {
+                                    muteKeyboardSounds();
+                                    isKeyBoardTapped = true;
+
+                                    _focusNode.requestFocus();
+                                    stopSpeaking();
+
+                                    _lastWords = "";
+                                    setState(() {});
+                                  },
+                                  child: Column(
+                                    children: [
+                                      Icon(
+                                        Icons.keyboard_voice,
+                                        size: 44,
+                                        color: primaryColor,
+                                      ),
+                                      MyText(
+                                        text: "Keyboard Audio",
+                                        fontSize: 12,
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 24,
+                                ),
+                                GestureDetector(
+                                  onTap: () async {
+                                    stopSpeaking();
+                                    final bool? res = await TaboogamechatPage(
+                                      widget.allGameModel,
+                                      widget.index,
+                                      widget.sessionId,
+                                    ).launch(context);
+                                    if (res == true) {
+                                      allConversationApiCall();
+                                    } else {}
+                                  },
+                                  child: Column(
+                                    children: [
+                                      Icon(
+                                        Icons.chat,
+                                        size: 36,
+                                      ),
+                                      MyText(
+                                        text: "Write",
+                                        fontSize: 12,
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ).paddingSymmetric(horizontal: 20),
+                    )
+                ],
+              ),
+            )),
+          ],
+        ),
       ),
     );
   }

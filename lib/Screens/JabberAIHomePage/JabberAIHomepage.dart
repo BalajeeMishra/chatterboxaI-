@@ -103,7 +103,10 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
           content: Text('Tap back again to leave',
               style: primaryTextStyle(color: Colors.white)),
         ),
-        child: WillPopScope(
+        child:
+
+
+        WillPopScope(
           onWillPop: () async {
             SystemNavigator.pop();
             return false;
