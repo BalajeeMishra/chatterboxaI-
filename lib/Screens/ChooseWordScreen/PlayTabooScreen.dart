@@ -69,7 +69,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   String message = '';
   int _lastSpokenIndex = 0;
   String selectedLanguage = 'English';
-  bool _isListening = false;
+  // bool _isListening = false;
   bool isSpeechInitialized = false;
   bool isKeyBoardTapped = false;
   final FocusNode _focusNode = FocusNode();
@@ -90,14 +90,22 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
         widget.allGameModel,
         widget.index,
         true,
+        isMuted
       );
     });
     startListening = false;
     apiCalled = true;
-    if (getStringAsync(USER_NATIVE_LANGUAGE).isNotEmpty &&
-        getStringAsync(USER_ENGLISH_PROFICIENCY) == "Beginner") {
-      selectedLanguage = getStringAsync(USER_NATIVE_LANGUAGE);
-    }
+    // if (getStringAsync(USER_NATIVE_LANGUAGE).isNotEmpty) {
+    //   selectedLanguage = getStringAsync(USER_NATIVE_LANGUAGE);
+    //   setTtsLanguage(selectedLanguage);
+    // }else{
+    //   await flutterTts.setLanguage('en-US');
+    //
+    // }
+
+    // else{
+    //   selectedLanguage =
+    // }
     appStore.setLastWords("");
     setState(() {});
   }
@@ -125,6 +133,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
   Future<void> allConversationApiCall() async {
     appStore.setLoading(true);
+    setValue( IS_MUTE ,isMuted);
 
     await allConversationApi(widget.sessionId).then((value) async {
       appStore.setLoading(false);
@@ -380,7 +389,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     Provider.of<PlayTabooScreenVM>(context, listen: false)
         .seInitialValue(widget.allGameModel, widget.index, widget.sessionId);
     Provider.of<PlayTabooScreenVM>(context, listen: false).chatPageAPI(context,
-        ques, widget.sessionId, widget.allGameModel, widget.index, false);
+        ques, widget.sessionId, widget.allGameModel, widget.index, false,isMuted);
     // configureTts();
     apiCalled = true;
 
@@ -392,7 +401,9 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
       });
     });
     // unmuteSystemSounds();
+ isMuted=getBoolAsync(IS_MUTE);
 
+ print("ISMUTED ==>"+isMuted.toString());
     setState(() {});
   }
 
@@ -406,7 +417,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     Provider.of<PlayTabooScreenVM>(context, listen: false)
         .seInitialValue(widget.allGameModel, widget.index, widget.sessionId);
     Provider.of<PlayTabooScreenVM>(context, listen: false).chatPageAPI(context,
-        ques, widget.sessionId, widget.allGameModel, widget.index, false);
+        ques, widget.sessionId, widget.allGameModel, widget.index, false,isMuted);
     // configureTts();
     apiCalled = true;
     _lastWords = appStore.lastWords;
@@ -416,6 +427,9 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
         message = 'Thinking...';
       });
     });
+    isMuted=getBoolAsync(IS_MUTE);
+    print("ISMUTED ==>"+isMuted.toString());
+
     // unmuteSystemSounds();
     setState(() {});
   }
@@ -649,7 +663,10 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                     setState(() {
                                       _lastWords = appStore.lastWords;
 
+                                      // isMuted= getBoolAsync(IS_MUTE);
+
                                       isMuted = !isMuted;
+setValue(IS_MUTE, isMuted);
                                       if (isMuted) {
                                         stopSpeaking();
                                       } else if (_lastWords.isNotEmpty &&
@@ -712,6 +729,9 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                     stopSpeaking();
 
                                     _lastWords = "";
+                                    if (isMuted) {
+                                      stopSpeaking();
+                                    }
                                     setState(() {});
                                   },
                                   child: Column(
@@ -741,6 +761,9 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                     ).launch(context);
                                     if (res == true) {
                                       allConversationApiCall();
+                                      if (isMuted) {
+                                        stopSpeaking();
+                                      }
                                     } else {}
                                   },
                                   child: Column(
@@ -839,6 +862,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
             GestureDetector(
               onTap: () {
                 // _stopListening();
+                // isMuted= getBoolAsync(IS_MUTE);
 
                 setState(() {
                   ques = _lastWords;

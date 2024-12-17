@@ -31,6 +31,8 @@ class PlayTabooScreenVM extends ChangeNotifier {
   bool apiHitStatus = false;
   List<Map<String, dynamic>> dynamicDta = [];
   bool isFirstCall = true;
+  bool isMuted = false;
+
   String selectedLanguage = 'English';
 
   var dataToPass;
@@ -94,7 +96,11 @@ class PlayTabooScreenVM extends ChangeNotifier {
       String sessionId,
       AllGameModel allGameModel,
       int index,
-      bool isFirst) async {
+      bool isFirst,
+      bool isMute,
+      ) async {
+   isMuted= isMute ;
+   print("isMuted"+isMuted.toString());
     isFirstCall = isFirst;
     if (dataGet == "") {
       MySnackBar.showSnackBar(context, "Please speak first!");
@@ -138,7 +144,13 @@ class PlayTabooScreenVM extends ChangeNotifier {
           } else {
             isFirstCall = false;
           }
-          print("Is First call$isFirstCall");
+          // print("Is First call$isFirstCall");
+          print("Is Mute ??/$isMuted");
+
+          if(isMuted){
+            stopSpeaking();
+
+          }
             break;
         // tabooGameChatPageModel = response.data!;
         // notifyListeners();
@@ -237,10 +249,13 @@ class PlayTabooScreenVM extends ChangeNotifier {
   Future<void> configureTts() async {
     if (getStringAsync(USER_NATIVE_LANGUAGE).isNotEmpty) {
       selectedLanguage = getStringAsync(USER_NATIVE_LANGUAGE);
+      setTtsLanguage(selectedLanguage);
+    }else{
+      await flutterTts.setLanguage('en-US');
+
     }
     print("Selectd Language is ==>"+selectedLanguage.toString());
-    setTtsLanguage(selectedLanguage);
-    // await flutterTts.setLanguage('en-US');
+
     await flutterTts.setSpeechRate(0.4);
     await flutterTts.setVolume(1.0);
   }
@@ -250,6 +265,10 @@ class PlayTabooScreenVM extends ChangeNotifier {
     appStore.setLastWords(text);
 
     await flutterTts.speak(updatedText);
+  }
+
+  Future<void> stopSpeaking() async {
+    await flutterTts.stop();
   }
 }
 
