@@ -2,6 +2,7 @@ import {Router} from "express";
 import User from "../model/User.js";
 import jwtHelper  from "../helper/jwt_helper.js";
 import UserDataLog from "../model/Userdata.js";
+
 const router = Router();
 
 
@@ -21,7 +22,23 @@ catch(err){
   }
   throw err;
 }
-})
+});
+
+
+
+
+router.put("/changeproficiency",jwtHelper.verifyToken,async(req,res,next)=>{
+  try{
+  const userId = req.userId;
+  const {nativeLanguage,engprolevel } = req.body; 
+  const user = await User.findByIdAndUpdate(userId, {nativeLanguage,engprolevel},{new:true});
+  return res.status(200).json({user});
+}
+catch(err){
+  throw err;
+}
+});
+
 
 router.post("/checkphoneno",async(req,res,next)=>{
   try{
