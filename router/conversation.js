@@ -19,7 +19,7 @@ const router = Router();
 const apiKey = fs.readFileSync("OpenAiKey.txt", "utf-8").trim();
 
 
-
+// gpt-4o
 const llm = new ChatOpenAI({ temperature: 0, apiKey: apiKey, modelName: "gpt-4o-mini" });
 
 
