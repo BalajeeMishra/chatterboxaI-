@@ -26,8 +26,8 @@ const userSessions = {};
 const userSessionsfor ={};
 
 function getUserSessionfor(session, prompt) {
-  if (!userSessions[session]) {
-      userSessions[session] = {
+  if (!userSessionsfor[session]) {
+      userSessionsfor[session] = {
         chain: new LLMChain({
           llm,
           prompt,
@@ -36,7 +36,7 @@ function getUserSessionfor(session, prompt) {
       };
   }
 
-  return userSessions[session];
+  return userSessionsfor[session];
 }
 
 
@@ -99,7 +99,7 @@ router.post("/play", jwtHelper.verifyToken, async (req, res) => {
   //   return res.json({ message: `You used a taboo word: ${usedTabooWord}` });
   // }
   try {
-    const userSession = getUserSession(sessionId, prompt, true);
+    const userSession = getUserSession(sessionId, prompt);
     const gamecontent = await GameContent.findOne({ mainContent });
 
     const maincontent = gamecontent.mainContent;
