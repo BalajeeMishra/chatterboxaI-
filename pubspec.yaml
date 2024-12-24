@@ -25,7 +25,9 @@ dependencies:
   provider: ^6.1.2
   flutter_easyloading: ^3.0.5
   webview_flutter:
-#  shared_preferences:
+  showcaseview: ^3.0.0
+
+  #  shared_preferences:
 
   #n
   connectivity_plus: ^6.1.0
@@ -43,6 +45,8 @@ dependencies:
   dropdown_search: ^6.0.1
   permission_handler: ^11.3.1
   emoji_regex: ^0.0.5
+  dotted_border: ^2.1.0
+
 
 
 

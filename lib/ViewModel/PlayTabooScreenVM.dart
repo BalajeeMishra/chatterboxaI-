@@ -30,7 +30,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
   TabooGameChatPageModel tabooGameChatPageModel = TabooGameChatPageModel();
   bool apiHitStatus = false;
   List<Map<String, dynamic>> dynamicDta = [];
-  bool isFirstCall = true;
+  // bool isFirstCall = true;
   bool isMuted = false;
 
   String selectedLanguage = 'English';
@@ -101,7 +101,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
       ) async {
    isMuted= isMute ;
    print("isMuted"+isMuted.toString());
-    isFirstCall = isFirst;
+    // isFirstCall = isFirst;
     if (dataGet == "") {
       MySnackBar.showSnackBar(context, "Please speak first!");
       return;
@@ -139,11 +139,13 @@ class PlayTabooScreenVM extends ChangeNotifier {
           apiHitStatus = true;
           tabooGameChatPageModel = response.data!;
           notifyListeners();
-          if (!isFirstCall) {
-            speakText(response.data!.response!.aiResponse!.last);
-          } else {
-            isFirstCall = false;
-          }
+          speakText(response.data!.response!.aiResponse!.last);
+
+          // if (!isFirstCall) {
+          //   speakText(response.data!.response!.aiResponse!.last);
+          // } else {
+          //   isFirstCall = false;
+          // }
           // print("Is First call$isFirstCall");
           print("Is Mute ??/$isMuted");
 
@@ -247,11 +249,15 @@ class PlayTabooScreenVM extends ChangeNotifier {
   }
 
   Future<void> configureTts() async {
-    if (getStringAsync(USER_NATIVE_LANGUAGE).isNotEmpty) {
-      selectedLanguage = getStringAsync(USER_NATIVE_LANGUAGE);
+    print("Configuration time ==>"+userStore.userNativeLanguage.toString());
+    if (userStore.userNativeLanguage.isNotEmpty && userStore.userEnglishProficiency =="Beginner") {
+      selectedLanguage = userStore.userNativeLanguage;
       setTtsLanguage(selectedLanguage);
     }else{
+      print("Amrican");
       await flutterTts.setLanguage('en-US');
+      // await flutterTts.se;
+
 
     }
     print("Selectd Language is ==>"+selectedLanguage.toString());
@@ -261,6 +267,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
   }
 
   void speakText(String text) async {
+    configureTts();
     String updatedText = cleanTextForTTS(text);
     appStore.setLastWords(text);
 

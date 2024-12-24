@@ -10,6 +10,7 @@ import 'package:balajiicode/extensions/extension_util/int_extensions.dart';
 import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
 import 'package:balajiicode/extensions/shared_pref.dart';
 import 'package:balajiicode/extensions/text_styles.dart';
+import 'package:dotted_border/dotted_border.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:emoji_regex/emoji_regex.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,7 @@ import 'package:flutter_tts/flutter_tts.dart';
 // import 'package:speech_to_text/speech_to_text.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
+import 'package:showcaseview/showcaseview.dart';
 import '../../Model/AllConversationModel.dart';
 import '../../Model/AllGameModel.dart';
 import '../../Utils/app_colors.dart';
@@ -191,15 +193,24 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   String selectedLanguageForList = 'Hindi';
   final dropDownKey = GlobalKey<DropdownSearchState>();
 
+  //showcase
+  GlobalKey _one = GlobalKey();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
 
   @override
   void initState() {
     super.initState();
     appStore.setLoading(false);
-    selectedLanguageForList = getStringAsync(USER_NATIVE_LANGUAGE);
-    englishLevel = getStringAsync(USER_ENGLISH_PROFICIENCY);
+    selectedLanguageForList = userStore.userNativeLanguage;
+    englishLevel = userStore.userEnglishProficiency;
+
+    print("User NAtive Language is==>"+userStore.userNativeLanguage);
+    print("User English Proficiency is==>"+userStore.userEnglishProficiency);
+
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+// _focusNode.unfocus();
       Provider.of<PlayTabooScreenVM>(context, listen: false)
           .seInitialValue(widget.allGameModel, widget.index, widget.sessionId);
 
@@ -532,46 +543,54 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     setState(() {});
   }
 
-  save2() {
+  save2(String? correctedQues,String? sessionId) async{
     // unmuteSystemSounds();
     setState(() {
       isSpeaking = true;
     });
     message = 'Correcting Speech recognition mistakes';
+try {
+  final correctedSentence = await correctSentence(correctedQues, sessionId);
 
-    Provider.of<PlayTabooScreenVM>(context, listen: false)
-        .seInitialValue(widget.allGameModel, widget.index, widget.sessionId);
-    Provider.of<PlayTabooScreenVM>(context, listen: false).chatPageAPI(
-        context,
-        ques,
-        widget.sessionId,
-        widget.allGameModel,
-        widget.index,
-        false,
-        isMuted);
-    // configureTts();
-    apiCalled = true;
-    _lastWords = appStore.lastWords;
-    startListening = false;
-    Future.delayed(Duration(seconds: 2), () {
-      setState(() {
-        message = 'Thinking...';
-      });
+  if (correctedSentence != null) {
+    print("Corrected Sentence is ==>"+correctedSentence.toString());
+    correctedQues = correctedSentence;
+  }
+  Provider.of<PlayTabooScreenVM>(context, listen: false)
+      .seInitialValue(widget.allGameModel, widget.index, widget.sessionId);
+  Provider.of<PlayTabooScreenVM>(context, listen: false).chatPageAPI(
+      context,
+      correctedQues!,
+      sessionId!,
+      widget.allGameModel,
+      widget.index,
+      false,
+      isMuted);
+  // configureTts();
+  apiCalled = true;
+  _lastWords = appStore.lastWords;
+  startListening = false;
+  Future.delayed(Duration(seconds: 2), () {
+    setState(() {
+      message = 'Thinking...';
     });
-    isMuted = getBoolAsync(IS_MUTE);
-    print("ISMUTED ==>" + isMuted.toString());
+  });
+  isMuted = getBoolAsync(IS_MUTE);
+  print("ISMUTED ==>" + isMuted.toString());
 
-    // unmuteSystemSounds();
-    setState(() {});
+  // unmuteSystemSounds();
+  setState(() {});
+}catch(e){
+
+  toast(e.toString());
+}
   }
 
   showUpdateDialog() {
     return showDialog(
-      // useSafeArea: true,
         context: context,
         builder: (context) {
           return AlertDialog(
-
             title: const Text('Personalise your learning'),
             actions: [
               Row(
@@ -597,7 +616,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                         .toList();
                   }
                 },
-                selectedItem: selectedLanguage,
+                selectedItem: selectedLanguageForList,
                 popupProps: PopupProps.menu(
                   showSearchBox: true,
                   searchFieldProps: TextFieldProps(
@@ -610,7 +629,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                 ),
                 onChanged: (String? value) {
                   setState(() {
-                    selectedLanguage = value!;
+                    selectedLanguageForList = value!;
                   });
                 },
                 decoratorProps: DropDownDecoratorProps(
@@ -645,13 +664,13 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                 onChanged: (String? value) {
                   setState(() {
                     englishLevel = value!;
-                    if (selectedLanguageForList.isNotEmpty) {
-                      toastLeft(
-                          durationInSeconds: 7,
-                          bgColor: primaryColor,
-                          textColor: Colors.white,
-                          "You have chosen $englishLevel.\nAI will talk in your Native language & share few references in $selectedLanguage");
-                    }
+                    // if (selectedLanguageForList.isNotEmpty) {
+                    //   toastLeft(
+                    //       // durationInSeconds: 3,
+                    //       bgColor: primaryColor,
+                    //       textColor: Colors.white,
+                    //       "You have chosen $englishLevel.\nAI will talk in your Native language & share few references in $selectedLanguage");
+                    // }
                   });
                 },
                 focusNode: englishLevelFocus,
@@ -665,7 +684,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                 height: context.height() * 0.056,
                 color: primaryColor,
                 onTap: () {
-                  // save();
+                  updateProficiency(englishLevel,selectedLanguageForList);
                 },
               ),
 
@@ -683,12 +702,51 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   //   }
   // }
   //
+  Future<void> updateProficiency(String? englishProficiency,String? selectedNLanguage) async {
+    Map<String, dynamic> req = {
+      'nativeLanguage': selectedNLanguage,
+      'engprolevel':englishProficiency
+    };
+
+    try {
+      final value = await updateProficiencyApi(req);
+
+        setValue(USER_NATIVE_LANGUAGE, value.user!.nativeLanguage.toString());
+        userStore.setUserNativeLanguage(value.user!.nativeLanguage.toString());
+        setValue(USER_ENGLISH_PROFICIENCY, value.user!.engprolevel.toString());
+        userStore.setUserEnglishProficiency(value.user!.
+        engprolevel.toString());
+        pop();
+        setState(() {});
+
+    } catch (e) {
+      toast(e.toString());
+      appStore.setLoading(false);
+    }
+  }
+  Future<String?> correctSentence(String? ques,String? sessionId) async {
+    Map<String, dynamic> req = {
+      'sessionId': sessionId,
+      'sentence':ques
+    };
+
+    try {
+      final value = await correctSentenceApi(req);
+      return value.response?.text;
+      setState(() {});
+
+    } catch (e) {
+      toast(e.toString());
+      appStore.setLoading(false);
+      return null;
+    }
+  }
 
   @override
   void dispose() {
     super.dispose();
     // VolumeController().removeListener();
-
+_focusNode.dispose();
     stopSpeaking();
     // _startListening();
   }
@@ -696,6 +754,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key:_scaffoldKey,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(40.0),
         child: AppBar(
@@ -705,7 +764,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
           ).onTap(() {
             if (isKeyBoardTapped) {
               isKeyBoardTapped = false;
-
               setState(() {});
             } else {
               pop();
@@ -1017,6 +1075,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                   if (isMuted) {
                                     stopSpeaking();
                                   }
+
                                   setState(() {});
                                 },
                                 child: Column(
@@ -1188,6 +1247,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
       padding: EdgeInsets.all(15),
       child: Column(
         children: [
+
           Expanded(
             child: Consumer<PlayTabooScreenVM>(
               builder: (context, vm, child) {
@@ -1200,15 +1260,15 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                   focusNode: _focusNode,
                   controller: vm.controller,
                   maxLines: null,
-                  decoration: InputDecoration(
+                  decoration: InputDecoration( isDense: true,contentPadding: EdgeInsets.only(top: 80,bottom: 0 ,left: 10,right:10 ),
                     hintText: "",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
-                      borderSide: BorderSide(color: primaryColor, width: 3),
+                      borderSide: BorderSide(color: primaryColor, width: 3,),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
-                      borderSide: BorderSide(color: primaryColor, width: 3),
+                      borderSide: BorderSide(color: primaryColor, width: 3,),
                     ),
                   ),
                 );
@@ -1218,18 +1278,49 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                padding:
-                EdgeInsets.only(top: 4, bottom: 4, left: 14, right: 14),
-                decoration: boxDecorationWithRoundedCorners(
-                    backgroundColor: Color(0xFFe0ddf5)),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("Use Keyboard Microphone"),
-                    4.width,
-                    Image.asset('assets/images/voice.gif', width: 40)
-                  ],
+              DottedBorder(
+                color: gradientStartColor,strokeWidth: 2,
+
+                dashPattern: [2,2],
+                // strokeCap: StrokeCap.round,
+                borderType: BorderType.RRect,
+                radius: Radius.circular(12),
+                child: ClipRRect(
+                  child: Container(
+                    padding:
+                    EdgeInsets.only( left: 4, right: 4),
+
+                    // decoration: BoxDecoration(border: Border.all()),
+                    // decoration: boxDecorationWithRoundedCorners(
+                    //     // backgroundColor: Color(0xFFe0ddf5)
+                    //
+                    // ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Image.asset('assets/images/voice.gif', width: 40),
+
+                        Text("Use keyboard's voice typing"),
+                        4.width,
+                        ShowCaseWidget(
+                          builder: (context) {
+                            return Showcase(
+                              key: _one,
+                              title: "How should i Speak?",
+                              description: "\nplease locate the mic on keyboard.\nThis would help you Speak instead of type\n i'm not seeing the mic\n\nReason 1\nLocate setting option in your keyboard.In \nGBoard you can long press comma to find this.\nInside settings turn on Voice typing\n\nReason 2\nCheck the App settings,locate your keyboard\nApp and see if it has Microphone permission\n\nReason 3\nInside keyboard settings, got to Text suggestions and then turn on show suggestion strip ",
+                              child: Icon(Icons.help_outlined,size: 20,).onTap((){
+                                WidgetsBinding.instance.addPostFrameCallback(
+                                      (_) => ShowCaseWidget.of(context)
+                                      .startShowCase([_one]),
+                                );
+                              }),
+                            );
+                          }
+                        ),
+                        4.width,
+                      ],
+                    ),
+                  ),
                 ),
               ).expand(),
               SizedBox(width: 10),
@@ -1247,17 +1338,17 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                     _lastWords = "";
                   });
                   if (ques.isNotEmpty) {
-                    save2();
+                    save2(ques,widget.sessionId);
                   }
 
                   isKeyBoardTapped = false;
                   chatPageVM.controller.clear();
                 },
                 child: Container(
-                  padding: EdgeInsets.all(10),
+                  padding: EdgeInsets.all(13),
                   decoration: BoxDecoration(
                     color: primaryColor,
-                    borderRadius: BorderRadius.circular(15),
+                    borderRadius: BorderRadius.circular(40),
                   ),
                   child: Icon(Icons.send, color: Colors.white),
                 ),
