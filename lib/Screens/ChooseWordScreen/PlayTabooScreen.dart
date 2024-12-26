@@ -192,11 +192,10 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   String englishLevel = 'Beginner';
   String selectedLanguageForList = 'Hindi';
   final dropDownKey = GlobalKey<DropdownSearchState>();
-
+  String newEnglishLevel = "";
   //showcase
   GlobalKey _one = GlobalKey();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
 
   @override
   void initState() {
@@ -204,7 +203,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     appStore.setLoading(false);
     selectedLanguageForList = userStore.userNativeLanguage;
     englishLevel = userStore.userEnglishProficiency;
-
+    newEnglishLevel =  userStore.userEnglishProficiency;
     print("User NAtive Language is==>"+userStore.userNativeLanguage);
     print("User English Proficiency is==>"+userStore.userEnglishProficiency);
 
@@ -434,6 +433,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     if (text.isNotEmpty) {
       _lastWords = updatedText;
 
+
       await flutterTts.speak(updatedText);
       isSpeaking = true;
 
@@ -569,6 +569,9 @@ try {
   // configureTts();
   apiCalled = true;
   _lastWords = appStore.lastWords;
+  print("Last Words is here ==>"+_lastWords.toString());
+  print("Last Words appStore ==>"+appStore.lastWords.toString());
+
   startListening = false;
   Future.delayed(Duration(seconds: 2), () {
     setState(() {
@@ -590,6 +593,8 @@ try {
     return showDialog(
         context: context,
         builder: (context) {
+          String tempEnglishLevel = englishLevel; // Temporary variable
+
           return AlertDialog(
             title: const Text('Personalise your learning'),
             actions: [
@@ -650,6 +655,7 @@ try {
               paddingSymmetric(horizontal: 16, vertical: 4),
               4.height,
               DropdownButtonFormField(
+
                 items: englishLevelList
                     .map((value) => DropdownMenuItem<String>(
                   value: value,
@@ -660,10 +666,14 @@ try {
                 isDense: true,
                 borderRadius: radius(),
                 decoration: defaultInputDecoration(context),
-                value: englishLevel,
+                value: tempEnglishLevel,
                 onChanged: (String? value) {
                   setState(() {
-                    englishLevel = value!;
+                    tempEnglishLevel = value!;
+
+                    print("English level"+englishLevel);
+
+
                     // if (selectedLanguageForList.isNotEmpty) {
                     //   toastLeft(
                     //       // durationInSeconds: 3,
@@ -672,7 +682,12 @@ try {
                     //       "You have chosen $englishLevel.\nAI will talk in your Native language & share few references in $selectedLanguage");
                     // }
                   });
+
                 },
+                // onSaved: (String? newValue) {
+                //   newEnglishLevel =newValue!;
+                //   print("New Value==>"+newValue.toString());
+                // },
                 focusNode: englishLevelFocus,
               ).paddingSymmetric(horizontal: 16, vertical: 4),
               40.height,
@@ -684,6 +699,7 @@ try {
                 height: context.height() * 0.056,
                 color: primaryColor,
                 onTap: () {
+                  englishLevel = tempEnglishLevel;
                   updateProficiency(englishLevel,selectedLanguageForList);
                 },
               ),
@@ -710,6 +726,7 @@ try {
 
     try {
       final value = await updateProficiencyApi(req);
+      newEnglishLevel = englishProficiency!;
 
         setValue(USER_NATIVE_LANGUAGE, value.user!.nativeLanguage.toString());
         userStore.setUserNativeLanguage(value.user!.nativeLanguage.toString());
@@ -791,7 +808,7 @@ _focusNode.dispose();
                 child: Row(
                   children: [
                     Text(
-                      englishLevel,
+                      newEnglishLevel,
                       style:
                       secondaryTextStyle(fontStyle: FontStyle.italic),
                     ),
@@ -994,147 +1011,151 @@ _focusNode.dispose();
                       ),
                     ),
                     if (!isKeyBoardTapped)
-                      Center(
-                        child: startListening
-                            ? listeningWidget()
-                            : Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _lastWords = appStore.lastWords;
+    Consumer<PlayTabooScreenVM>(
+        builder: (context, vm, child) {
+          return vm.tabooGameChatPageModel.response == null
+              ? SizedBox()
+              : Center(
+            child: startListening
+                ? listeningWidget()
+                : Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _lastWords = appStore.lastWords;
 
-                                  // isMuted= getBoolAsync(IS_MUTE);
+                      // isMuted= getBoolAsync(IS_MUTE);
 
-                                  isMuted = !isMuted;
-                                  setValue(IS_MUTE, isMuted);
-                                  if (isMuted) {
-                                    stopSpeaking();
-                                  } else if (_lastWords.isNotEmpty &&
-                                      _lastSpokenIndex < _lastWords.length) {
-                                    speakText(_lastWords
-                                        .substring(_lastSpokenIndex));
-                                  }
-                                });
-                              },
-                              child: Column(
-                                children: [
-                                  Icon(
-                                    !isMuted
-                                        ? Icons.volume_off
-                                        : Icons.volume_up,
-                                    size: 36,
-                                  ),
-                                  MyText(
-                                    text: !isMuted ? "Mute" : "Unmute",
-                                    fontSize: 12,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(
-                              width: !isMuted ? 29 : 22,
-                            ),
-                            // GestureDetector(
-                            //   onTap: () {
-                            //     _initSpeech();
-                            //     apiCalled = false;
-                            //     isFirstTime = true;
-                            //
-                            //     _lastWords = "";
-                            //     setState(() {});
-                            //   },
-                            //   child: Column(
-                            //     children: [
-                            //       Icon(
-                            //         Icons.keyboard_voice,
-                            //         size: 36,
-                            //       ),
-                            //       MyText(
-                            //         text: "Speak",
-                            //         fontSize: 12,
-                            //       )
-                            //     ],
-                            //   ),
-                            // ),
-                            //
-                            // SizedBox(
-                            //   width: 24,
-                            // ),
-                            GestureDetector(
-                                onTap: () {
-                                  // muteKeyboardSounds();
-                                  isKeyBoardTapped = true;
+                      isMuted = !isMuted;
+                      setValue(IS_MUTE, isMuted);
+                      if (isMuted) {
+                        stopSpeaking();
+                      } else if (_lastWords.isNotEmpty &&
+                          _lastSpokenIndex < _lastWords.length) {
+                        speakText(_lastWords
+                            .substring(_lastSpokenIndex));
+                      }
+                    });
+                  },
+                  child: Column(
+                    children: [
+                      Icon(
+                        !isMuted
+                            ? Icons.volume_off
+                            : Icons.volume_up,
+                        size: 36,
+                      ),
+                      MyText(
+                        text: !isMuted ? "Mute" : "Unmute",
+                        fontSize: 12,
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  width: !isMuted ? 29 : 22,
+                ),
+                // GestureDetector(
+                //   onTap: () {
+                //     _initSpeech();
+                //     apiCalled = false;
+                //     isFirstTime = true;
+                //
+                //     _lastWords = "";
+                //     setState(() {});
+                //   },
+                //   child: Column(
+                //     children: [
+                //       Icon(
+                //         Icons.keyboard_voice,
+                //         size: 36,
+                //       ),
+                //       MyText(
+                //         text: "Speak",
+                //         fontSize: 12,
+                //       )
+                //     ],
+                //   ),
+                // ),
+                //
+                // SizedBox(
+                //   width: 24,
+                // ),
+                GestureDetector(
+                    onTap: () {
+                      // muteKeyboardSounds();
+                      isKeyBoardTapped = true;
 
-                                  _focusNode.requestFocus();
-                                  stopSpeaking();
+                      _focusNode.requestFocus();
+                      stopSpeaking();
 
-                                  _lastWords = "";
-                                  if (isMuted) {
-                                    stopSpeaking();
-                                  }
+                      _lastWords = "";
+                      if (isMuted) {
+                        stopSpeaking();
+                      }
 
-                                  setState(() {});
-                                },
-                                child: Column(
-                                  children: [
-                                    Container(
-                                      child: Icon(
-                                        Icons.keyboard_voice,
-                                        size: 50,
-                                        color: primaryColor,
-                                      ),
-                                      padding: EdgeInsets.all(14),
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                          BorderRadius.circular(50),
-                                          color: Color(0XFFe0ddf5)),
-                                    ),
-                                    MyText(
-                                      text: "Speak",
-                                      fontSize: 12,
-                                    )
-                                  ],
-                                )
-                              // .paddingBottom(40),
-                            ),
-                            SizedBox(
-                              width: 24,
-                            ),
-                            GestureDetector(
-                              onTap: () async {
-                                stopSpeaking();
-                                final bool? res = await TaboogamechatPage(
-                                  widget.allGameModel,
-                                  widget.index,
-                                  widget.sessionId,
-                                ).launch(context);
-                                if (res == true) {
-                                  allConversationApiCall();
-                                  if (isMuted) {
-                                    stopSpeaking();
-                                  }
-                                } else {}
-                              },
-                              child: Column(
-                                children: [
-                                  Icon(
-                                    Icons.chat,
-                                    size: 36,
-                                  ),
-                                  MyText(
-                                    text: "Write",
-                                    fontSize: 12,
-                                  )
-                                ],
-                              ),
-                            ),
-                          ],
-                        ).paddingOnly(left: 20, right: 20, bottom: 20),
+                      setState(() {});
+                    },
+                    child: Column(
+                      children: [
+                        Container(
+                          child: Icon(
+                            Icons.keyboard_voice,
+                            size: 50,
+                            color: primaryColor,
+                          ),
+                          padding: EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                              borderRadius:
+                              BorderRadius.circular(50),
+                              color: Color(0XFFe0ddf5)),
+                        ),
+                        MyText(
+                          text: "Speak",
+                          fontSize: 12,
+                        )
+                      ],
+                    )
+                  // .paddingBottom(40),
+                ),
+                SizedBox(
+                  width: 24,
+                ),
+                GestureDetector(
+                  onTap: () async {
+                    stopSpeaking();
+                    final bool? res = await TaboogamechatPage(
+                      widget.allGameModel,
+                      widget.index,
+                      widget.sessionId,
+                    ).launch(context);
+                    if (res == true) {
+                      allConversationApiCall();
+                      if (isMuted) {
+                        stopSpeaking();
+                      }
+                    } else {}
+                  },
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.chat,
+                        size: 36,
+                      ),
+                      MyText(
+                        text: "Write",
+                        fontSize: 12,
                       )
-                  ],
+                    ],
+                  ),
+                ),
+              ],
+            ).paddingOnly(left: 20, right: 20, bottom: 20),
+          );
+        }) ],
                 )),
           ],
         ),
