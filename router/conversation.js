@@ -10,10 +10,13 @@ import GameContent from "../model/GameContent.js";
 import User from "../model/User.js";
 import Prompt from "../model/Template.js";
 import jwtHelper from "../helper/jwt_helper.js";
+import getSecret from "../helper/secret.js";
 
 const router = Router();
 
-const apiKey = fs.readFileSync("OpenAiKey.txt", "utf-8").trim();
+// const apiKey = fs.readFileSync("OpenAiKey.txt", "utf-8").trim();
+
+const apiKey = await getSecret();
 
 // gpt-4o
 const llm = new ChatOpenAI({
