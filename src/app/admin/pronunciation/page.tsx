@@ -5,24 +5,37 @@ import PageHeadDesc from "@/components/ui/PageHeadDesc";
 import Editor from "react-simple-wysiwyg";
 
 export default function Newgame() {
-  const [template, setTemplate] = useState(""); // Template content
-  const [errors, setErrors] = useState<{ template?: string }>({});
+  const [content, setContent] = useState(""); // Content for editing
+  const [contentId, setContentId] = useState<string | null>(null); // ID of the existing content
+  const [errors, setErrors] = useState<{ content?: string }>({});
   const [loading, setLoading] = useState(false); // Loading state for API calls
 
-  // Fetch the existing template on component mount
+  // Fetch the existing content on component mount
   useEffect(() => {
-    fetchTemplate();
+    fetchContent();
   }, []);
 
-  // Fetch template data from API
-  const fetchTemplate = async () => {
+  // Fetch content data from API
+  const fetchContent = async () => {
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:8000/templates/single"); // Adjust endpoint as needed
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/game/pronounciationtemplate`
+      );
+
+      if (!response.ok) {
+        // No content exists
+        setContent("");
+        setContentId(null);
+        return;
+      }
+
       const data = await response.json();
-      setTemplate(data.template || ""); // Default to an empty template if not provided
+      console.log(data.pronounciation);
+      setContent(data.pronounciation[0].content || "");
+      setContentId(data.pronounciation[0]._id || null);
     } catch (error) {
-      console.error("Failed to fetch template:", error);
+      console.error("Failed to fetch content:", error);
     } finally {
       setLoading(false);
     }
@@ -33,29 +46,40 @@ export default function Newgame() {
     e.preventDefault();
     setErrors({}); // Clear existing errors
 
-    if (!template.trim()) {
-      setErrors({ template: "Template cannot be empty." });
+    if (!content.trim()) {
+      setErrors({ content: "Content cannot be empty." });
       return;
     }
 
     try {
       setLoading(true);
 
-      const response = await fetch("http://localhost:8000/templates/single", {
-        method: "PUT", // Always updating the single template
+      const url = contentId
+        ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/game/pronounciationtemplate/${contentId}`
+        : `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/game/pronounciationtemplate`;
+
+      const method = contentId ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ template }),
+        body: JSON.stringify({ content }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to save template.");
+        throw new Error("Failed to save content.");
       }
 
-      alert("Template saved successfully!");
+      alert(
+        contentId
+          ? "Content updated successfully!"
+          : "Content added successfully!"
+      );
+      fetchContent(); // Refresh content
     } catch (error) {
-      console.error("Failed to save template:", error);
+      console.error("Failed to save content:", error);
     } finally {
       setLoading(false);
     }
@@ -64,23 +88,29 @@ export default function Newgame() {
   return (
     <div>
       <PageHeadDesc
-        title="Edit Pronunciation Template"
-        desc="Update the details of the pronunciation template."
+        title={contentId ? "Edit Content" : "Add Content"}
+        desc={
+          contentId
+            ? "Update the details of the content."
+            : "Add new content to the database."
+        }
       />
       <div className="mx-6">
         <div className="max-w-5xl p-4 bg-white shadow-md rounded-lg">
-          <h1 className="text-2xl font-bold mb-4">Edit Template</h1>
+          <h1 className="text-2xl font-bold mb-4">
+            {contentId ? "Edit Content" : "Add Content"}
+          </h1>
           <form onSubmit={handleSubmit}>
-            {/* Template with WYSIWYG Editor */}
+            {/* Content with WYSIWYG Editor */}
             <div className="mb-4">
               <Editor
-                value={template}
-                onChange={(e: any) => setTemplate(e.target.value)}
+                value={content}
+                onChange={(e: any) => setContent(e.target.value)}
                 style={{ height: "200px", overflowY: "auto" }}
                 className="border border-gray-300 rounded-md"
               />
-              {errors.template && (
-                <div className="text-red-600 text-sm">{errors.template}</div>
+              {errors.content && (
+                <div className="text-red-600 text-sm">{errors.content}</div>
               )}
             </div>
 
@@ -94,7 +124,11 @@ export default function Newgame() {
               } text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50`}
               disabled={loading}
             >
-              {loading ? "Saving..." : "Save Template"}
+              {loading
+                ? "Saving..."
+                : contentId
+                ? "Update Content"
+                : "Add Content"}
             </button>
           </form>
         </div>
