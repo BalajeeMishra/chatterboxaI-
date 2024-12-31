@@ -4,6 +4,7 @@ import GameContent from "../model/GameContent.js";
 import Template from "../model/Template.js";
 import striptags from 'striptags';
 import he from'he';
+import Pronounciation from "../model/PronounciationTemplate.js";
 
 
 
@@ -204,5 +205,32 @@ router.get("/game-template/:id",async(req,res,next)=>{
     throw err; 
   }
 })
+
+
+router.post("/pronounciationtemplate", async(req,res,next)=>{
+  try{
+    const {content} = req.body;
+    const pronounciation = await new Pronounciation({
+      content
+    }).save();
+    return res.status(200).json({pronounciation});
+  }
+  catch{
+    throw err;
+  }
+})
+
+router.put("/pronounciationtemplate/:id", async(req,res,next)=>{
+  try{
+    const {id} = req.params;
+    const {content} = req.body;
+    const updatedPronounciation = await Pronounciation.findByIdAndUpdate(id,{content},{new:true});
+    return res.status(200).json({updatedPronounciation});
+  }
+  catch{
+    throw err;
+  }
+})
+
 
 export default router;

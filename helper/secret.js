@@ -8,15 +8,12 @@ const name = 'projects/dialogflow-first-test/secrets/OPENAI_SECRET/versions/late
 import {SecretManagerServiceClient} from '@google-cloud/secret-manager';
 
 // Instantiates a client
-const client = new SecretManagerServiceClient();
+const client = new SecretManagerServiceClient({keyFilename:"C:\\Users\\suman\\Downloads\\dialogflow-first-test-6d3ef1235b44.json"});
 
 export default async function getSecret() {
   // const [secret] = await client.getSecret({
   //   name: name,
   // });
-
-  
-
   // const policy = secret.replication.replication;
 
   // console.info(`Found secret ${secret.name} (${policy})`);
@@ -25,11 +22,8 @@ export default async function getSecret() {
   const [accessResponse] = await client.accessSecretVersion({
     name: name,
   });
-
   // Decode the secret payload
   const secretValue = accessResponse.payload.data.toString('utf8');
-
+   
   return secretValue
-  
-
 }
