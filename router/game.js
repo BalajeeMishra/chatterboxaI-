@@ -206,6 +206,18 @@ router.get("/game-template/:id",async(req,res,next)=>{
   }
 })
 
+router.get("/pronounciationtemplate", async(req,res,next)=>{
+  try{
+    const {content} = req.body;
+    const pronounciation = await Pronounciation.find({
+    })
+    return res.status(200).json({pronounciation});
+  }
+  catch{
+    throw err;
+  }
+})
+
 
 router.post("/pronounciationtemplate", async(req,res,next)=>{
   try{
