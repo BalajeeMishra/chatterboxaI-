@@ -119,6 +119,16 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
               </li>
               <li>
                 <Link
+                  href="/admin/pronunciation"
+                  className="flex gap-2 py-2 px-4 rounded hover:bg-gray-100 hover:text-black"
+                >
+                  <Icon icon="cil:description" width="20" />
+                  <span>pronunciation Temp.</span>
+                </Link>
+              </li>
+              
+              <li>
+                <Link
                   href="/admin/admindetails"
                   className="flex gap-2 py-2 px-4 rounded hover:bg-gray-100 hover:text-black"
                 >
