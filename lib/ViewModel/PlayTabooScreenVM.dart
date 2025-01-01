@@ -13,6 +13,7 @@ import '../Repository/TaboogameChatPageRepository.dart';
 import '../Services/ApiResponseStatus.dart';
 import '../Utils/ShowSnackBar.dart';
 import '../Utils/app_constants.dart';
+import '../components/tts.dart';
 import '../extensions/shared_pref.dart';
 
 class PlayTabooScreenVM extends ChangeNotifier {
@@ -140,6 +141,8 @@ class PlayTabooScreenVM extends ChangeNotifier {
           tabooGameChatPageModel = response.data!;
           notifyListeners();
           speakText(response.data!.response!.aiResponse!.last);
+          userStore.setTTSPlaying("YES");
+          print("is yes"+userStore.isTTSPlaying.toString());
 
           // if (!isFirstCall) {
           //   speakText(response.data!.response!.aiResponse!.last);
@@ -199,7 +202,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
     appStore.setLoading(false);
   }
 
-  FlutterTts flutterTts = FlutterTts();
+  final TTSManager ttsManager = TTSManager();
   Future<void> setTtsLanguage(String language) async {
     String ttsLanguage;
 
@@ -245,7 +248,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
         break;
     }
 
-    await flutterTts.setLanguage(ttsLanguage);
+    await ttsManager.setLanguage(ttsLanguage);
   }
 
   Future<void> configureTts() async {
@@ -255,27 +258,28 @@ class PlayTabooScreenVM extends ChangeNotifier {
       setTtsLanguage(selectedLanguage);
     }else{
       print("Amrican");
-      await flutterTts.setLanguage('en-US');
+      await ttsManager.setLanguage('en-US');
       // await flutterTts.se;
 
 
     }
     print("Selectd Language is ==>"+selectedLanguage.toString());
 
-    await flutterTts.setSpeechRate(0.4);
-    await flutterTts.setVolume(1.0);
+    await ttsManager.setSpeechRate(0.4);
+    await ttsManager.setVolume(1.0);
   }
 
   void speakText(String text) async {
+    print("Into Vm Calling");
     configureTts();
     String updatedText = cleanTextForTTS(text);
     appStore.setLastWords(text);
 
-    await flutterTts.speak(updatedText);
+    await ttsManager.speak(updatedText);
   }
 
   Future<void> stopSpeaking() async {
-    await flutterTts.stop();
+    await ttsManager.stop();
   }
 }
 

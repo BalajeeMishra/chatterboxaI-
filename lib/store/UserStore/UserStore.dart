@@ -57,7 +57,8 @@ abstract class UserStoreBase with Store {
 
   @observable
   String phoneNo = '';
-
+  @observable
+  String isTTSPlaying = '';
 
   @observable
   String currencyPosition = '';
@@ -78,7 +79,11 @@ abstract class UserStoreBase with Store {
     phoneNo = val;
     if (!isInitialization) await setValue(PHONE_NUMBER, val);
   }
-
+  @action
+  Future<void> setTTSPlaying(String val, {bool isInitialization = false}) async {
+    isTTSPlaying = val;
+    if (!isInitialization) await setValue(IS_TTS_PLAYING, val);
+  }
 
 
 

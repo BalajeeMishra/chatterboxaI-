@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:balajiicode/Constants/ImageConstant.dart';
 import 'package:balajiicode/Constants/constantRow.dart';
 import 'package:balajiicode/Model/TabooGameChatPageModel.dart';
@@ -31,6 +33,7 @@ import '../../ViewModel/PlayTabooScreenVM.dart';
 import '../../ViewModel/TabooGameChatPageVM.dart';
 import '../../Widget/appbar.dart';
 import '../../components/loader_widget_new.dart';
+import '../../components/tts.dart';
 import '../../extensions/app_button.dart';
 import '../../extensions/colors.dart';
 import '../../extensions/constants.dart';
@@ -70,7 +73,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
   //Screen2 data
   double speechRate = 0.4;
-  FlutterTts flutterTts = FlutterTts();
+  final TTSManager ttsManager = TTSManager();
   bool isSpeaking = false;
   String message = '';
   int _lastSpokenIndex = 0;
@@ -424,25 +427,91 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   // }
 
   /// Speak text with TTS
+  Future<void> setTtsLanguage(String language) async {
+    String ttsLanguage;
+
+    switch (language) {
+      case 'Hindi':
+        ttsLanguage = 'hi-IN';
+        break;
+      case 'English':
+        ttsLanguage = 'en-US';
+        break;
+      case 'Bengali':
+        ttsLanguage = 'bn-IN';
+        break;
+      case 'Kannada':
+        ttsLanguage = 'kn-IN';
+        break;
+      case 'Malayalam':
+        ttsLanguage = 'ml-IN';
+        break;
+      case 'Marathi':
+        ttsLanguage = 'mr-IN';
+        break;
+      case 'Nepali':
+        ttsLanguage = 'ne-NP';
+        break;
+      case 'Punjabi':
+        ttsLanguage = 'pa-IN';
+        break;
+      case 'Tamil':
+        ttsLanguage = 'ta-IN';
+        break;
+      case 'Telugu':
+        ttsLanguage = 'te-IN';
+        break;
+      case 'Urdu':
+        ttsLanguage = 'ur-IN';
+        break;
+      case 'Gujarati':
+        ttsLanguage = 'gu-IN';
+        break;
+      default:
+        ttsLanguage = 'en-US';
+        break;
+    }
+
+    await ttsManager.setLanguage(ttsLanguage);
+  }
+
+  Future<void> configureTts() async {
+    print("Configuration time ==>"+userStore.userNativeLanguage.toString());
+    if (userStore.userNativeLanguage.isNotEmpty && userStore.userEnglishProficiency =="Beginner") {
+      selectedLanguage = userStore.userNativeLanguage;
+      setTtsLanguage(selectedLanguage);
+    }else{
+      print("Amrican");
+      await ttsManager.setLanguage('en-US');
+      // await flutterTts.se;
+
+
+    }
+    print("Selectd Language is ==>"+selectedLanguage.toString());
+
+    await ttsManager.setSpeechRate(0.4);
+    await ttsManager.setVolume(1.0);
+  }
 
   Future<void> speakText(String text) async {
+    configureTts();
     String updatedText = cleanTextForTTS(text);
 
-    await flutterTts.stop();
+    await ttsManager.stop();
 
     if (text.isNotEmpty) {
       _lastWords = updatedText;
 
 
-      await flutterTts.speak(updatedText);
+      await ttsManager.speak(updatedText);
       isSpeaking = true;
 
-      flutterTts.setCompletionHandler(() {
+      ttsManager.setCompletionHandler(() {
         isSpeaking = false;
         _lastSpokenIndex = updatedText.length;
       });
 
-      flutterTts.setErrorHandler((error) {
+      ttsManager.setErrorHandler((error) {
         isSpeaking = false;
       });
     } else {}
@@ -450,7 +519,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
   /// Stop speaking
   Future<void> stopSpeaking() async {
-    await flutterTts.stop();
+    await ttsManager.stop();
   }
 
   /// Submit and call next function
@@ -462,17 +531,17 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     speechRate += change;
     speechRate = speechRate.clamp(0.1, 2.0);
 
-    await flutterTts.setSpeechRate(speechRate);
+    await ttsManager.setSpeechRate(speechRate);
     print("isSpeaking" + isSpeaking.toString());
     if (isSpeaking) {
       print("Inside If");
-      await flutterTts.stop();
+      await ttsManager.stop();
 
       String remainingText = _getRemainingText();
 
       Future.delayed(Duration(milliseconds: 200), () async {
         if (remainingText.isNotEmpty) {
-          await flutterTts.setSpeechRate(speechRate);
+          await ttsManager.setSpeechRate(speechRate);
           await speakText(remainingText);
         }
       });
@@ -498,19 +567,19 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     // unmuteSystemSounds();
 
     message = 'Correcting Speech recognition mistakes';
-    flutterTts.setStartHandler(() {
+    ttsManager.setStartHandler(() {
       setState(() {
         isSpeaking = true;
       });
     });
 
-    flutterTts.setCompletionHandler(() {
+    ttsManager.setCompletionHandler(() {
       setState(() {
         isSpeaking = false;
       });
     });
 
-    flutterTts.setErrorHandler((msg) {
+    ttsManager.setErrorHandler((msg) {
       setState(() {
         isSpeaking = false;
       });
@@ -593,120 +662,145 @@ try {
     return showDialog(
         context: context,
         builder: (context) {
-          String tempEnglishLevel = englishLevel; // Temporary variable
+          String tempEnglishLevel = englishLevel;
 
-          return AlertDialog(
-            title: const Text('Personalise your learning'),
-            actions: [
-              Row(
-                children: [
-                  Text('Your Native Language',
-                      style: secondaryTextStyle(
-                          color: textPrimaryColorGlobal)),
-                  2.width,
-                  Text('*', style: secondaryTextStyle(color: redColor))
-                ],
-              ).paddingSymmetric(horizontal: 16, vertical: 4),
-              4.height,
-              DropdownSearch<String>(
-                key: dropDownKey,
-                items: (String filter, LoadProps? loadProps) async {
-                  if (filter.isEmpty) {
-                    return languageList;
-                  } else {
-                    return languageList
-                        .where((language) => language
-                        .toLowerCase()
-                        .contains(filter.toLowerCase()))
-                        .toList();
-                  }
-                },
-                selectedItem: selectedLanguageForList,
-                popupProps: PopupProps.menu(
-                  showSearchBox: true,
-                  searchFieldProps: TextFieldProps(
-                    decoration:
-                    InputDecoration(hintText: 'Search Language'),
-                  ),
-                  emptyBuilder: (context, searchEntry) {
-                    return Text('No Language available').center();
-                  },
-                ),
-                onChanged: (String? value) {
-                  setState(() {
-                    selectedLanguageForList = value!;
-                  });
-                },
-                decoratorProps: DropDownDecoratorProps(
-                  decoration: defaultInputDecoration(
-                      context), // Applying the decoration here
-                ),
-              ).paddingSymmetric(horizontal: 16, vertical: 4),
-              16.height,
-              Row(
-                children: [
-                  Text('Your English Proficiency',
-                      style: secondaryTextStyle(
-                          color: textPrimaryColorGlobal)),
-                  2.width,
-                  Text('*', style: secondaryTextStyle(color: redColor))
-                ],
-              ).
-              paddingSymmetric(horizontal: 16, vertical: 4),
-              4.height,
-              DropdownButtonFormField(
-
-                items: englishLevelList
-                    .map((value) => DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value, style: primaryTextStyle()),
-                ))
-                    .toList(),
-                isExpanded: false,
-                isDense: true,
-                borderRadius: radius(),
-                decoration: defaultInputDecoration(context),
-                value: tempEnglishLevel,
-                onChanged: (String? value) {
-                  setState(() {
-                    tempEnglishLevel = value!;
-
-                    print("English level"+englishLevel);
-
-
-                    // if (selectedLanguageForList.isNotEmpty) {
-                    //   toastLeft(
-                    //       // durationInSeconds: 3,
-                    //       bgColor: primaryColor,
-                    //       textColor: Colors.white,
-                    //       "You have chosen $englishLevel.\nAI will talk in your Native language & share few references in $selectedLanguage");
-                    // }
-                  });
-
-                },
-                // onSaved: (String? newValue) {
-                //   newEnglishLevel =newValue!;
-                //   print("New Value==>"+newValue.toString());
-                // },
-                focusNode: englishLevelFocus,
-              ).paddingSymmetric(horizontal: 16, vertical: 4),
-              40.height,
-
-              AppButton(
-                text: 'Confirm',
-                padding: EdgeInsetsDirectional.all(0),
-                width: context.width() * 0.68,
-                height: context.height() * 0.056,
-                color: primaryColor,
+          return Stack(
+            children: [
+              GestureDetector(
                 onTap: () {
-                  englishLevel = tempEnglishLevel;
-                  updateProficiency(englishLevel,selectedLanguageForList);
+                  pop();
                 },
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10), // Adjust sigma for more blur
+                  child: Container(
+                    color: primaryColor.withOpacity(0.4), // Semi-transparent overlay
+                  ),
+                ),
               ),
+              AlertDialog(
+                title: const Text('Personalise your learning'),
+                actions: [
+                  Row(
+                    children: [
+                      Text('Your Native Language',
+                          style: secondaryTextStyle(
+                              color: textPrimaryColorGlobal)),
+                      2.width,
+                      Text('*', style: secondaryTextStyle(color: redColor))
+                    ],
+                  ).paddingSymmetric(horizontal: 16, vertical: 4),
+                  4.height,
+                  DropdownSearch<String>(
+                    key: dropDownKey,
+                    items: (String filter, LoadProps? loadProps) async {
+                      if (filter.isEmpty) {
+                        return languageList;
+                      } else {
+                        return languageList
+                            .where((language) => language
+                            .toLowerCase()
+                            .contains(filter.toLowerCase()))
+                            .toList();
+                      }
+                    },
+                    selectedItem: selectedLanguageForList,
+                    popupProps: PopupProps.menu(
+                      showSearchBox: true,
+                      searchFieldProps: TextFieldProps(
+                        decoration:
+                        InputDecoration(hintText: 'Search Language'),
+                      ),
+                      emptyBuilder: (context, searchEntry) {
+                        return Text('No Language available').center();
+                      },
+                    ),
+                    onChanged: (String? value) {
+                      setState(() {
+                        selectedLanguageForList = value!;
+                      });
+                    },
+                    decoratorProps: DropDownDecoratorProps(
+                      decoration: defaultInputDecoration(
+                          context), // Applying the decoration here
+                    ),
+                  ).paddingSymmetric(horizontal: 16, vertical: 4),
+                  16.height,
+                  Row(
+                    children: [
+                      Text('Your English Proficiency',
+                          style: secondaryTextStyle(
+                              color: textPrimaryColorGlobal)),
+                      2.width,
+                      Text('*', style: secondaryTextStyle(color: redColor))
+                    ],
+                  ).
+                  paddingSymmetric(horizontal: 16, vertical: 4),
+                  4.height,
+                  DropdownButtonFormField(
+
+                    items: englishLevelList
+                        .map((value) => DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value, style: primaryTextStyle()),
+                    ))
+                        .toList(),
+                    isExpanded: false,
+                    isDense: true,
+                    borderRadius: radius(),
+                    decoration: defaultInputDecoration(context),
+                    value: tempEnglishLevel,
+                    onChanged: (String? value) {
+                      setState(() {
+                        tempEnglishLevel = value!;
+
+                        print("English level"+englishLevel);
+
+
+                        // if (selectedLanguageForList.isNotEmpty) {
+                        //   toastLeft(
+                        //       // durationInSeconds: 3,
+                        //       bgColor: primaryColor,
+                        //       textColor: Colors.white,
+                        //       "You have chosen $englishLevel.\nAI will talk in your Native language & share few references in $selectedLanguage");
+                        // }
+                      });
+
+                    },
+                    // onSaved: (String? newValue) {
+                    //   newEnglishLevel =newValue!;
+                    //   print("New Value==>"+newValue.toString());
+                    // },
+                    focusNode: englishLevelFocus,
+                  ).paddingSymmetric(horizontal: 16, vertical: 4),
+                  40.height,
+
+                  AppButton(
+                    text: 'Confirm',
+                    padding: EdgeInsetsDirectional.all(0),
+                    width: context.width() * 0.68,
+                    height: context.height() * 0.056,
+                    color: primaryColor,
+                    onTap: () {
+                      englishLevel = tempEnglishLevel;
+
+                      updateProficiency(englishLevel,selectedLanguageForList);
+
+                     print("Last word is ==?"+appStore.lastWords.toString());
+
+                      // setState(() {
+                      //
+                      // });
+                      },
+                  ),
+
+                ],
+              ).center(),
 
             ],
-          );
-        }
+            );
+
+        },
+        // barrierColor: primaryColor
     );
   }
   // void muteKeyboardSounds() async {
@@ -733,6 +827,7 @@ try {
         setValue(USER_ENGLISH_PROFICIENCY, value.user!.engprolevel.toString());
         userStore.setUserEnglishProficiency(value.user!.
         engprolevel.toString());
+      speakText(appStore.lastWords);
         pop();
         setState(() {});
 
@@ -783,7 +878,7 @@ _focusNode.dispose();
               isKeyBoardTapped = false;
               setState(() {});
             } else {
-              pop();
+              pop(true);
             }
           }),
           title: Text(
@@ -801,26 +896,27 @@ _focusNode.dispose();
             ),
           ),
           actions: [
-            if(!isKeyBoardTapped) Container(
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20)),
-                child: Row(
-                  children: [
-                    Text(
-                      newEnglishLevel,
-                      style:
-                      secondaryTextStyle(fontStyle: FontStyle.italic),
-                    ),
-                    Icon(
-                      Icons.keyboard_arrow_down_outlined,
-                      color: primaryColor,
-                    )
-                  ],
-                ).paddingOnly(left: 8, right: 2)).onTap((){
-              showUpdateDialog();
-            })
-                .paddingRight(12)
+            if (!isKeyBoardTapped)
+              Container(
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20)),
+                      child: Row(
+                        children: [
+                          Text(
+                            newEnglishLevel,
+                            style:
+                                secondaryTextStyle(fontStyle: FontStyle.italic),
+                          ),
+                          Icon(
+                            Icons.keyboard_arrow_down_outlined,
+                            color: primaryColor,
+                          )
+                        ],
+                      ).paddingOnly(left: 8, right: 2))
+                  .onTap(() {
+                showUpdateDialog();
+              }).paddingRight(12)
           ],
         ),
       ),
@@ -831,7 +927,7 @@ _focusNode.dispose();
 
             setState(() {});
           } else {
-            pop();
+            pop(true);
           }
           return false;
         },
@@ -840,323 +936,329 @@ _focusNode.dispose();
           children: [
             Expanded(
                 child: Column(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        children: [
-                          SizedBox(
-                            height: 20,
-                          ),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            mainAxisAlignment: !apiCalled
-                                ? MainAxisAlignment.center
-                                : MainAxisAlignment.spaceBetween,
-                            // mainAxisSize: MainAxisSize.min,
-                            children: [
-                              if (apiCalled && !isKeyBoardTapped)
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    // IconButton(
-                                    //   alignment: Alignment.bottomLeft,
-                                    //
-                                    //   padding: EdgeInsets.all(0),
-                                    //   // constraints: BoxConstraints(maxWidth: 0,minWidth: 0),
-                                    //
-                                    //   icon:
-                                    InkWell(
-                                      onTap: () => _onDecreaseRatePressed(),
-                                      child: Icon(
-                                        Icons.fast_rewind,
-                                        size: 30,
-                                      ),
-                                    ),
-
-                                    //   onPressed: () => _onDecreaseRatePressed(),
-                                    // ),
-                                    Text(
-                                      "Slow",
-                                      style: secondaryTextStyle(size: 12),
-                                    ).onTap(() {
-                                      _onDecreaseRatePressed();
-                                    })
-                                  ],
-                                ).paddingOnly(bottom: 20, left: 4),
-                              if (!isKeyBoardTapped)
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: Image.asset(
-                                      fit: BoxFit.cover,
-                                      height: 212,
-                                      width: 270,
-                                      ic_transparent_girlImage2),
-                                ),
-                              if (apiCalled && !isKeyBoardTapped)
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    // IconButton(
-                                    //   alignment: Alignment.bottomRight,
-                                    //
-                                    //   // constraints: BoxConstraints(maxWidth: 0,minWidth: 0),
-                                    //   padding: EdgeInsets.all(0),
-                                    //   icon:
-                                    InkWell(
-                                      onTap: () => _onIncreaseRatePressed(),
-                                      child: Icon(
-                                        Icons.fast_forward,
-                                        size: 30,
-                                      ),
-                                    ),
-                                    //   onPressed: () => _onIncreaseRatePressed(),
-                                    // ),
-                                    Text(
-                                      "Fast",
-                                      style: secondaryTextStyle(size: 12),
-                                    ).onTap(() {
-                                      _onIncreaseRatePressed();
-                                    })
-                                  ],
-                                ).paddingOnly(bottom: 20, right: 4),
-                            ],
-                          ).paddingOnly(left: 4, right: 4),
-                          SizedBox(
-                            height: 15,
-                          ),
-                          if (isKeyBoardTapped)
-                            _buildMessageInput(context).expand(),
-                          if (isFirstTime)
-                            LoadingWidget(
-                              message: "Listening...",
-                            ),
-                          if (!apiCalled && !isLoading)
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: MyText(
-                                    text: _lastWords,
-                                    color: Color(0xff000000),
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              ],
-                            ).paddingSymmetric(horizontal: 24, vertical: 14),
-                          if (apiCalled && !isKeyBoardTapped)
-                            Consumer<PlayTabooScreenVM>(
-                              builder: (context, vm, child) {
-                                return vm.tabooGameChatPageModel.response == null
-                                    ? LoadingWidget(
-                                  message: message,
-                                )
-                                    : Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 28.0, vertical: 8),
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                          child: startListening
-                                              ? MyText(
-                                            text: _lastWords,
-                                            color: Color(0xff000000),
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w400,
-                                          )
-                                              : (vm
-                                              .tabooGameChatPageModel
-                                              .response!
-                                              .aiResponse!
-                                              .last ==
-                                              null ||
-                                              vm
-                                                  .tabooGameChatPageModel
-                                                  .response!
-                                                  .aiResponse!
-                                                  .last ==
-                                                  "")
-                                              ? Text("")
-                                              : SizedBox(
-                                            height:
-                                            context.height() *
-                                                0.420,
-                                            child:
-                                            SingleChildScrollView(
-                                              child:
-                                              // Text(vm.tabooGameChatPageModel.response!.aiResponse!.last)
-                                              RichText(
-                                                text: TextSpan(
-                                                  children: _buildBoldText(vm
-                                                      .tabooGameChatPageModel
-                                                      .response!
-                                                      .aiResponse!
-                                                      .last),
-                                                  style:
-                                                  primaryTextStyle(
-                                                      size:
-                                                      16)
-                                                      .copyWith(
-                                                    height: 1.5,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          )),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
-                        ],
-                      ),
-                    ),
-                    if (!isKeyBoardTapped)
-    Consumer<PlayTabooScreenVM>(
-        builder: (context, vm, child) {
-          return vm.tabooGameChatPageModel.response == null
-              ? SizedBox()
-              : Center(
-            child: startListening
-                ? listeningWidget()
-                : Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _lastWords = appStore.lastWords;
-
-                      // isMuted= getBoolAsync(IS_MUTE);
-
-                      isMuted = !isMuted;
-                      setValue(IS_MUTE, isMuted);
-                      if (isMuted) {
-                        stopSpeaking();
-                      } else if (_lastWords.isNotEmpty &&
-                          _lastSpokenIndex < _lastWords.length) {
-                        speakText(_lastWords
-                            .substring(_lastSpokenIndex));
-                      }
-                    });
-                  },
+                Expanded(
                   child: Column(
                     children: [
-                      Icon(
-                        !isMuted
-                            ? Icons.volume_off
-                            : Icons.volume_up,
-                        size: 36,
+                      SizedBox(
+                        height: 20,
                       ),
-                      MyText(
-                        text: !isMuted ? "Mute" : "Unmute",
-                        fontSize: 12,
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisAlignment: !apiCalled
+                            ? MainAxisAlignment.center
+                            : MainAxisAlignment.spaceBetween,
+                        // mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (apiCalled && !isKeyBoardTapped)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // IconButton(
+                                //   alignment: Alignment.bottomLeft,
+                                //
+                                //   padding: EdgeInsets.all(0),
+                                //   // constraints: BoxConstraints(maxWidth: 0,minWidth: 0),
+                                //
+                                //   icon:
+                                InkWell(
+                                  onTap: () => _onDecreaseRatePressed(),
+                                  child: Icon(
+                                    Icons.fast_rewind,
+                                    size: 30,
+                                  ),
+                                ),
+
+                                //   onPressed: () => _onDecreaseRatePressed(),
+                                // ),
+                                Text(
+                                  "Slow",
+                                  style: secondaryTextStyle(size: 12),
+                                ).onTap(() {
+                                  _onDecreaseRatePressed();
+                                })
+                              ],
+                            ).paddingOnly(bottom: 20, left: 4),
+                          if (!isKeyBoardTapped)
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.asset(
+                                  fit: BoxFit.cover,
+                                  height: 212,
+                                  width: 270,
+                                  ic_transparent_girlImage2),
+                            ),
+                          if (apiCalled && !isKeyBoardTapped)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                // IconButton(
+                                //   alignment: Alignment.bottomRight,
+                                //
+                                //   // constraints: BoxConstraints(maxWidth: 0,minWidth: 0),
+                                //   padding: EdgeInsets.all(0),
+                                //   icon:
+                                InkWell(
+                                  onTap: () => _onIncreaseRatePressed(),
+                                  child: Icon(
+                                    Icons.fast_forward,
+                                    size: 30,
+                                  ),
+                                ),
+                                //   onPressed: () => _onIncreaseRatePressed(),
+                                // ),
+                                Text(
+                                  "Fast",
+                                  style: secondaryTextStyle(size: 12),
+                                ).onTap(() {
+                                  _onIncreaseRatePressed();
+                                })
+                              ],
+                            ).paddingOnly(bottom: 20, right: 4),
+                        ],
+                      ).paddingOnly(left: 4, right: 4),
+                      SizedBox(
+                        height: 15,
                       ),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  width: !isMuted ? 29 : 22,
-                ),
-                // GestureDetector(
-                //   onTap: () {
-                //     _initSpeech();
-                //     apiCalled = false;
-                //     isFirstTime = true;
-                //
-                //     _lastWords = "";
-                //     setState(() {});
-                //   },
-                //   child: Column(
-                //     children: [
-                //       Icon(
-                //         Icons.keyboard_voice,
-                //         size: 36,
-                //       ),
-                //       MyText(
-                //         text: "Speak",
-                //         fontSize: 12,
-                //       )
-                //     ],
-                //   ),
-                // ),
-                //
-                // SizedBox(
-                //   width: 24,
-                // ),
-                GestureDetector(
-                    onTap: () {
-                      // muteKeyboardSounds();
-                      isKeyBoardTapped = true;
-
-                      _focusNode.requestFocus();
-                      stopSpeaking();
-
-                      _lastWords = "";
-                      if (isMuted) {
-                        stopSpeaking();
-                      }
-
-                      setState(() {});
-                    },
-                    child: Column(
-                      children: [
-                        Container(
-                          child: Icon(
-                            Icons.keyboard_voice,
-                            size: 50,
-                            color: primaryColor,
-                          ),
-                          padding: EdgeInsets.all(14),
-                          decoration: BoxDecoration(
-                              borderRadius:
-                              BorderRadius.circular(50),
-                              color: Color(0XFFe0ddf5)),
+                      if (isKeyBoardTapped)
+                        _buildMessageInput(context).expand(),
+                      if (isFirstTime)
+                        LoadingWidget(
+                          message: "Listening...",
                         ),
-                        MyText(
-                          text: "Speak",
-                          fontSize: 12,
-                        )
-                      ],
-                    )
-                  // .paddingBottom(40),
-                ),
-                SizedBox(
-                  width: 24,
-                ),
-                GestureDetector(
-                  onTap: () async {
-                    stopSpeaking();
-                    final bool? res = await TaboogamechatPage(
-                      widget.allGameModel,
-                      widget.index,
-                      widget.sessionId,
-                    ).launch(context);
-                    if (res == true) {
-                      allConversationApiCall();
-                      if (isMuted) {
-                        stopSpeaking();
-                      }
-                    } else {}
-                  },
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.chat,
-                        size: 36,
-                      ),
-                      MyText(
-                        text: "Write",
-                        fontSize: 12,
-                      )
+                      if (!apiCalled && !isLoading)
+                        Row(
+                          children: [
+                            Expanded(
+                              child: MyText(
+                                text: _lastWords,
+                                color: Color(0xff000000),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ).paddingSymmetric(horizontal: 24, vertical: 14),
+                      if (apiCalled && !isKeyBoardTapped)
+                        Consumer<PlayTabooScreenVM>(
+                          builder: (context, vm, child) {
+                            return vm.tabooGameChatPageModel.response == null
+                                ? LoadingWidget(
+                                    message: message,
+                                  )
+                                : Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 28.0, vertical: 8),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                            child: startListening
+                                                ? MyText(
+                                                    text: _lastWords,
+                                                    color: Color(0xff000000),
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.w400,
+                                                  )
+                                                : (vm
+                                                                .tabooGameChatPageModel
+                                                                .response!
+                                                                .aiResponse!
+                                                                .last ==
+                                                            null ||
+                                                        vm
+                                                                .tabooGameChatPageModel
+                                                                .response!
+                                                                .aiResponse!
+                                                                .last ==
+                                                            "")
+                                                    ? Text("")
+                                                    : SizedBox(
+                                                        height:
+                                                            context.height() *
+                                                                0.420,
+                                                        child:
+                                                            SingleChildScrollView(
+                                                          child:
+                                                              // Text(vm.tabooGameChatPageModel.response!.aiResponse!.last)
+                                                              RichText(
+                                                            text: TextSpan(
+                                                              children: _buildBoldText(vm
+                                                                  .tabooGameChatPageModel
+                                                                  .response!
+                                                                  .aiResponse!
+                                                                  .last),
+                                                              style:
+                                                                  primaryTextStyle(
+                                                                          size:
+                                                                              16)
+                                                                      .copyWith(
+                                                                height: 1.5,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      )),
+                                      ],
+                                    ),
+                                  );
+                          },
+                        ),
                     ],
                   ),
                 ),
+                if (!isKeyBoardTapped)
+                  Consumer<PlayTabooScreenVM>(builder: (context, vm, child) {
+                    return vm.tabooGameChatPageModel.response == null
+                        ? SizedBox()
+                        : Center(
+                            child: startListening
+                                ? listeningWidget()
+                                : Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            _lastWords = appStore.lastWords;
+
+                                            // isMuted= getBoolAsync(IS_MUTE);
+
+                                            isMuted = !isMuted;
+                                            setValue(IS_MUTE, isMuted);
+                                            if (isMuted) {
+                                              stopSpeaking();
+                                            } else if (_lastWords.isNotEmpty &&
+                                                _lastSpokenIndex <
+                                                    _lastWords.length) {
+                                              speakText(_lastWords
+                                                  .substring(_lastSpokenIndex));
+                                            }
+                                          });
+                                        },
+                                        child: Column(
+                                          children: [
+                                            Icon(
+                                              !isMuted
+                                                  ? Icons.volume_off
+                                                  : Icons.volume_up,
+                                              size: 36,
+                                            ),
+                                            MyText(
+                                              text:
+                                                  !isMuted ? "Mute" : "Unmute",
+                                              fontSize: 12,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: !isMuted ? 29 : 22,
+                                      ),
+                                      // GestureDetector(
+                                      //   onTap: () {
+                                      //     _initSpeech();
+                                      //     apiCalled = false;
+                                      //     isFirstTime = true;
+                                      //
+                                      //     _lastWords = "";
+                                      //     setState(() {});
+                                      //   },
+                                      //   child: Column(
+                                      //     children: [
+                                      //       Icon(
+                                      //         Icons.keyboard_voice,
+                                      //         size: 36,
+                                      //       ),
+                                      //       MyText(
+                                      //         text: "Speak",
+                                      //         fontSize: 12,
+                                      //       )
+                                      //     ],
+                                      //   ),
+                                      // ),
+                                      //
+                                      // SizedBox(
+                                      //   width: 24,
+                                      // ),
+                                      GestureDetector(
+                                          onTap: () {
+                                            // muteKeyboardSounds();
+                                            isKeyBoardTapped = true;
+
+                                            _focusNode.requestFocus();
+                                            stopSpeaking();
+
+                                            _lastWords = "";
+                                            if (isMuted) {
+                                              stopSpeaking();
+                                            }
+
+                                            setState(() {});
+                                          },
+                                          child: Column(
+                                            children: [
+                                              Container(
+                                                child: Icon(
+                                                  Icons.keyboard_voice,
+                                                  size: 50,
+                                                  color: primaryColor,
+                                                ),
+                                                padding: EdgeInsets.all(14),
+                                                decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            50),
+                                                    color: Color(0XFFe0ddf5)),
+                                              ),
+                                              MyText(
+                                                text: "Speak",
+                                                fontSize: 12,
+                                              )
+                                            ],
+                                          )
+                                          // .paddingBottom(40),
+                                          ),
+                                      SizedBox(
+                                        width: 24,
+                                      ),
+                                      GestureDetector(
+                                        onTap: () async {
+                                          stopSpeaking();
+                                          final bool? res =
+                                              await TaboogamechatPage(
+                                            widget.allGameModel,
+                                            widget.index,
+                                            widget.sessionId,
+                                          ).launch(context);
+                                          if (res == true) {
+                                            allConversationApiCall();
+                                            if (isMuted) {
+                                              stopSpeaking();
+                                            }
+                                          } else {}
+                                        },
+                                        child: Column(
+                                          children: [
+                                            Icon(
+                                              Icons.chat,
+                                              size: 36,
+                                            ),
+                                            MyText(
+                                              text: "Write",
+                                              fontSize: 12,
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ).paddingOnly(
+                                    left: 20, right: 20, bottom: 20),
+                          );
+                  })
               ],
-            ).paddingOnly(left: 20, right: 20, bottom: 20),
-          );
-        }) ],
-                )),
+            )),
           ],
         ),
       ),
@@ -1198,37 +1300,37 @@ _focusNode.dispose();
             Expanded(
               child: startListening
                   ? Padding(
-                padding: EdgeInsets.symmetric(vertical: 10.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Lottie.asset(
-                      'assets/lottiefile/recordaudio.json',
-                      height: 120,
-                      fit: BoxFit.contain,
-                    ),
-                  ],
-                ),
-              )
+                      padding: EdgeInsets.symmetric(vertical: 10.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Lottie.asset(
+                            'assets/lottiefile/recordaudio.json',
+                            height: 120,
+                            fit: BoxFit.contain,
+                          ),
+                        ],
+                      ),
+                    )
                   : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image(
-                    image: AssetImage(ImageConstant.pitch1),
-                    height: 50,
-                  ),
-                  SizedBox(width: 5),
-                  Image(
-                    image: AssetImage(ImageConstant.pitch2),
-                    height: 50,
-                  ),
-                  SizedBox(width: 5),
-                  Image(
-                    image: AssetImage(ImageConstant.pitch3),
-                    height: 50,
-                  ),
-                ],
-              ),
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image(
+                          image: AssetImage(ImageConstant.pitch1),
+                          height: 50,
+                        ),
+                        SizedBox(width: 5),
+                        Image(
+                          image: AssetImage(ImageConstant.pitch2),
+                          height: 50,
+                        ),
+                        SizedBox(width: 5),
+                        Image(
+                          image: AssetImage(ImageConstant.pitch3),
+                          height: 50,
+                        ),
+                      ],
+                    ),
             ),
             SizedBox(width: 10),
             GestureDetector(
@@ -1268,7 +1370,6 @@ _focusNode.dispose();
       padding: EdgeInsets.all(15),
       child: Column(
         children: [
-
           Expanded(
             child: Consumer<PlayTabooScreenVM>(
               builder: (context, vm, child) {
@@ -1281,15 +1382,24 @@ _focusNode.dispose();
                   focusNode: _focusNode,
                   controller: vm.controller,
                   maxLines: null,
-                  decoration: InputDecoration( isDense: true,contentPadding: EdgeInsets.only(top: 80,bottom: 0 ,left: 10,right:10 ),
+                  decoration: InputDecoration(
+                    isDense: true,
+                    contentPadding: EdgeInsets.only(
+                        top: 80, bottom: 0, left: 10, right: 10),
                     hintText: "",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
-                      borderSide: BorderSide(color: primaryColor, width: 3,),
+                      borderSide: BorderSide(
+                        color: primaryColor,
+                        width: 3,
+                      ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
-                      borderSide: BorderSide(color: primaryColor, width: 3,),
+                      borderSide: BorderSide(
+                        color: primaryColor,
+                        width: 3,
+                      ),
                     ),
                   ),
                 );
@@ -1300,17 +1410,14 @@ _focusNode.dispose();
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               DottedBorder(
-                color: gradientStartColor,strokeWidth: 2,
-
-                dashPattern: [2,2],
+                color: gradientStartColor, strokeWidth: 2,
+                dashPattern: [2, 2],
                 // strokeCap: StrokeCap.round,
                 borderType: BorderType.RRect,
                 radius: Radius.circular(12),
                 child: ClipRRect(
                   child: Container(
-                    padding:
-                    EdgeInsets.only( left: 4, right: 4),
-
+                    padding: EdgeInsets.only(left: 4, right: 4),
                     // decoration: BoxDecoration(border: Border.all()),
                     // decoration: boxDecorationWithRoundedCorners(
                     //     // backgroundColor: Color(0xFFe0ddf5)
@@ -1320,24 +1427,69 @@ _focusNode.dispose();
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Image.asset('assets/images/voice.gif', width: 40),
-
                         Text("Use keyboard's voice typing"),
                         4.width,
-                        ShowCaseWidget(
-                          builder: (context) {
-                            return Showcase(
-                              key: _one,
-                              title: "How should i Speak?",
-                              description: "\nplease locate the mic on keyboard.\nThis would help you Speak instead of type\n i'm not seeing the mic\n\nReason 1\nLocate setting option in your keyboard.In \nGBoard you can long press comma to find this.\nInside settings turn on Voice typing\n\nReason 2\nCheck the App settings,locate your keyboard\nApp and see if it has Microphone permission\n\nReason 3\nInside keyboard settings, got to Text suggestions and then turn on show suggestion strip ",
-                              child: Icon(Icons.help_outlined,size: 20,).onTap((){
-                                WidgetsBinding.instance.addPostFrameCallback(
-                                      (_) => ShowCaseWidget.of(context)
-                                      .startShowCase([_one]),
-                                );
-                              }),
-                            );
-                          }
-                        ),
+                        ShowCaseWidget(builder: (context) {
+                          return Showcase(
+                            key: _one,
+                            title: "How should i Speak?",
+                            description:
+                                "\nPlease locate the Mic icon on your keyboard.\n\n"
+                                "Not seeing a Mic icon?\n\n"
+                                "Reason 1\n"
+                                "(Gboard) Long press comma and open settings. Turn on voice typing inside settings.\n\n"
+                                "Reason 2\n"
+                                "Check your App settings and locate your keyboard App. Make sure you have given microphone permission.\n\n"
+                                "Reason 3\n"
+                                "Inside Keyboard settings, go to Text suggestions and then turn on show suggestion strip.",
+                            // description:_buildRichDescription(),
+                            // RichText(
+                            //   text: TextSpan(
+                            //     children: [
+                            //       TextSpan(
+                            //         text: "Reason 1: ",
+                            //         style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                            //       ),
+                            //       TextSpan(
+                            //         text: "Long press comma and open settings to turn on voice typing.\n\n",
+                            //         style: TextStyle(color: Colors.black),
+                            //       ),
+                            //       TextSpan(
+                            //         text: "Reason 2: ",
+                            //         style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                            //       ),
+                            //       TextSpan(
+                            //         text: "Check your app settings and ensure microphone permission is enabled.\n\n",
+                            //         style: TextStyle(color: Colors.black),
+                            //       ),
+                            //       TextSpan(
+                            //         text: "Reason 3: ",
+                            //         style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                            //       ),
+                            //       TextSpan(
+                            //         text: "Go to text suggestions in keyboard settings and enable 'show suggestion strip'.",
+                            //         style: TextStyle(color: Colors.black),
+                            //       ),
+                            //     ],
+                            //   ),
+                            // ),
+                            //
+                            child: Column(
+                              children: [
+                                Icon(
+                                  Icons.help_outlined,
+                                  size: 20,
+                                ).onTap(() {
+                                  WidgetsBinding.instance.addPostFrameCallback(
+                                    (_) => ShowCaseWidget.of(context)
+                                        .startShowCase([_one]),
+                                  );
+                                }),
+                                // _buildRichDescription(),
+                              ],
+                            ),
+                          );
+                        }),
                         4.width,
                       ],
                     ),
@@ -1350,7 +1502,7 @@ _focusNode.dispose();
                   // FocusScope.of(context).unfocus();
                   // unmuteSystemSounds();
                   var chatPageVM =
-                  Provider.of<PlayTabooScreenVM>(context, listen: false);
+                      Provider.of<PlayTabooScreenVM>(context, listen: false);
                   String messageText = chatPageVM.controller.text.trim();
                   _lastWords = messageText;
                   // save2();
@@ -1359,7 +1511,7 @@ _focusNode.dispose();
                     _lastWords = "";
                   });
                   if (ques.isNotEmpty) {
-                    save2(ques,widget.sessionId);
+                    save2(ques, widget.sessionId);
                   }
 
                   isKeyBoardTapped = false;
@@ -1377,6 +1529,28 @@ _focusNode.dispose();
             ],
           ).paddingTop(10),
         ],
+      ),
+    );
+  }
+
+  Widget _buildRichDescription() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Text.rich(
+        TextSpan(
+          children: [
+            TextSpan(
+              text: 'Reason 1: ',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            TextSpan(text: '(Gboard) Long press comma and open settings.\n'),
+            TextSpan(
+              text: 'Reason 2: ',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            TextSpan(text: 'Check your app settings.\n'),
+          ],
+        ),
       ),
     );
   }
