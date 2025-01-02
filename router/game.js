@@ -172,7 +172,9 @@ router.put("/game-template/:id",async(req,res,next)=>{
   try{
   const {id}= req.params;
   const {engprolevel,content} = req.body;
-  const updatedTemplate = await Template.findByIdAndUpdate(id, {engprolevel,content},{new:true});
+  let plainText = striptags(content);
+  plainText = he.decode(plainText);
+  const updatedTemplate = await Template.findByIdAndUpdate(id, {engprolevel,content:plainText},{new:true});
   return res.status(200).json({updatedTemplate});
 }
 catch(err){
@@ -208,9 +210,8 @@ router.get("/game-template/:id",async(req,res,next)=>{
 
 router.get("/pronounciationtemplate", async(req,res,next)=>{
   try{
-    const {content} = req.body;
     const pronounciation = await Pronounciation.find({
-    })
+    });
     return res.status(200).json({pronounciation});
   }
   catch{
@@ -221,9 +222,12 @@ router.get("/pronounciationtemplate", async(req,res,next)=>{
 
 router.post("/pronounciationtemplate", async(req,res,next)=>{
   try{
+
     const {content} = req.body;
+    let plainText = striptags(content);
+    plainText = he.decode(plainText);
     const pronounciation = await new Pronounciation({
-      content
+      content:plainText
     }).save();
     return res.status(200).json({pronounciation});
   }
@@ -236,7 +240,9 @@ router.put("/pronounciationtemplate/:id", async(req,res,next)=>{
   try{
     const {id} = req.params;
     const {content} = req.body;
-    const updatedPronounciation = await Pronounciation.findByIdAndUpdate(id,{content},{new:true});
+    let plainText = striptags(content);
+    plainText = he.decode(plainText);
+    const updatedPronounciation = await Pronounciation.findByIdAndUpdate(id,{content:plainText},{new:true});
     return res.status(200).json({updatedPronounciation});
   }
   catch{

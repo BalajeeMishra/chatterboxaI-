@@ -11,7 +11,7 @@ import User from "../model/User.js";
 import Prompt from "../model/Template.js";
 import jwtHelper from "../helper/jwt_helper.js";
 import getSecret from "../helper/secret.js";
-
+import Pronounciation from "../model/PronounciationTemplate.js";
 const router = Router();
 
 // const apiKey = fs.readFileSync("OpenAiKey.txt", "utf-8").trim();
@@ -146,12 +146,15 @@ router.post("/play", jwtHelper.verifyToken, async (req, res) => {
 
 router.post("/correctsentance", jwtHelper.verifyToken, async (req, res) => {
   try {
-    const { sentence, sessionId } = req.body;
+    const { sentence, sessionId,previousSentence } = req.body;
     const words = sentence.trim().split(/\s+/);
     if (words.length < 5) {
       return res.status(200).json({ sentence });
     } else {
-      const template = `Improve pronounciation mistake in {sentence} and return Improved pronunciation. I need only Improved pronunciation in  response`;
+      const pronounciation = await Pronounciation.find({
+      });
+      const {content} = pronounciation[0];
+      const template = `previous sentence was ${previousSentence},${content} Following is the current sentence: ${sentence}`;
       const prompt = new PromptTemplate({
         inputVariables: ["sentence"],
         template: template,
