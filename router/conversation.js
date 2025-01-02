@@ -147,6 +147,7 @@ router.post("/play", jwtHelper.verifyToken, async (req, res) => {
 router.post("/correctsentance", jwtHelper.verifyToken, async (req, res) => {
   try {
     const { sentence, sessionId,previousSentence } = req.body;
+   
     const words = sentence.trim().split(/\s+/);
     if (words.length < 5) {
       return res.status(200).json({ sentence });
@@ -154,7 +155,8 @@ router.post("/correctsentance", jwtHelper.verifyToken, async (req, res) => {
       const pronounciation = await Pronounciation.find({
       });
       const {content} = pronounciation[0];
-      const template = `previous sentence was ${previousSentence},${content} Following is the current sentence: ${sentence}`;
+     
+      const template = `previous sentence was ${previousSentence},Follow the rule:${content} You need to correct the current sentence based on previous sentence and rule. You dont need to suggest anything from your side. You only need to check on given sentence.Following is the current sentence: {sentence}`;
       const prompt = new PromptTemplate({
         inputVariables: ["sentence"],
         template: template,

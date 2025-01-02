@@ -23,6 +23,7 @@ app.use("/api/user", User);
 app.use("/api", ConverSation);
 app.use("/api/auth", Admin);
 app.get("/", async (_, res) => res.send("Server is running"));
+
 app.use(async (err, req, res, next) => {
   if (!err?.status) {
     err.status = 404;
