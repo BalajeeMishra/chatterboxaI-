@@ -156,7 +156,7 @@ router.post("/correctsentance", jwtHelper.verifyToken, async (req, res) => {
       });
       const {content} = pronounciation[0];
      
-      const template = `previous sentence was ${previousSentence},Follow the rule:${content} You need to correct the current sentence based on previous sentence and rule. You dont need to suggest anything from your side. You only need to check on given sentence.Following is the current sentence: {sentence}`;
+      const template = `previous sentence was ${previousSentence},Follow the rule:${content} You need to correct the current sentence based on previous sentence and rule. You dont need to suggest anything from your side. You only need to check on given sentence. If you found nothing wrong with sentence just return the original sentence. Following is the current sentence: {sentence}`;
       const prompt = new PromptTemplate({
         inputVariables: ["sentence"],
         template: template,
