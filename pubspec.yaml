@@ -25,7 +25,7 @@ dependencies:
   provider: ^6.1.2
   flutter_easyloading: ^3.0.5
   webview_flutter:
-  showcaseview: ^3.0.0
+#  showcaseview: ^3.0.0
 
   #  shared_preferences:
 

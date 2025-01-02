@@ -253,17 +253,19 @@ class PlayTabooScreenVM extends ChangeNotifier {
 
   Future<void> configureTts() async {
     print("Configuration time ==>"+userStore.userNativeLanguage.toString());
-    if (userStore.userNativeLanguage.isNotEmpty && userStore.userEnglishProficiency =="Beginner") {
-      selectedLanguage = userStore.userNativeLanguage;
-      setTtsLanguage(selectedLanguage);
-    }else{
-      print("Amrican");
-      await ttsManager.setLanguage('en-US');
-      // await flutterTts.se;
+    // if (userStore.userNativeLanguage.isNotEmpty && userStore.userEnglishProficiency =="Beginner") {
+    //   selectedLanguage = userStore.userNativeLanguage;
+    //   setTtsLanguage(selectedLanguage);
+    // }else{
+    //   print("Amrican");
+    //   await ttsManager.setLanguage('en-US');
+    //   // await flutterTts.se;
+    //
+    //
+    // }
+    await ttsManager.setLanguage('en-US');
 
-
-    }
-    print("Selectd Language is ==>"+selectedLanguage.toString());
+    // print("Selectd Language is ==>"+selectedLanguage.toString());
 
     await ttsManager.setSpeechRate(0.4);
     await ttsManager.setVolume(1.0);

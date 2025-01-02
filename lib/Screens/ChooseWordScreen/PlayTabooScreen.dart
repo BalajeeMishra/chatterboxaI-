@@ -22,7 +22,6 @@ import 'package:flutter_tts/flutter_tts.dart';
 // import 'package:speech_to_text/speech_to_text.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
-import 'package:showcaseview/showcaseview.dart';
 import '../../Model/AllConversationModel.dart';
 import '../../Model/AllGameModel.dart';
 import '../../Utils/app_colors.dart';
@@ -197,8 +196,9 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   final dropDownKey = GlobalKey<DropdownSearchState>();
   String newEnglishLevel = "";
   //showcase
-  GlobalKey _one = GlobalKey();
+  // GlobalKey _one = GlobalKey();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  String previousSentence = "";
 
   @override
   void initState() {
@@ -206,10 +206,9 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     appStore.setLoading(false);
     selectedLanguageForList = userStore.userNativeLanguage;
     englishLevel = userStore.userEnglishProficiency;
-    newEnglishLevel =  userStore.userEnglishProficiency;
-    print("User NAtive Language is==>"+userStore.userNativeLanguage);
-    print("User English Proficiency is==>"+userStore.userEnglishProficiency);
-
+    newEnglishLevel = userStore.userEnglishProficiency;
+    print("User NAtive Language is==>" + userStore.userNativeLanguage);
+    print("User English Proficiency is==>" + userStore.userEnglishProficiency);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
 // _focusNode.unfocus();
@@ -223,7 +222,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
           widget.allGameModel,
           widget.index,
           true,
-          isMuted);
+          false);
     });
     startListening = false;
     apiCalled = true;
@@ -476,20 +475,21 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   }
 
   Future<void> configureTts() async {
-    print("Configuration time ==>"+userStore.userNativeLanguage.toString());
-    if (userStore.userNativeLanguage.isNotEmpty && userStore.userEnglishProficiency =="Beginner") {
-      selectedLanguage = userStore.userNativeLanguage;
-      setTtsLanguage(selectedLanguage);
-    }else{
-      print("Amrican");
-      await ttsManager.setLanguage('en-US');
-      // await flutterTts.se;
+    print("Configuration time ==>" + userStore.userNativeLanguage.toString());
+    // if (userStore.userNativeLanguage.isNotEmpty &&
+    //     userStore.userEnglishProficiency == "Beginner") {
+    //   selectedLanguage = userStore.userNativeLanguage;
+    //   setTtsLanguage(selectedLanguage);
+    // } else {
+    //   print("Amrican");
+    //   await ttsManager.setLanguage('en-US');
+    //   // await flutterTts.se;
+    // }
+    await ttsManager.setLanguage('en-US');
 
+    // print("Selectd Language is ==>" + selectedLanguage.toString());
 
-    }
-    print("Selectd Language is ==>"+selectedLanguage.toString());
-
-    await ttsManager.setSpeechRate(0.4);
+    // await ttsManager.setSpeechRate(0.4);
     await ttsManager.setVolume(1.0);
   }
 
@@ -501,7 +501,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
     if (text.isNotEmpty) {
       _lastWords = updatedText;
-
 
       await ttsManager.speak(updatedText);
       isSpeaking = true;
@@ -529,11 +528,14 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     _lastWords = appStore.lastWords;
 
     speechRate += change;
-    speechRate = speechRate.clamp(0.1, 2.0);
+    speechRate = speechRate.clamp(0.5, 2.0);
+    print("SPEECH RATE IS ==>"+speechRate.toString());
 
     await ttsManager.setSpeechRate(speechRate);
     print("isSpeaking" + isSpeaking.toString());
-    if (isSpeaking) {
+    if (isSpeaking || userStore.isTTSPlaying == "YES") {
+
+      // if (isSpeaking || ) {
       print("Inside If");
       await ttsManager.stop();
 
@@ -543,12 +545,16 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
         if (remainingText.isNotEmpty) {
           await ttsManager.setSpeechRate(speechRate);
           await speakText(remainingText);
+          setState(() {
+
+          });
         }
       });
     } else {}
   }
 
   String _getRemainingText() {
+    print("Last Word is "+_lastWords.toString());
     if (_lastSpokenIndex < _lastWords.length) {
       return _lastWords.substring(_lastSpokenIndex);
     }
@@ -557,10 +563,12 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
   _onIncreaseRatePressed() {
     adjustSpeechRate(0.1);
+    setState(() {});
   }
 
   _onDecreaseRatePressed() {
     adjustSpeechRate(-0.1);
+    setState(() {});
   }
 
   save() {
@@ -612,197 +620,305 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     setState(() {});
   }
 
-  save2(String? correctedQues,String? sessionId) async{
+  save2(String? correctedQues, String? sessionId) async {
     // unmuteSystemSounds();
     setState(() {
       isSpeaking = true;
     });
     message = 'Correcting Speech recognition mistakes';
-try {
-  final correctedSentence = await correctSentence(correctedQues, sessionId);
+    try {
+      print("into try");
+      final correctedSentence = await correctSentence(correctedQues, sessionId);
+      print("into correct sence check" + correctedSentence.toString());
 
-  if (correctedSentence != null) {
-    print("Corrected Sentence is ==>"+correctedSentence.toString());
-    correctedQues = correctedSentence;
-  }
-  Provider.of<PlayTabooScreenVM>(context, listen: false)
-      .seInitialValue(widget.allGameModel, widget.index, widget.sessionId);
-  Provider.of<PlayTabooScreenVM>(context, listen: false).chatPageAPI(
-      context,
-      correctedQues!,
-      sessionId!,
-      widget.allGameModel,
-      widget.index,
-      false,
-      isMuted);
-  // configureTts();
-  apiCalled = true;
-  _lastWords = appStore.lastWords;
-  print("Last Words is here ==>"+_lastWords.toString());
-  print("Last Words appStore ==>"+appStore.lastWords.toString());
+      if (correctedSentence != null) {
+        print("Corrected Sentence is ==>" + correctedSentence.toString());
+        correctedQues = correctedSentence;
+      }
 
-  startListening = false;
-  Future.delayed(Duration(seconds: 2), () {
-    setState(() {
-      message = 'Thinking...';
-    });
-  });
-  isMuted = getBoolAsync(IS_MUTE);
-  print("ISMUTED ==>" + isMuted.toString());
+      print("Last Question is ==>" + userStore.previousSentence.toString());
+      Provider.of<PlayTabooScreenVM>(context, listen: false)
+          .seInitialValue(widget.allGameModel, widget.index, widget.sessionId);
+      Provider.of<PlayTabooScreenVM>(context, listen: false).chatPageAPI(
+          context,
+          correctedQues!,
+          sessionId!,
+          widget.allGameModel,
+          widget.index,
+          false,
+          isMuted);
+      // configureTts();
+      apiCalled = true;
+      _lastWords = appStore.lastWords;
+      userStore.setPreviousSentence(_lastWords);
+      print("Last Words is here ==>" + _lastWords.toString());
+      print("Last Words appStore ==>" + appStore.lastWords.toString());
 
-  // unmuteSystemSounds();
-  setState(() {});
-}catch(e){
+      startListening = false;
+      Future.delayed(Duration(seconds: 2), () {
+        setState(() {
+          message = 'Thinking...';
+        });
+      });
+      isMuted = getBoolAsync(IS_MUTE);
+      print("ISMUTED ==>" + isMuted.toString());
 
-  toast(e.toString());
-}
+      // unmuteSystemSounds();
+      setState(() {});
+    } catch (e) {
+      toast(e.toString());
+    }
   }
 
   showUpdateDialog() {
     return showDialog(
-        context: context,
-        builder: (context) {
-          String tempEnglishLevel = englishLevel;
+      context: context,
+      builder: (context) {
+        String tempEnglishLevel = englishLevel;
 
-          return Stack(
-            children: [
-              GestureDetector(
-                onTap: () {
-                  pop();
-                },
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10), // Adjust sigma for more blur
-                  child: Container(
-                    color: primaryColor.withOpacity(0.4), // Semi-transparent overlay
-                  ),
+        return Stack(
+          children: [
+            GestureDetector(
+              onTap: () {
+                pop();
+              },
+              child: BackdropFilter(
+                filter: ImageFilter.blur(
+                    sigmaX: 10, sigmaY: 10), // Adjust sigma for more blur
+                child: Container(
+                  color:
+                      primaryColor.withOpacity(0.4), // Semi-transparent overlay
                 ),
               ),
-              AlertDialog(
-                title: const Text('Personalise your learning'),
-                actions: [
-                  Row(
-                    children: [
-                      Text('Your Native Language',
-                          style: secondaryTextStyle(
-                              color: textPrimaryColorGlobal)),
-                      2.width,
-                      Text('*', style: secondaryTextStyle(color: redColor))
-                    ],
-                  ).paddingSymmetric(horizontal: 16, vertical: 4),
-                  4.height,
-                  DropdownSearch<String>(
-                    key: dropDownKey,
-                    items: (String filter, LoadProps? loadProps) async {
-                      if (filter.isEmpty) {
-                        return languageList;
-                      } else {
-                        return languageList
-                            .where((language) => language
-                            .toLowerCase()
-                            .contains(filter.toLowerCase()))
-                            .toList();
-                      }
-                    },
-                    selectedItem: selectedLanguageForList,
-                    popupProps: PopupProps.menu(
-                      showSearchBox: true,
-                      searchFieldProps: TextFieldProps(
-                        decoration:
-                        InputDecoration(hintText: 'Search Language'),
-                      ),
-                      emptyBuilder: (context, searchEntry) {
-                        return Text('No Language available').center();
-                      },
+            ),
+            AlertDialog(
+              title: const Text('Personalise your learning'),
+              actions: [
+                Row(
+                  children: [
+                    Text('Your Native Language',
+                        style:
+                            secondaryTextStyle(color: textPrimaryColorGlobal)),
+                    2.width,
+                    Text('*', style: secondaryTextStyle(color: redColor))
+                  ],
+                ).paddingSymmetric(horizontal: 16, vertical: 4),
+                4.height,
+                DropdownSearch<String>(
+                  key: dropDownKey,
+                  items: (String filter, LoadProps? loadProps) async {
+                    if (filter.isEmpty) {
+                      return languageList;
+                    } else {
+                      return languageList
+                          .where((language) => language
+                              .toLowerCase()
+                              .contains(filter.toLowerCase()))
+                          .toList();
+                    }
+                  },
+                  selectedItem: selectedLanguageForList,
+                  popupProps: PopupProps.menu(
+                    showSearchBox: true,
+                    searchFieldProps: TextFieldProps(
+                      decoration: InputDecoration(hintText: 'Search Language'),
                     ),
-                    onChanged: (String? value) {
-                      setState(() {
-                        selectedLanguageForList = value!;
-                      });
+                    emptyBuilder: (context, searchEntry) {
+                      return Text('No Language available').center();
                     },
-                    decoratorProps: DropDownDecoratorProps(
-                      decoration: defaultInputDecoration(
-                          context), // Applying the decoration here
-                    ),
-                  ).paddingSymmetric(horizontal: 16, vertical: 4),
-                  16.height,
-                  Row(
-                    children: [
-                      Text('Your English Proficiency',
-                          style: secondaryTextStyle(
-                              color: textPrimaryColorGlobal)),
-                      2.width,
-                      Text('*', style: secondaryTextStyle(color: redColor))
-                    ],
-                  ).
-                  paddingSymmetric(horizontal: 16, vertical: 4),
-                  4.height,
-                  DropdownButtonFormField(
-
-                    items: englishLevelList
-                        .map((value) => DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value, style: primaryTextStyle()),
-                    ))
-                        .toList(),
-                    isExpanded: false,
-                    isDense: true,
-                    borderRadius: radius(),
-                    decoration: defaultInputDecoration(context),
-                    value: tempEnglishLevel,
-                    onChanged: (String? value) {
-                      setState(() {
-                        tempEnglishLevel = value!;
-
-                        print("English level"+englishLevel);
-
-
-                        // if (selectedLanguageForList.isNotEmpty) {
-                        //   toastLeft(
-                        //       // durationInSeconds: 3,
-                        //       bgColor: primaryColor,
-                        //       textColor: Colors.white,
-                        //       "You have chosen $englishLevel.\nAI will talk in your Native language & share few references in $selectedLanguage");
-                        // }
-                      });
-
-                    },
-                    // onSaved: (String? newValue) {
-                    //   newEnglishLevel =newValue!;
-                    //   print("New Value==>"+newValue.toString());
-                    // },
-                    focusNode: englishLevelFocus,
-                  ).paddingSymmetric(horizontal: 16, vertical: 4),
-                  40.height,
-
-                  AppButton(
-                    text: 'Confirm',
-                    padding: EdgeInsetsDirectional.all(0),
-                    width: context.width() * 0.68,
-                    height: context.height() * 0.056,
-                    color: primaryColor,
-                    onTap: () {
-                      englishLevel = tempEnglishLevel;
-
-                      updateProficiency(englishLevel,selectedLanguageForList);
-
-                     print("Last word is ==?"+appStore.lastWords.toString());
-
-                      // setState(() {
-                      //
-                      // });
-                      },
                   ),
+                  onChanged: (String? value) {
+                    setState(() {
+                      selectedLanguageForList = value!;
+                    });
+                  },
+                  decoratorProps: DropDownDecoratorProps(
+                    decoration: defaultInputDecoration(
+                        context), // Applying the decoration here
+                  ),
+                ).paddingSymmetric(horizontal: 16, vertical: 4),
+                16.height,
+                Row(
+                  children: [
+                    Text('Your English Proficiency',
+                        style:
+                            secondaryTextStyle(color: textPrimaryColorGlobal)),
+                    2.width,
+                    Text('*', style: secondaryTextStyle(color: redColor))
+                  ],
+                ).paddingSymmetric(horizontal: 16, vertical: 4),
+                4.height,
+                DropdownButtonFormField(
+                  items: englishLevelList
+                      .map((value) => DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value, style: primaryTextStyle()),
+                          ))
+                      .toList(),
+                  isExpanded: false,
+                  isDense: true,
+                  borderRadius: radius(),
+                  decoration: defaultInputDecoration(context),
+                  value: tempEnglishLevel,
+                  onChanged: (String? value) {
+                    setState(() {
+                      tempEnglishLevel = value!;
 
-                ],
-              ).center(),
+                      print("English level" + englishLevel);
 
-            ],
-            );
+                      // if (selectedLanguageForList.isNotEmpty) {
+                      //   toastLeft(
+                      //       // durationInSeconds: 3,
+                      //       bgColor: primaryColor,
+                      //       textColor: Colors.white,
+                      //       "You have chosen $englishLevel.\nAI will talk in your Native language & share few references in $selectedLanguage");
+                      // }
+                    });
+                  },
+                  // onSaved: (String? newValue) {
+                  //   newEnglishLevel =newValue!;
+                  //   print("New Value==>"+newValue.toString());
+                  // },
+                  focusNode: englishLevelFocus,
+                ).paddingSymmetric(horizontal: 16, vertical: 4),
+                40.height,
+                AppButton(
+                  text: 'Confirm',
+                  padding: EdgeInsetsDirectional.all(0),
+                  width: context.width() * 0.68,
+                  height: context.height() * 0.056,
+                  color: primaryColor,
+                  onTap: () {
+                    englishLevel = tempEnglishLevel;
 
-        },
-        // barrierColor: primaryColor
+                    updateProficiency(englishLevel, selectedLanguageForList);
+
+                    print("Last word is ==?" + appStore.lastWords.toString());
+
+                    // setState(() {
+                    //
+                    // });
+                  },
+                ),
+              ],
+            ).center(),
+          ],
+        );
+      },
+      // barrierColor: primaryColor
     );
   }
+
+  void showInstructionDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          child: AnimatedContainer(
+            duration: Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            width: MediaQuery.of(context).size.width * 0.9, // Adjust width here
+            padding: EdgeInsets.all(12.0),
+            child: SingleChildScrollView(
+              child: Stack(
+                clipBehavior:
+                    Clip.none, // Allows positioning outside the dialog
+
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      10.height,
+                      Text(
+                        'How should I speak?',
+                        style: secondaryTextStyle(
+                            size: 24, weight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 20),
+                      Text(
+                        'Please locate the Mic icon on your keyboard.',
+                        style: secondaryTextStyle(),
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        'Not seeing a Mic icon?',
+                        style: secondaryTextStyle(size: 18),
+                      ),
+                      SizedBox(height: 10),
+                      buildReason(
+                          'Reason 1',
+                          '(Gboard) Long press comma and open settings. Turn on ',
+                          'voice typing ',
+                          'inside settings\n'),
+                      buildReason(
+                          'Reason 2',
+                          'Check your App settings and locate your keyboard App. Make sure you have given ',
+                          'microphone permission.\n',
+                          ''),
+                      buildReason(
+                          'Reason 3',
+                          'Inside Keyboard settings, go to Text suggestions and then turn on ',
+                          'show suggestion strip\n',
+                          ''),
+                    ],
+                  ),
+                  Positioned(
+                    top: -30, // Move the close button above the dialog box
+                    right:
+                        -30, // Move the close button to the right of the dialog box
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: CircleAvatar(
+                        radius: 15,
+                        backgroundColor: Colors.black,
+                        child: Icon(
+                          Icons.close,
+                          color: Colors.white,
+                          size: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget buildReason(
+      String title, String text, String highlight, String remaining) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: primaryTextStyle(),
+        ),
+        Text.rich(
+          TextSpan(
+            children: [
+              TextSpan(text: text),
+              TextSpan(
+                  text: highlight,
+                  style: primaryTextStyle(weight: FontWeight.bold)),
+              TextSpan(text: remaining),
+            ],
+          ),
+        ),
+        SizedBox(height: 10),
+      ],
+    );
+  }
+
   // void muteKeyboardSounds() async {
   //   try {
   //     await MethodChannel('volume_control').invokeMethod('muteKeyboardSounds');
@@ -812,41 +928,41 @@ try {
   //   }
   // }
   //
-  Future<void> updateProficiency(String? englishProficiency,String? selectedNLanguage) async {
+  Future<void> updateProficiency(
+      String? englishProficiency, String? selectedNLanguage) async {
     Map<String, dynamic> req = {
       'nativeLanguage': selectedNLanguage,
-      'engprolevel':englishProficiency
+      'engprolevel': englishProficiency
     };
 
     try {
       final value = await updateProficiencyApi(req);
       newEnglishLevel = englishProficiency!;
 
-        setValue(USER_NATIVE_LANGUAGE, value.user!.nativeLanguage.toString());
-        userStore.setUserNativeLanguage(value.user!.nativeLanguage.toString());
-        setValue(USER_ENGLISH_PROFICIENCY, value.user!.engprolevel.toString());
-        userStore.setUserEnglishProficiency(value.user!.
-        engprolevel.toString());
+      setValue(USER_NATIVE_LANGUAGE, value.user!.nativeLanguage.toString());
+      userStore.setUserNativeLanguage(value.user!.nativeLanguage.toString());
+      setValue(USER_ENGLISH_PROFICIENCY, value.user!.engprolevel.toString());
+      userStore.setUserEnglishProficiency(value.user!.engprolevel.toString());
       speakText(appStore.lastWords);
-        pop();
-        setState(() {});
-
+      pop();
+      setState(() {});
     } catch (e) {
       toast(e.toString());
       appStore.setLoading(false);
     }
   }
-  Future<String?> correctSentence(String? ques,String? sessionId) async {
+
+  Future<String?> correctSentence(String? ques, String? sessionId) async {
     Map<String, dynamic> req = {
       'sessionId': sessionId,
-      'sentence':ques
+      'sentence': ques,
+      'previousSentence': userStore.previousSentence
     };
 
     try {
       final value = await correctSentenceApi(req);
       return value.response?.text;
       setState(() {});
-
     } catch (e) {
       toast(e.toString());
       appStore.setLoading(false);
@@ -858,7 +974,7 @@ try {
   void dispose() {
     super.dispose();
     // VolumeController().removeListener();
-_focusNode.dispose();
+    _focusNode.dispose();
     stopSpeaking();
     // _startListening();
   }
@@ -866,7 +982,7 @@ _focusNode.dispose();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key:_scaffoldKey,
+      key: _scaffoldKey,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(40.0),
         child: AppBar(
@@ -1429,67 +1545,73 @@ _focusNode.dispose();
                         Image.asset('assets/images/voice.gif', width: 40),
                         Text("Use keyboard's voice typing"),
                         4.width,
-                        ShowCaseWidget(builder: (context) {
-                          return Showcase(
-                            key: _one,
-                            title: "How should i Speak?",
-                            description:
-                                "\nPlease locate the Mic icon on your keyboard.\n\n"
-                                "Not seeing a Mic icon?\n\n"
-                                "Reason 1\n"
-                                "(Gboard) Long press comma and open settings. Turn on voice typing inside settings.\n\n"
-                                "Reason 2\n"
-                                "Check your App settings and locate your keyboard App. Make sure you have given microphone permission.\n\n"
-                                "Reason 3\n"
-                                "Inside Keyboard settings, go to Text suggestions and then turn on show suggestion strip.",
-                            // description:_buildRichDescription(),
-                            // RichText(
-                            //   text: TextSpan(
-                            //     children: [
-                            //       TextSpan(
-                            //         text: "Reason 1: ",
-                            //         style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-                            //       ),
-                            //       TextSpan(
-                            //         text: "Long press comma and open settings to turn on voice typing.\n\n",
-                            //         style: TextStyle(color: Colors.black),
-                            //       ),
-                            //       TextSpan(
-                            //         text: "Reason 2: ",
-                            //         style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-                            //       ),
-                            //       TextSpan(
-                            //         text: "Check your app settings and ensure microphone permission is enabled.\n\n",
-                            //         style: TextStyle(color: Colors.black),
-                            //       ),
-                            //       TextSpan(
-                            //         text: "Reason 3: ",
-                            //         style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-                            //       ),
-                            //       TextSpan(
-                            //         text: "Go to text suggestions in keyboard settings and enable 'show suggestion strip'.",
-                            //         style: TextStyle(color: Colors.black),
-                            //       ),
-                            //     ],
-                            //   ),
-                            // ),
-                            //
-                            child: Column(
-                              children: [
-                                Icon(
-                                  Icons.help_outlined,
-                                  size: 20,
-                                ).onTap(() {
-                                  WidgetsBinding.instance.addPostFrameCallback(
-                                    (_) => ShowCaseWidget.of(context)
-                                        .startShowCase([_one]),
-                                  );
-                                }),
-                                // _buildRichDescription(),
-                              ],
-                            ),
-                          );
+                        Icon(
+                          Icons.help_outlined,
+                          size: 20,
+                        ).onTap(() {
+                          showInstructionDialog();
                         }),
+                        // ShowCaseWidget(builder: (context) {
+                        //   return Showcase(
+                        //     key: _one,
+                        //     title: "How should i Speak?",
+                        //     description:
+                        //         "\nPlease locate the Mic icon on your keyboard.\n\n"
+                        //         "Not seeing a Mic icon?\n\n"
+                        //         "Reason 1\n"
+                        //         "(Gboard) Long press comma and open settings. Turn on voice typing inside settings.\n\n"
+                        //         "Reason 2\n"
+                        //         "Check your App settings and locate your keyboard App. Make sure you have given microphone permission.\n\n"
+                        //         "Reason 3\n"
+                        //         "Inside Keyboard settings, go to Text suggestions and then turn on show suggestion strip.",
+                        //     // description:_buildRichDescription(),
+                        //     // RichText(
+                        //     //   text: TextSpan(
+                        //     //     children: [
+                        //     //       TextSpan(
+                        //     //         text: "Reason 1: ",
+                        //     //         style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                        //     //       ),
+                        //     //       TextSpan(
+                        //     //         text: "Long press comma and open settings to turn on voice typing.\n\n",
+                        //     //         style: TextStyle(color: Colors.black),
+                        //     //       ),
+                        //     //       TextSpan(
+                        //     //         text: "Reason 2: ",
+                        //     //         style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                        //     //       ),
+                        //     //       TextSpan(
+                        //     //         text: "Check your app settings and ensure microphone permission is enabled.\n\n",
+                        //     //         style: TextStyle(color: Colors.black),
+                        //     //       ),
+                        //     //       TextSpan(
+                        //     //         text: "Reason 3: ",
+                        //     //         style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                        //     //       ),
+                        //     //       TextSpan(
+                        //     //         text: "Go to text suggestions in keyboard settings and enable 'show suggestion strip'.",
+                        //     //         style: TextStyle(color: Colors.black),
+                        //     //       ),
+                        //     //     ],
+                        //     //   ),
+                        //     // ),
+                        //     //
+                        //     child: Column(
+                        //       children: [
+                        //         Icon(
+                        //           Icons.help_outlined,
+                        //           size: 20,
+                        //         ).onTap(() {
+                        //           WidgetsBinding.instance.addPostFrameCallback(
+                        //             (_) => ShowCaseWidget.of(context)
+                        //                 .startShowCase([_one]),
+                        //           );
+                        //         }),
+                        //         // _buildRichDescription(),
+                        //       ],
+                        //     ),
+                        //   );
+                        // }),
                         4.width,
                       ],
                     ),
@@ -1529,28 +1651,6 @@ _focusNode.dispose();
             ],
           ).paddingTop(10),
         ],
-      ),
-    );
-  }
-
-  Widget _buildRichDescription() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Text.rich(
-        TextSpan(
-          children: [
-            TextSpan(
-              text: 'Reason 1: ',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            TextSpan(text: '(Gboard) Long press comma and open settings.\n'),
-            TextSpan(
-              text: 'Reason 2: ',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            TextSpan(text: 'Check your app settings.\n'),
-          ],
-        ),
       ),
     );
   }
