@@ -22,8 +22,9 @@ class TaboogamechatPage extends StatefulWidget {
   final AllGameModel allGameModel;
   final int index;
   final String sessionId;
+  String gameName;
 
-  const TaboogamechatPage(this.allGameModel, this.index, this.sessionId, {super.key});
+  TaboogamechatPage(this.allGameModel, this.index, this.sessionId, this.gameName,{super.key});
 
   @override
   State<StatefulWidget> createState() => _TaboogamechatPage();
@@ -161,7 +162,7 @@ class _TaboogamechatPage extends State<TaboogamechatPage> with WidgetsBindingObs
         onPressed: () {
           Navigator.pop(context,true);
         },
-        title: "Taboo",
+        title:  widget.gameName,
       ),
       body: WillPopScope(
         onWillPop: () async {

@@ -23,9 +23,6 @@ android {
         jvmTarget = JavaVersion.VERSION_1_8
     }
 
-//    sourceSets {
-//        main.java.srcDirs += 'src/main/kotlin'
-//    }
 
     defaultConfig {
         applicationId "com.talkyplay.zapai"

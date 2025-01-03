@@ -67,6 +67,8 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   bool isLoading = false;
   bool apiCalled = false;
   bool isFirstTime = false;
+  bool isLoaderShow = false;
+
   bool isMuted = false;
   String currentSpeechText = "";
 
@@ -524,19 +526,16 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   /// Submit and call next function
 
   Future<void> adjustSpeechRate(double change) async {
-    print("LAst Owrds is ==>" + appStore.lastWords);
+    print("Last Words: ${appStore.lastWords}");
     _lastWords = appStore.lastWords;
 
-    speechRate += change;
-    speechRate = speechRate.clamp(0.5, 2.0);
-    print("SPEECH RATE IS ==>"+speechRate.toString());
+    speechRate = (speechRate + change).clamp(0.2, 2.0);
+    print("Speech Rate is: $speechRate");
 
     await ttsManager.setSpeechRate(speechRate);
-    print("isSpeaking" + isSpeaking.toString());
-    if (isSpeaking || userStore.isTTSPlaying == "YES") {
 
-      // if (isSpeaking || ) {
-      print("Inside If");
+    if (isSpeaking || userStore.isTTSPlaying == "YES") {
+      print("Inside If: Stopping TTS and restarting with new rate");
       await ttsManager.stop();
 
       String remainingText = _getRemainingText();
@@ -545,30 +544,28 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
         if (remainingText.isNotEmpty) {
           await ttsManager.setSpeechRate(speechRate);
           await speakText(remainingText);
-          setState(() {
-
-          });
+          setState(() {});
         }
       });
-    } else {}
+    }
+  }
+
+   _onIncreaseRatePressed() {
+    adjustSpeechRate(0.2);
+    setState(() {});
+  }
+
+   _onDecreaseRatePressed() {
+    adjustSpeechRate(-0.2);
+    setState(() {});
   }
 
   String _getRemainingText() {
-    print("Last Word is "+_lastWords.toString());
+    print("Last Word is " + _lastWords.toString());
     if (_lastSpokenIndex < _lastWords.length) {
       return _lastWords.substring(_lastSpokenIndex);
     }
     return '';
-  }
-
-  _onIncreaseRatePressed() {
-    adjustSpeechRate(0.1);
-    setState(() {});
-  }
-
-  _onDecreaseRatePressed() {
-    adjustSpeechRate(-0.1);
-    setState(() {});
   }
 
   save() {
@@ -669,6 +666,40 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
       toast(e.toString());
     }
   }
+  save3(String? correctedQues, String? sessionId) async {
+    setState(() {
+      isSpeaking = true;
+    });
+
+    try {
+      final correctedSentence = await correctSentence(correctedQues, sessionId);
+
+      if (correctedSentence != null) {
+        correctedQues = correctedSentence;
+      }
+
+      Provider.of<PlayTabooScreenVM>(context, listen: false)
+          .seInitialValue(widget.allGameModel, widget.index, widget.sessionId);
+      Provider.of<PlayTabooScreenVM>(context, listen: false).chatPageAPI(
+          context,
+          correctedQues!,
+          sessionId!,
+          widget.allGameModel,
+          widget.index,
+          false,
+          isMuted);
+      isLoaderShow =false;
+      apiCalled = true;
+      _lastWords = appStore.lastWords;
+      userStore.setPreviousSentence(_lastWords);
+      startListening = false;
+      isMuted = getBoolAsync(IS_MUTE);
+
+      setState(() {});
+    } catch (e) {
+      toast(e.toString());
+    }
+  }
 
   showUpdateDialog() {
     return showDialog(
@@ -684,10 +715,10 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
               },
               child: BackdropFilter(
                 filter: ImageFilter.blur(
-                    sigmaX: 10, sigmaY: 10), // Adjust sigma for more blur
+                    sigmaX: 10, sigmaY: 10),
                 child: Container(
                   color:
-                      primaryColor.withOpacity(0.4), // Semi-transparent overlay
+                      primaryColor.withOpacity(0.4),
                 ),
               ),
             ),
@@ -764,15 +795,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                     setState(() {
                       tempEnglishLevel = value!;
 
-                      print("English level" + englishLevel);
-
-                      // if (selectedLanguageForList.isNotEmpty) {
-                      //   toastLeft(
-                      //       // durationInSeconds: 3,
-                      //       bgColor: primaryColor,
-                      //       textColor: Colors.white,
-                      //       "You have chosen $englishLevel.\nAI will talk in your Native language & share few references in $selectedLanguage");
-                      // }
                     });
                   },
                   // onSaved: (String? newValue) {
@@ -793,11 +815,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
                     updateProficiency(englishLevel, selectedLanguageForList);
 
-                    print("Last word is ==?" + appStore.lastWords.toString());
-
-                    // setState(() {
-                    //
-                    // });
                   },
                 ),
               ],
@@ -805,7 +822,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
           ],
         );
       },
-      // barrierColor: primaryColor
     );
   }
 
@@ -820,12 +836,12 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
           child: AnimatedContainer(
             duration: Duration(milliseconds: 300),
             curve: Curves.easeInOut,
-            width: MediaQuery.of(context).size.width * 0.9, // Adjust width here
+            width: MediaQuery.of(context).size.width * 0.9,
             padding: EdgeInsets.all(12.0),
             child: SingleChildScrollView(
               child: Stack(
                 clipBehavior:
-                    Clip.none, // Allows positioning outside the dialog
+                    Clip.none,
 
                 children: [
                   Column(
@@ -867,9 +883,9 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                     ],
                   ),
                   Positioned(
-                    top: -30, // Move the close button above the dialog box
+                    top: -30,
                     right:
-                        -30, // Move the close button to the right of the dialog box
+                        -30,
                     child: GestureDetector(
                       onTap: () {
                         Navigator.of(context).pop();
@@ -919,15 +935,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     );
   }
 
-  // void muteKeyboardSounds() async {
-  //   try {
-  //     await MethodChannel('volume_control').invokeMethod('muteKeyboardSounds');
-  //     print("Keyboard voice typing sounds muted.");
-  //   } catch (e) {
-  //     print("Error muting keyboard sounds: $e");
-  //   }
-  // }
-  //
+
   Future<void> updateProficiency(
       String? englishProficiency, String? selectedNLanguage) async {
     Map<String, dynamic> req = {
@@ -936,14 +944,19 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     };
 
     try {
+      isLoaderShow =true;
       final value = await updateProficiencyApi(req);
       newEnglishLevel = englishProficiency!;
+      ques=appStore.lastWords;
+      if (ques.isNotEmpty) {
+        ttsManager.stop();
+        save3(ques, widget.sessionId);
+      }
 
       setValue(USER_NATIVE_LANGUAGE, value.user!.nativeLanguage.toString());
       userStore.setUserNativeLanguage(value.user!.nativeLanguage.toString());
       setValue(USER_ENGLISH_PROFICIENCY, value.user!.engprolevel.toString());
       userStore.setUserEnglishProficiency(value.user!.engprolevel.toString());
-      speakText(appStore.lastWords);
       pop();
       setState(() {});
     } catch (e) {
@@ -962,7 +975,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     try {
       final value = await correctSentenceApi(req);
       return value.response?.text;
-      setState(() {});
     } catch (e) {
       toast(e.toString());
       appStore.setLoading(false);
@@ -973,10 +985,8 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   @override
   void dispose() {
     super.dispose();
-    // VolumeController().removeListener();
     _focusNode.dispose();
     stopSpeaking();
-    // _startListening();
   }
 
   @override
@@ -1142,6 +1152,10 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                         LoadingWidget(
                           message: "Listening...",
                         ),
+                      if(isLoaderShow)
+                        CircularProgressIndicator(color: primaryColor),
+
+
                       if (!apiCalled && !isLoading)
                         Row(
                           children: [
@@ -1155,7 +1169,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                             ),
                           ],
                         ).paddingSymmetric(horizontal: 24, vertical: 14),
-                      if (apiCalled && !isKeyBoardTapped)
+                      if (apiCalled && !isKeyBoardTapped && !isLoaderShow)
                         Consumer<PlayTabooScreenVM>(
                           builder: (context, vm, child) {
                             return vm.tabooGameChatPageModel.response == null
@@ -1222,7 +1236,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                     ],
                   ),
                 ),
-                if (!isKeyBoardTapped)
+                if (!isKeyBoardTapped && !isLoaderShow)
                   Consumer<PlayTabooScreenVM>(builder: (context, vm, child) {
                     return vm.tabooGameChatPageModel.response == null
                         ? SizedBox()
@@ -1344,10 +1358,11 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                           stopSpeaking();
                                           final bool? res =
                                               await TaboogamechatPage(
-                                            widget.allGameModel,
-                                            widget.index,
-                                            widget.sessionId,
-                                          ).launch(context);
+                                                      widget.allGameModel,
+                                                      widget.index,
+                                                      widget.sessionId,
+                                                      widget.gameName)
+                                                  .launch(context);
                                           if (res == true) {
                                             allConversationApiCall();
                                             if (isMuted) {
