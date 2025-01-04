@@ -111,6 +111,12 @@ router.post("/play", jwtHelper.verifyToken, async (req, res) => {
 
     const nativeLanguage = user.nativeLanguage;
 
+    if(userdatalog?.engprolevel != user.engprolevel){
+      userSession.history = "";
+      userdatalog.engprolevel = user.engprolevel;
+      await userdatalog.save();
+    }
+
     const response = await userSession.chain.invoke({
       question: question,
       maincontent: maincontent,
@@ -135,6 +141,7 @@ router.post("/play", jwtHelper.verifyToken, async (req, res) => {
         aiResponse: [response.text],
         userId,
         sessionId: sessionId,
+        engprolevel:user.engprolevel
       });
     }
     await userdatalog.save();
