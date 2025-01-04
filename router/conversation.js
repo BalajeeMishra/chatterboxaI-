@@ -147,10 +147,9 @@ router.post("/play", jwtHelper.verifyToken, async (req, res) => {
 router.post("/correctsentance", jwtHelper.verifyToken, async (req, res) => {
   try {
     const { sentence, sessionId,previousSentence } = req.body;
-   
     const words = sentence.trim().split(/\s+/);
     if (words.length < 5) {
-      return res.status(200).json({ sentence });
+      return res.status(200).json({ response:{text:sentence} });
     } else {
       const pronounciation = await Pronounciation.find({
       });
