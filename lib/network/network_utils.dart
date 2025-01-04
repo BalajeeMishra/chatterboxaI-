@@ -115,6 +115,8 @@ Future<Response> buildHttpResponse(String endPoint, {HttpMethod method = HttpMet
       log('Request: $request');
       response =
       await http.post(url, body: jsonEncode(request), headers: headers);
+      print("Raw Response: ${response.body}");
+
     } else if (method == HttpMethod.DELETE) {
       response = await http.delete(url, headers: headers);
     } else if (method == HttpMethod.PUT) {

@@ -141,6 +141,8 @@ class PlayTabooScreenVM extends ChangeNotifier {
           tabooGameChatPageModel = response.data!;
           notifyListeners();
           speakText(response.data!.response!.aiResponse!.last);
+          print("Response data is==>"+response.data!.toJson().toString());
+          appStore.setUserResponse(response.data!.response!.userResponse!.last);
           userStore.setTTSPlaying("YES");
           print("is yes"+userStore.isTTSPlaying.toString());
 

@@ -550,12 +550,12 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     }
   }
 
-   _onIncreaseRatePressed() {
+  _onIncreaseRatePressed() {
     adjustSpeechRate(0.2);
     setState(() {});
   }
 
-   _onDecreaseRatePressed() {
+  _onDecreaseRatePressed() {
     adjustSpeechRate(-0.2);
     setState(() {});
   }
@@ -618,7 +618,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   }
 
   save2(String? correctedQues, String? sessionId) async {
-    // unmuteSystemSounds();
     setState(() {
       isSpeaking = true;
     });
@@ -633,7 +632,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
         correctedQues = correctedSentence;
       }
 
-      print("Last Question is ==>" + userStore.previousSentence.toString());
       Provider.of<PlayTabooScreenVM>(context, listen: false)
           .seInitialValue(widget.allGameModel, widget.index, widget.sessionId);
       Provider.of<PlayTabooScreenVM>(context, listen: false).chatPageAPI(
@@ -666,18 +664,13 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
       toast(e.toString());
     }
   }
+
   save3(String? correctedQues, String? sessionId) async {
     setState(() {
       isSpeaking = true;
     });
 
     try {
-      final correctedSentence = await correctSentence(correctedQues, sessionId);
-
-      if (correctedSentence != null) {
-        correctedQues = correctedSentence;
-      }
-
       Provider.of<PlayTabooScreenVM>(context, listen: false)
           .seInitialValue(widget.allGameModel, widget.index, widget.sessionId);
       Provider.of<PlayTabooScreenVM>(context, listen: false).chatPageAPI(
@@ -688,7 +681,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
           widget.index,
           false,
           isMuted);
-      isLoaderShow =false;
+      isLoaderShow = false;
       apiCalled = true;
       _lastWords = appStore.lastWords;
       userStore.setPreviousSentence(_lastWords);
@@ -714,11 +707,9 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                 pop();
               },
               child: BackdropFilter(
-                filter: ImageFilter.blur(
-                    sigmaX: 10, sigmaY: 10),
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                 child: Container(
-                  color:
-                      primaryColor.withOpacity(0.4),
+                  color: primaryColor.withOpacity(0.4),
                 ),
               ),
             ),
@@ -794,7 +785,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                   onChanged: (String? value) {
                     setState(() {
                       tempEnglishLevel = value!;
-
                     });
                   },
                   // onSaved: (String? newValue) {
@@ -814,7 +804,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                     englishLevel = tempEnglishLevel;
 
                     updateProficiency(englishLevel, selectedLanguageForList);
-
                   },
                 ),
               ],
@@ -840,9 +829,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
             padding: EdgeInsets.all(12.0),
             child: SingleChildScrollView(
               child: Stack(
-                clipBehavior:
-                    Clip.none,
-
+                clipBehavior: Clip.none,
                 children: [
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -884,8 +871,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                   ),
                   Positioned(
                     top: -30,
-                    right:
-                        -30,
+                    right: -30,
                     child: GestureDetector(
                       onTap: () {
                         Navigator.of(context).pop();
@@ -935,7 +921,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     );
   }
 
-
   Future<void> updateProficiency(
       String? englishProficiency, String? selectedNLanguage) async {
     Map<String, dynamic> req = {
@@ -944,10 +929,11 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     };
 
     try {
-      isLoaderShow =true;
+      isLoaderShow = true;
       final value = await updateProficiencyApi(req);
       newEnglishLevel = englishProficiency!;
-      ques=appStore.lastWords;
+      ques = appStore.userResponse;
+      print("UserResponse is =>"+ques.toString());
       if (ques.isNotEmpty) {
         ttsManager.stop();
         save3(ques, widget.sessionId);
@@ -969,13 +955,14 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     Map<String, dynamic> req = {
       'sessionId': sessionId,
       'sentence': ques,
-      'previousSentence': userStore.previousSentence
+      'previousSentence': userStore.previousSentence,
     };
 
     try {
       final value = await correctSentenceApi(req);
       return value.response?.text;
     } catch (e) {
+      // print("Error in correctSentence: $e");
       toast(e.toString());
       appStore.setLoading(false);
       return null;
@@ -1152,10 +1139,8 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                         LoadingWidget(
                           message: "Listening...",
                         ),
-                      if(isLoaderShow)
+                      if (isLoaderShow)
                         CircularProgressIndicator(color: primaryColor),
-
-
                       if (!apiCalled && !isLoading)
                         Row(
                           children: [
@@ -1642,7 +1627,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                       Provider.of<PlayTabooScreenVM>(context, listen: false);
                   String messageText = chatPageVM.controller.text.trim();
                   _lastWords = messageText;
-                  // save2();
                   setState(() {
                     ques = _lastWords;
                     _lastWords = "";
