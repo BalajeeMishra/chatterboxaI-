@@ -111,7 +111,7 @@ router.post("/play", jwtHelper.verifyToken, async (req, res) => {
 
     const nativeLanguage = user.nativeLanguage;
 
-    if(userdatalog?.engprolevel != user.engprolevel){
+    if(userdatalog && userdatalog?.engprolevel != user.engprolevel){
       userSession.history = "";
       userdatalog.engprolevel = user.engprolevel;
       await userdatalog.save();
