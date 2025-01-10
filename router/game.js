@@ -86,12 +86,13 @@ catch(err){
 router.post("/new-game-content/:id",async(req,res,next)=>{
   try{
   const {id}= req.params;
-  const {level,mainContent,detailOfContent} = req.body;
+  const {level,mainContent,detailOfContent,youtubeUrl} = req.body;
   const gameContent = new GameContent({
     gameId:id,
     level,
     mainContent,
-    detailOfContent
+    detailOfContent,
+    youtubeUrl
   });
   await gameContent.save();
   return res.status(200).json({gameContent});
@@ -120,8 +121,8 @@ router.get("/allgamecontent/:id",async(req,res,next)=>{
 router.put("/edit-game-content/:id",async(req,res,next)=>{
   try{
   const id = req.params.id;
-  const {level,mainContent,detailOfContent} = req.body;
-  const editedGameContent = await GameContent.findByIdAndUpdate(id, {level,mainContent,detailOfContent},{new:true});
+  const {level,mainContent,detailOfContent,youtubeUrl} = req.body;
+  const editedGameContent = await GameContent.findByIdAndUpdate(id, {level,mainContent,detailOfContent,youtubeUrl},{new:true});
   if(!editedGameContent){
     return res.status(500).json({messagae:"Something went wrong."})
   }

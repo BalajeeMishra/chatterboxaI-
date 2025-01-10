@@ -12,7 +12,11 @@ const gameContentSchema = new mongoose.Schema({
     type: String,
     enum: ["easy", "medium", "hard"]
   },
-  detailOfContent: [String]
+  detailOfContent: [String],
+  
+  youtubeUrl:{
+    type: String,
+  }
 });
 
 const GameContent = mongoose.model("GameContent", gameContentSchema);
