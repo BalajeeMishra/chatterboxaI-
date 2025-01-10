@@ -45,6 +45,7 @@ export interface Game {
   mainContent: string;
   level: string;
   detailOfContent: string[];
+  youtubeUrl?:any
 }
 
 // // Define the columns for the new table structure
@@ -77,6 +78,15 @@ export const columns: ColumnDef<Game>[] = [
       return <div>{details ? details.join(", ") : "No details available"}</div>;
     },
   },
+  {
+    accessorKey: "youtubeUrl",
+    header: "Youtube URL",
+
+    cell: ({ row }) => {
+      const details = row.getValue("youtubeUrl") as string[] | undefined; // Allow it to be undefined
+      return <div>{details ? details : "No details available"}</div>;
+    },
+  },
 ];
 interface NewGameContentFormProps {
   seteditMainContent: React.Dispatch<React.SetStateAction<string>>;
@@ -87,6 +97,8 @@ interface NewGameContentFormProps {
   data: Game[]; // The array of Game objects
   setData: React.Dispatch<React.SetStateAction<Game[]>>; // Function to update the state
   setEditgameId: any;
+  edityoutubeUrl?: any;
+  seteditYoutubeUrl?: any;
 }
 
 export const GameContentTable: React.FC<NewGameContentFormProps> = ({
@@ -96,6 +108,8 @@ export const GameContentTable: React.FC<NewGameContentFormProps> = ({
   seteditLevel,
   seteditDetailOfContent,
   setEditgameId,
+  edityoutubeUrl,
+  seteditYoutubeUrl,
 }) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] =
@@ -132,7 +146,6 @@ export const GameContentTable: React.FC<NewGameContentFormProps> = ({
       } catch (err) {
         console.log(err);
         setError("Failed to load games");
-        
       } finally {
         setLoading(false);
       }
@@ -164,7 +177,7 @@ export const GameContentTable: React.FC<NewGameContentFormProps> = ({
       const updatedContent = await fetchGameContent(selectgameId);
       setData(updatedContent);
       console.log(updatedContent);
-      
+
       // Return the updated content or handle it as needed
       // return updatedContent;
     } catch (error) {
@@ -182,6 +195,7 @@ export const GameContentTable: React.FC<NewGameContentFormProps> = ({
     seteditLevel(game.level as "easy" | "medium" | "hard");
     seteditDetailOfContent(game.detailOfContent);
     setEditgameId(game._id);
+    seteditYoutubeUrl(game.youtubeUrl);
   };
 
   const table = useReactTable({

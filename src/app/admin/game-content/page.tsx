@@ -8,6 +8,8 @@ export default function GameContent() {
   const [data, setData] = React.useState<Game[]>([]);
   const [editgameId, setEditgameId] = useState<string>("");
   const [editmainContent, seteditMainContent] = useState<string>("");
+  
+  const [edityoutubeUrl, seteditYoutubeUrl] = useState();
   const [editlevel, seteditLevel] = useState<"easy" | "medium" | "hard">(
     "medium"
   );
@@ -30,6 +32,8 @@ export default function GameContent() {
           seteditDetailOfContent={seteditDetailOfContent}
           data={data}
           setData={setData}
+          edityoutubeUrl={edityoutubeUrl} 
+          seteditYoutubeUrl={seteditYoutubeUrl}
         />
         <GameContentTable
           seteditMainContent={seteditMainContent}
@@ -38,6 +42,8 @@ export default function GameContent() {
           seteditDetailOfContent={seteditDetailOfContent}
           data={data}
           setData={setData}
+          edityoutubeUrl={edityoutubeUrl} 
+          seteditYoutubeUrl={seteditYoutubeUrl}
         />
       </div>
     </div>
