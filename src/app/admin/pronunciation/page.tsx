@@ -31,7 +31,6 @@ export default function Newgame() {
       }
 
       const data = await response.json();
-      console.log(data.pronounciation);
       setContent(data.pronounciation[0].content || "");
       setContentId(data.pronounciation[0]._id || null);
     } catch (error) {
