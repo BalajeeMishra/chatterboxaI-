@@ -1,9 +1,6 @@
 import 'dart:async';
 import 'dart:io';
-
-import 'package:balajiicode/Screens/expired_screen.dart';
-import 'package:balajiicode/Screens/login_screen.dart';
-import 'package:balajiicode/Screens/profile_screen.dart';
+import 'package:balajiicode/Screens/Account/account_screen.dart';
 import 'package:balajiicode/providers/providers.dart';
 import 'package:balajiicode/store/UserStore/UserStore.dart';
 import 'package:balajiicode/store/app_store.dart';
@@ -13,11 +10,11 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Screens/JabberAIHomePage/JabberAIHomepage.dart';
 import 'Screens/no_internet_screen.dart';
+import 'Screens/profile_screen.dart';
 import 'Screens/splash_screen.dart';
 import 'Utils/app_common.dart';
 import 'Utils/app_config.dart';
@@ -114,6 +111,7 @@ class MyAppState extends State<MyApp> {
         home: getStringAsync(TOKEN).toString().isEmpty
             ? SplashScreen()
             : JabberAIHomepage(),
+        // home: AccountScreen(),
         localizationsDelegates: [
           CountryLocalizations.delegate,
         ],

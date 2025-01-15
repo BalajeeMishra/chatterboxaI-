@@ -6,4 +6,7 @@ const no_internet = "assets/images/no_internet.png";
 const no_data_found = "assets/images/no_data_found.png";
 const ic_whatsapp = "assets/images/ic_whatsapp.png";
 const ic_whatsapp_fill = "assets/images/ic_whatsapp_fill.png";
+const whatsapp_logo = "assets/images/whatsapp.png";
+const privacy_logo = "assets/images/privacy.png";
+const profile_logo = "assets/images/profile.png";
 

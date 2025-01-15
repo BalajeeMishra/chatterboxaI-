@@ -35,6 +35,7 @@ class JabberHomeAIvm extends ChangeNotifier {
     try {
       ApiResponse<HomePageModel> response =
           await _jabberHomeAIRepository.homePageApiCallFunction();
+      // print("this is khush res : ${response.status}");
       switch (response.status) {
         case ApiResponseStatus.success:
           homePageModel = response.data!;
@@ -65,7 +66,6 @@ class JabberHomeAIvm extends ChangeNotifier {
       }
     } catch (e) {
       appStore.setLoading(false);
-
       // EasyLoading.dismiss();
       MySnackBar.showSnackBar(context, e.toString());
     }

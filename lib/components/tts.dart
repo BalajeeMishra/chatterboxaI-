@@ -13,7 +13,7 @@ class TTSManager {
   void Function(String)? errorHandler;
 
   TTSManager._internal() {
-    flutterTts = FlutterTts();
+      flutterTts = FlutterTts();
 
     // Attach internal handlers to TTS events
     flutterTts.setStartHandler(() {
