@@ -104,8 +104,20 @@ router.get("/allgameconversation", async (req, res) => {
   }
 });
 
+
+
+
 router.get("/all", async (req, res) => {
   try {
+    const {regDate,recentActive} = req.query;
+    if(regDate){
+      const allUser = await User.find({}).sort({createdAt:-1});
+      return res.status(200).json({ allUser });
+    }
+    if(recentActive){
+      const allUser = await User.find({}).sort({lastActive:-1});
+      return res.status(200).json({ allUser });
+    }
     const allUser = await User.find({});
     return res.status(200).json({ allUser });
   } catch (err) {
@@ -125,5 +137,21 @@ router.delete("/delete",jwtHelper.verifyToken, async (req, res) => {
     throw err;
   }
 });
+
+router.get("/currentuser",jwtHelper.verifyToken,async(req,res)=>{
+  try{
+    
+    const userId = req.userId;
+  
+    const user = await User.findById(userId);
+    if(!user){
+      return res.status(404).json({message:"User not found"});
+    }
+    return res.status(200).json({user});
+  }
+    catch(err){
+      throw err;
+    }
+})
 
 export default router;

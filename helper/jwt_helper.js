@@ -27,11 +27,13 @@ export default {
   verifyToken: async (req, res, next) => {
     if (!req.headers["authorization"])
       return next(new Error("Unauthorized", 401));
+  
     const authHeader = req.headers["authorization"];
     const bearerToken = authHeader.split(" ");
     const token = bearerToken[1];
     JWT.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, payload) => {
       if (err) {
+       
         // logger.error(
         //   `${err.status} - ${err.message} - ${req.originalUrl} - ${req.method} inside verifyToken of jwt helper`,
         // );
@@ -46,7 +48,7 @@ export default {
       }
       req.payload = payload;
       req.userId = payload.aud;
-      const user = await User.findById(req.userId);
+      // const user = await User.findById(req.userId);
       next();
     });
   },

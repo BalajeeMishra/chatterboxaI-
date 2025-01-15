@@ -12,6 +12,7 @@ import Prompt from "../model/Template.js";
 import jwtHelper from "../helper/jwt_helper.js";
 import getSecret from "../helper/secret.js";
 import Pronounciation from "../model/PronounciationTemplate.js";
+import lastActivity from "../helper/lastactivity.js";
 const router = Router();
 
 // const apiKey = fs.readFileSync("OpenAiKey.txt", "utf-8").trim();
@@ -62,7 +63,7 @@ function getUserSession(session, prompt) {
   return userSessions[session];
 }
 
-router.post("/play", jwtHelper.verifyToken, async (req, res) => {
+router.post("/play", jwtHelper.verifyToken,lastActivity, async (req, res) => {
   // nativelanguage, listofword, firstword
   // let { question, userId, session,firstword } = req.body;
 
@@ -144,7 +145,8 @@ router.post("/play", jwtHelper.verifyToken, async (req, res) => {
         aiResponse: [response.text],
         userId,
         sessionId: sessionId,
-        engprolevel:user.engprolevel
+        engprolevel:user.engprolevel,
+        gameId
       });
     }
     await userdatalog.save();
@@ -154,8 +156,10 @@ router.post("/play", jwtHelper.verifyToken, async (req, res) => {
   }
 });
 
-router.post("/correctsentance", jwtHelper.verifyToken, async (req, res) => {
+
+router.post("/correctsentance", jwtHelper.verifyToken, lastActivity, async (req, res) => {
   try {
+    
     const { sentence, sessionId,previousSentence } = req.body;
     const words = sentence.trim().split(/\s+/);
     if (words.length < 5) {
@@ -175,6 +179,7 @@ router.post("/correctsentance", jwtHelper.verifyToken, async (req, res) => {
       return res.status(200).json({ response });
     }
   } catch (err) {
+    
     throw err;
   }
 });

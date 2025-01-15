@@ -43,6 +43,7 @@ const userSchema = new mongoose.Schema({
         type:String, 
         enum: ["Beginner","Intermediate","Advanced"],
       },
+    lastActive: { type: Date, default: Date.now }
     },
       {
         timestamps: true
