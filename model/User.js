@@ -43,7 +43,11 @@ const userSchema = new mongoose.Schema({
         type:String, 
         enum: ["Beginner","Intermediate","Advanced"],
       },
-});
+    },
+      {
+        timestamps: true
+      },
+);
 
 // Create the user model
 const User = mongoose.model('User', userSchema);
