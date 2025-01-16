@@ -97,7 +97,34 @@ router.patch("/changestatus/:id", async (req, res, next) => {
 router.get("/allgameconversation", async (req, res) => {
   try {
     const { userId } = req.query;
-    const completeConversation = await UserLog.find({ userId });
+    // const completeConversation = await UserLog.find({ userId });
+
+    const completeConversation = await UserLog.aggregate([
+      {
+        $match: {
+          userId: userId, // Match documents based on userId
+        },
+      },
+      {
+        $addFields: {
+          gameIdObjectId: { $toObjectId: "$gameId" }, // Convert gameId (string) to ObjectId
+        },
+      },
+      {
+        $lookup: {
+          from: "games", // The name of the collection for the Game model
+          localField: "gameIdObjectId", // The converted ObjectId field
+          foreignField: "_id", // Match with the _id field in the Game collection
+          as: "gameDetails", // Output field for the joined documents
+        },
+      },
+      {
+        $unwind: {
+          path: "$gameDetails", // Unwind the joined array to a single object
+          preserveNullAndEmptyArrays: true, // Include documents without a matching Game
+        },
+      },
+    ]);
     return res.status(200).json({ completeConversation });
   } catch (err) {
     throw err;
