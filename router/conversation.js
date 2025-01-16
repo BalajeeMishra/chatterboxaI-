@@ -213,9 +213,7 @@ router.get("/allconversation", async (req, res) => {
           preserveNullAndEmptyArrays: true, // Include documents with no matching Game
         },
       },
-    ]);
-    
-
+    ]).sort({createdAt:-1});
     return res.status(200).json({ completeConversation });
   } catch (err) {
     throw err;

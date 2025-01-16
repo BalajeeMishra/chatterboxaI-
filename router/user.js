@@ -7,11 +7,10 @@ const router = Router();
 
 router.post("/register", async (req, res, next) => {
   try {
-    const { name, age, nativeLanguage, country, mobileNo, engprolevel } =
+    const { name,nativeLanguage, country, mobileNo, engprolevel } =
       req.body;
     const newUser = new User({
       name,
-      age,
       nativeLanguage,
       country,
       mobileNo,
