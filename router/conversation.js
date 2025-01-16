@@ -2,10 +2,8 @@ import { PromptTemplate } from "@langchain/core/prompts";
 import { ChatOpenAI } from "@langchain/openai";
 import { LLMChain } from "langchain/chains";
 import { BufferMemory } from "langchain/memory";
-
 import { Router } from "express";
-import fs from "fs";
-import UserDataLog from "../model/Userdata.js";
+import UserLog from "../model/logs.js";
 import GameContent from "../model/GameContent.js";
 import User from "../model/User.js";
 import Prompt from "../model/Template.js";
@@ -94,7 +92,7 @@ router.post("/play", jwtHelper.verifyToken,lastActivity, async (req, res) => {
     template: template,
   });
 
-  let userdatalog = await UserDataLog.findOne({ userId, sessionId: sessionId });
+  let userdatalog = await UserLog.findOne({ userId, sessionId: sessionId });
   if (!userdatalog) {
     delete userSessions[sessionId];
   }
@@ -137,12 +135,12 @@ router.post("/play", jwtHelper.verifyToken,lastActivity, async (req, res) => {
     history = await userSession.memory.loadMemoryVariables({});
     userSession.history = history.history;
     if (userdatalog) {
-      userdatalog.userResponse = [...userdatalog.userResponse, question];
-      userdatalog.aiResponse = [...userdatalog.aiResponse, response.text];
+      userdatalog.userResponse = [...userdatalog.userResponse, {text:question}];
+      userdatalog.aiResponse = [...userdatalog.aiResponse,{text:response.text}];
     } else {
-      userdatalog = new UserDataLog({
-        userResponse: [question],
-        aiResponse: [response.text],
+      userdatalog = new UserLog({
+        userResponse: [{text:question}],
+        aiResponse: [{text:response.text}],
         userId,
         sessionId: sessionId,
         engprolevel:user.engprolevel,
@@ -152,12 +150,13 @@ router.post("/play", jwtHelper.verifyToken,lastActivity, async (req, res) => {
     await userdatalog.save();
     return res.status(200).json({ response: userdatalog });
   } catch (error) {
+    console.log(error,"error");
     res.status(500).json({ error: "Something went wrong" });
   }
 });
 
 
-router.post("/correctsentance", jwtHelper.verifyToken, lastActivity, async (req, res) => {
+router.post("/correctsentance", jwtHelper.verifyToken, async (req, res) => {
   try {
     
     const { sentence, sessionId,previousSentence } = req.body;
@@ -189,7 +188,7 @@ router.post("/correctsentance", jwtHelper.verifyToken, lastActivity, async (req,
 router.get("/allconversation", async (req, res) => {
   try {
     const { sessionId } = req.query;
-    const completeConversation = await UserDataLog.findOne({
+    const completeConversation = await UserLog.findOne({
       sessionId: sessionId,
     });
     return res.status(200).json({ completeConversation });

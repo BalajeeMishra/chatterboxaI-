@@ -1,7 +1,7 @@
 import { Router } from "express";
 import User from "../model/User.js";
 import jwtHelper from "../helper/jwt_helper.js";
-import UserDataLog from "../model/Userdata.js";
+import UserLog from "../model/logs.js";
 
 const router = Router();
 
@@ -97,7 +97,7 @@ router.patch("/changestatus/:id", async (req, res, next) => {
 router.get("/allgameconversation", async (req, res) => {
   try {
     const { userId } = req.query;
-    const completeConversation = await UserDataLog.find({ userId });
+    const completeConversation = await UserLog.find({ userId });
     return res.status(200).json({ completeConversation });
   } catch (err) {
     throw err;

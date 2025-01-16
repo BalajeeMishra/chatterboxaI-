@@ -1,20 +1,20 @@
-import mongoose from "mongoose";
+// import mongoose from "mongoose";
 
-const userDataLogSchema = new mongoose.Schema({
-    userId: {
-        // type: mongoose.Schema.ObjectId,
-        // ref:"User"
-        type:String
-    },
-    userResponse:[String], 
-    aiResponse:[String],
-    sessionId:String,
-    engprolevel:String,
-    gameId:String,
-});
+// const userDataLogSchema = new mongoose.Schema({
+//     userId: {
+//         // type: mongoose.Schema.ObjectId,
+//         // ref:"User"
+//         type:String
+//     },
+//     userResponse:[String], 
+//     aiResponse:[String],
+//     sessionId:String,
+//     engprolevel:String,
+//     gameId:String,
+// });
 
-// Create the user model
-const UserDataLog = mongoose.model('UserDataLog', userDataLogSchema);
+// // Create the user model
+// const UserDataLog = mongoose.model('UserDataLog', userDataLogSchema);
 
-export default UserDataLog;
+// export default UserDataLog;
 
