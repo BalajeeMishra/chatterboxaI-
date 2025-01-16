@@ -106,22 +106,26 @@ export function UserTable() {
   const [allUser, setAlluser] = React.useState<User[]>([]);
   const [error, setError] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState<boolean>(true);
+  const [regDate, setRegDate] = React.useState(false);
+  const [recentActive, setRecentActive] = React.useState(false);
 
   React.useEffect(() => {
-    loadUsers();
-  }, []);
-  const loadUsers = async () => {
+    const filter = regDate ? "regDate" : recentActive ? "recentActive" : "";
+    loadUsers(filter);
+  }, [regDate, recentActive]);
+  
+  const loadUsers = async (filter = "") => {
     try {
-      const userData = await fetchAllUsers();
-
+      const userData = await fetchAllUsers(filter);
       setAlluser(userData);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       setError("Failed to load users");
     } finally {
       setLoading(false);
     }
   };
+  
   const updatePlayingStatus = async (userId: string, status: boolean) => {
     const requestBody = {
       playingstatus: status === true ? "false" : "true",
@@ -172,7 +176,7 @@ export function UserTable() {
   if (!allUser || allUser?.length === 0) return <div> No results.</div>;
   return (
     <div className="w-full">
-      <div className="flex items-center py-4">
+      <div className="flex items-center justify-between py-4">
         <Input
           placeholder="Filter by name..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
@@ -181,6 +185,22 @@ export function UserTable() {
           }
           className="max-w-sm"
         />
+        <div className="flex items-center justify-center gap-3">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="ml-auto">
+              Filters <ChevronDown className="ml-2 h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="bg-white">
+            <DropdownMenuCheckboxItem onClick={() => setRegDate(true)}>
+              Reg. Date
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem onClick={() => setRecentActive(true)}>
+              Recent Active
+            </DropdownMenuCheckboxItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -208,6 +228,7 @@ export function UserTable() {
               })}
           </DropdownMenuContent>
         </DropdownMenu>
+        </div>
       </div>
       <div className="rounded-md border">
         <Table>

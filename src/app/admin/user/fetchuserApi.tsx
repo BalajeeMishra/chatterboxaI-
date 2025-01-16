@@ -16,11 +16,18 @@ export interface User {
   }
   
 
-export const fetchAllUsers = async (): Promise<User[]> => {
+  export const fetchAllUsers = async (filter: string = ""): Promise<User[]> => {
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user/all`
-      );
+      let url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user/all`;
+  
+      // Add query parameters based on the filter
+      if (filter === "regDate") {
+        url += "?regDate=1";
+      } else if (filter === "recentActive") {
+        url += "?recentActive=1";
+      }
+  
+      const response = await fetch(url);
   
       if (!response.ok) {
         throw new Error(`An error occurred: ${response.statusText}`);
@@ -33,4 +40,5 @@ export const fetchAllUsers = async (): Promise<User[]> => {
       throw error;
     }
   };
+  
   
