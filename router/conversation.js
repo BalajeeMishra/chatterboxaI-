@@ -188,9 +188,34 @@ router.post("/correctsentance", jwtHelper.verifyToken, async (req, res) => {
 router.get("/allconversation", async (req, res) => {
   try {
     const { sessionId } = req.query;
-    const completeConversation = await UserLog.findOne({
-      sessionId: sessionId,
-    });
+    const completeConversation = await UserLog.aggregate([
+      {
+        $match: {
+          sessionId: sessionId, // Match the sessionId
+        },
+      },
+      {
+        $addFields: {
+          gameIdObjectId: { $toObjectId: "$gameId" }, // Convert gameId (string) to ObjectId
+        },
+      },
+      {
+        $lookup: {
+          from: "games", // The name of the collection for the Game model
+          localField: "gameIdObjectId", // The converted ObjectId field
+          foreignField: "_id", // Match with the _id field in the Game collection
+          as: "gameDetails", // Output field for the joined documents
+        },
+      },
+      {
+        $unwind: {
+          path: "$gameDetails", // Unwind the joined array to a single object
+          preserveNullAndEmptyArrays: true, // Include documents with no matching Game
+        },
+      },
+    ]);
+    
+
     return res.status(200).json({ completeConversation });
   } catch (err) {
     throw err;
