@@ -16,6 +16,7 @@ class AllGameRepository{
       final response = await ApiClass.get(allgame+dataId, isHeader: true);
       final ApiResponseStatus status = mapStatusCode(response.statusCode);
       final Map<String, dynamic> responseData = jsonDecode(response.body);
+      print("this is game comtent using gameId ${responseData}");
       if (status == ApiResponseStatus.success) {
         final data = AllGameModel.fromJson(responseData);
         return ApiResponse.success(data);

@@ -826,6 +826,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       10.height,
+
                       Text(
                         'How should I speak?',
                         style: secondaryTextStyle(
@@ -950,6 +951,8 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
     try {
       final value = await correctSentenceApi(req);
+      // print("Hello this is inside correct sentence ${value.response!.text}");
+
       return value.response?.text;
     } catch (e) {
       // print("Error in correctSentence: $e");
@@ -1167,12 +1170,10 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                                     fontSize: 18,
                                                     fontWeight: FontWeight.w400,
                                                   )
-                                                : (vm
-                                                                .tabooGameChatPageModel
+                                                : (vm.tabooGameChatPageModel
                                                                 .response!
                                                                 .aiResponse!
-                                                                .last ==
-                                                            null ||
+                                                                .last == null ||
                                                         vm
                                                                 .tabooGameChatPageModel
                                                                 .response!
@@ -1375,7 +1376,8 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   }
 
   listeningWidget() {
-    return Align(
+    return Align
+      (
       alignment: Alignment.bottomCenter,
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 15),

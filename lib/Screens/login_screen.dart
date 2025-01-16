@@ -1,4 +1,5 @@
 import 'package:balajiicode/Screens/otp_screen.dart';
+import 'package:balajiicode/Screens/profile_screen.dart';
 import 'package:balajiicode/Utils/app_colors.dart';
 import 'package:balajiicode/Utils/app_config.dart';
 import 'package:balajiicode/extensions/app_text_field.dart';
@@ -300,6 +301,10 @@ class _LoginScreenState extends State<LoginScreen> {
           if (mFormKey.currentState!.validate()) {
             sendOTP();
           }
+          // ProfileScreen(
+          //   country: cCode,
+          //   mobileNumber:'$mMobileCont ${mMobileCont.text.trim()}',
+          // ).launch(context);
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,

@@ -44,6 +44,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
 
   seInitialValue(AllGameModel allGameModel, int index, String sessionId) {
     String data = "";
+    print("this is detailed of content ${allGameModel.allGame![index].detailOfContent!.length}");
     dynamicDta = [];
     for (var i = 0;
         i < allGameModel.allGame![index].detailOfContent!.length;

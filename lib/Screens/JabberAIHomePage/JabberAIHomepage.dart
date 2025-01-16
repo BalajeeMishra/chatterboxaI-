@@ -22,6 +22,7 @@ import '../../extensions/shared_pref.dart';
 import '../../extensions/text_styles.dart';
 import '../../main.dart';
 import '../../network/rest_api.dart';
+import '../Account/account_screen.dart';
 
 class JabberAIHomepage extends StatefulWidget {
   const JabberAIHomepage({super.key});
@@ -54,7 +55,8 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBarWidget(
+      appBar:
+      appBarWidget(
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -73,7 +75,8 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
         actions: [
           IconButton(
               onPressed: () {
-                ContactUsScreen().launch(context);
+
+                AccountScreen().launch(context);
               },
               icon: Icon(
                 Icons.person,
@@ -152,16 +155,16 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
                                           children: [
                                             InkWell(
                                               onTap: () {
-                                                if (isStatus == false) {
-                                                  ExpiredScreen()
-                                                      .launch(context);
-                                                } else {
+                                                // if (isStatus == false) {
+                                                //   ExpiredScreen()
+                                                //       .launch(context);
+                                                // } else {
                                                   Navigator.of(context).push(
                                                       MaterialPageRoute(
                                                           builder: (context) =>
                                                               ChooseWordScreen(
                                                                   data.sId!,data.gameName!)));
-                                                }
+                                                // }
                                               },
                                               child: Container(
                                                   decoration: BoxDecoration(

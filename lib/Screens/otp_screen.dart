@@ -8,7 +8,7 @@ import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:telephony/telephony.dart';
+// import 'package:telephony/telephony.dart';
 
 import '../Utils/app_colors.dart';
 import '../Utils/app_common.dart';
@@ -39,6 +39,7 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
   GlobalKey<OTPTextFieldState> otpTextFieldKey = GlobalKey<OTPTextFieldState>();
 
   // final TextEditingController _otpController = TextEditingController();
+
   Telephony telephony = Telephony.instance;
 
   String otpCode = '';
@@ -60,6 +61,7 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
     // requestSmsPermissions();
     appStore.setLoading(false);
     startTimer();
+
     telephony.listenIncomingSms(
       onNewMessage: (SmsMessage message) {
 
