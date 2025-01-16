@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 import 'package:balajiicode/Widget/text_widget.dart';
 import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
@@ -40,18 +41,100 @@ class _TaboogamechatPage extends State<TaboogamechatPage> with WidgetsBindingObs
   @override
   void initState() {
     super.initState();
+    detectSystemLocale();
+    // openAndroidKeyboardSettings();
     WidgetsBinding.instance.addObserver(this);
     _scrollController = ScrollController();
     Provider.of<TabooGameChatPageVM>(context, listen: false)
         .dynamicData
         .clear();
-
     // Provider.of<TabooGameChatPageVM>(context, listen: false)
     //     .setInitialValue(widget.allGameModel, widget.index);
     allConversationApiCall();
 
   }
+  // Future<void> initPlatformState() async {
+  //   String platformVersion;
+  //   // Platform messages may fail, so we use a try/catch PlatformException.
+  //   // We also handle the message potentially returning null.
+  //   try {
+  //     platformVersion =
+  //         await _systemKeyboardLanguagesPlugin.getPlatformVersion() ?? 'Unknown platform version';
+  //   } on PlatformException {
+  //     platformVersion = 'Failed to get platform version.';
+  //   }
+  //
+  //   // If the widget was removed from the tree while the asynchronous platform
+  //   // message was in flight, we want to discard the reply rather than calling
+  //   // setState to update our non-existent appearance.
+  //   if (!mounted) return;
+  //
+  //   setState(() {
+  //     _platformVersion = platformVersion;
+  //   });
+  // }
+  // Future<void> initKeyboardLanguagesState() async {
+  //   List<String> keyboardLanguages;
+  //   // Platform messages may fail, so we use a try/catch PlatformException.
+  //   // We also handle the message potentially returning null.
+  //   try {
+  //     keyboardLanguages = await getKeyboardLanguages() ?? <String>[];
+  //   } on PlatformException {
+  //     keyboardLanguages = <String>['Failed to get keyboard languages.'];
+  //   }
+  //
+  //   // If the widget was removed from the tree while the asynchronous platform
+  //   // message was in flight, we want to discard the reply rather than calling
+  //   // setState to update our non-existent appearance.
+  //   if (!mounted) {
+  //     return;
+  //   }
+  //
+  //   setState(() {
+  //     _keyboardLanguages = '';
+  //     for (final String kl in keyboardLanguages) {
+  //       _keyboardLanguages += kl.toString() + ', ';
+  //       print("Keyboard Language==>"+keyboardLanguages.toString());
+  //     }
+  //   });
+  // }
+  // void checkKeyboardLanguage(BuildContext context) {
+  //   String systemLocale = Platform.localeName;
+  //   String languageCode = systemLocale.split('_')[0];
+  //   print("Language code is ==>"+languageCode.toString());
+  //
+  //   if (languageCode != 'en') {
+  //     showDialog(
+  //       context: context,
+  //       builder: (BuildContext context) {
+  //         return AlertDialog(
+  //           title: Text('Change Keyboard Language'),
+  //           content: Text(
+  //               'Your keyboard language is set to $languageCode. Please change it to English for the best experience.'),
+  //           actions: [
+  //             TextButton(
+  //               onPressed: () => Navigator.of(context).pop(),
+  //               child: Text('OK'),
+  //             ),
+  //           ],
+  //         );
+  //       },
+  //     );
+  //   }
+  // }
 
+  // void openAndroidKeyboardSettings() async {
+  //   const platform = MethodChannel('app.channel.shared/data');
+  //   try {
+  //     await platform.invokeMethod('openKeyboardSettings');
+  //   } on PlatformException catch (e) {
+  //     print("Failed to open settings: ${e.message}");
+  //   }
+  // }
+  void detectSystemLocale() {
+    Locale systemLocale = window.locale;
+    print('System Locale Language is==>: ${systemLocale.languageCode}-${systemLocale.countryCode}');
+  }
   void allConversationApiCall() async {
     await allConversationApi(widget.sessionId).then((value) async {
       if (widget.index == null) {
@@ -153,7 +236,9 @@ class _TaboogamechatPage extends State<TaboogamechatPage> with WidgetsBindingObs
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+     // checkKeyboardLanguage( context) ;
+
+      return Scaffold(
       // resizeToAvoidBottomInset: false,
 
       appBar: backCustomAppBar(
@@ -432,7 +517,6 @@ class _TaboogamechatPage extends State<TaboogamechatPage> with WidgetsBindingObs
                 chatPageVM.chatPageAPI(context, widget.sessionId, messageText,
                     widget.allGameModel, widget.index);
               }
-
               chatPageVM.controller.clear();
             },
             child: Container(
@@ -467,3 +551,16 @@ List<TextSpan> _buildBoldText(String response) {
   }
   return textSpans;
 }
+// class KeyboardLanguage {
+//   static const platform = MethodChannel('com.talkyplay.keyboard_language');
+//
+//   static Future<String> getKeyboardLanguage() async {
+//     try {
+//       final String keyboardLanguage = await platform.invokeMethod('getKeyboardLanguage');
+//       return keyboardLanguage;
+//     } catch (e) {
+//       print('Failed to get keyboard language: $e');
+//       return 'unknown';
+//     }
+//   }
+// }

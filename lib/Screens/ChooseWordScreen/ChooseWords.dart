@@ -13,6 +13,7 @@ import '../../ViewModel/AllGameVm.dart';
 import '../../components/tts.dart';
 import '../../extensions/loader_widget.dart';
 import '../../main.dart';
+import '../youtube_video_player_screen.dart';
 import 'PlayTabooScreen.dart';
 import 'package:uuid/uuid.dart';
 
@@ -129,15 +130,26 @@ class _ChooseWordScreen extends State<ChooseWordScreen> {
                                 onTap: () async {
                                   final bool? res =
                                   await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              PlayTabooScreen(
-                                                vm.homePageModel,
-                                                index,
-                                                Uuid().v4(),
-                                                widget.gameName,
-                                              )));
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                YoutubeVideoPlayerScreen(
+                                                  vm.homePageModel,
+                                                  index,
+                                                  Uuid().v4(),
+                                                  widget.gameName,
+                                                )));
+
+                                  // await Navigator.push(
+                                  //     context,
+                                  //     MaterialPageRoute(
+                                  //         builder: (context) =>
+                                  //             PlayTabooScreen(
+                                  //               vm.homePageModel,
+                                  //               index,
+                                  //               Uuid().v4(),
+                                  //               widget.gameName,
+                                  //             )));
                                   if (res == true) {
                                     timerFunction();
 

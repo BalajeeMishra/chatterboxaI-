@@ -1,10 +1,8 @@
 import 'dart:ui';
 
 import 'package:balajiicode/Constants/ImageConstant.dart';
-import 'package:balajiicode/Constants/constantRow.dart';
 import 'package:balajiicode/Model/TabooGameChatPageModel.dart';
 import 'package:balajiicode/Widget/text_widget.dart';
-import 'package:balajiicode/extensions/app_text_field.dart';
 import 'package:balajiicode/extensions/common.dart';
 import 'package:balajiicode/extensions/decorations.dart';
 import 'package:balajiicode/extensions/extension_util/context_extensions.dart';
@@ -17,9 +15,6 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:emoji_regex/emoji_regex.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_tts/flutter_tts.dart';
-// import 'package:speech_to_text/speech_recognition_result.dart';
-// import 'package:speech_to_text/speech_to_text.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import '../../Model/AllConversationModel.dart';
@@ -29,20 +24,15 @@ import '../../Utils/app_common.dart';
 import '../../Utils/app_constants.dart';
 import '../../Utils/app_images.dart';
 import '../../ViewModel/PlayTabooScreenVM.dart';
-import '../../ViewModel/TabooGameChatPageVM.dart';
-import '../../Widget/appbar.dart';
 import '../../components/loader_widget_new.dart';
 import '../../components/tts.dart';
 import '../../extensions/app_button.dart';
 import '../../extensions/colors.dart';
 import '../../extensions/constants.dart';
-import '../../extensions/loader_widget.dart';
-import '../../extensions/widgets.dart';
 import '../../main.dart';
 import '../../network/rest_api.dart';
 import '../TabooGameChatpage/TaboogamechatPage.dart';
-import 'package:uuid/uuid.dart';
-import 'package:permission_handler/permission_handler.dart';
+
 
 class PlayTabooScreen extends StatefulWidget {
   AllGameModel allGameModel;
@@ -933,7 +923,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
       final value = await updateProficiencyApi(req);
       newEnglishLevel = englishProficiency!;
       ques = appStore.userResponse;
-      print("UserResponse is =>"+ques.toString());
+      print("UserResponse is =>" + ques.toString());
       if (ques.isNotEmpty) {
         ttsManager.stop();
         save3(ques, widget.sessionId);
@@ -983,6 +973,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(40.0),
         child: AppBar(
+          centerTitle: false,
           leading: Icon(
             Icons.arrow_back,
             color: Colors.white,
@@ -991,6 +982,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
               isKeyBoardTapped = false;
               setState(() {});
             } else {
+              pop(true);
               pop(true);
             }
           }),
@@ -1040,6 +1032,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
             setState(() {});
           } else {
+            pop(true);
             pop(true);
           }
           return false;

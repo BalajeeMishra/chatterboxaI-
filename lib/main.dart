@@ -108,6 +108,9 @@ class MyAppState extends State<MyApp> {
     return MultiProvider(
       providers: appProvider,
       child: MaterialApp(
+        supportedLocales: [
+          Locale('en', 'US'),
+        ],
         navigatorKey: navigatorKey,
         title: APP_NAME,
         debugShowCheckedModeBanner: false,

@@ -29,6 +29,7 @@ class AllGame {
   String? level;
   List<String>? detailOfContent;
   int? iV;
+  String? youtubeUrl;
 
   AllGame(
       {this.sId,
@@ -36,7 +37,9 @@ class AllGame {
         this.mainContent,
         this.level,
         this.detailOfContent,
-        this.iV});
+        this.iV,
+      this.youtubeUrl,
+      });
 
   AllGame.fromJson(Map<String, dynamic> json) {
     sId = json['_id'];
@@ -45,6 +48,7 @@ class AllGame {
     level = json['level'];
     detailOfContent = json['detailOfContent'].cast<String>();
     iV = json['__v'];
+    youtubeUrl=json['youtubeUrl'];
   }
 
   Map<String, dynamic> toJson() {
@@ -55,6 +59,7 @@ class AllGame {
     data['level'] = level;
     data['detailOfContent'] = detailOfContent;
     data['__v'] = iV;
+    data['youtubeUrl']=youtubeUrl;
     return data;
   }
 }
