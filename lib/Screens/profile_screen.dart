@@ -33,10 +33,10 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   GlobalKey<FormState> mFormKey = GlobalKey<FormState>();
   TextEditingController mNameCont = TextEditingController();
-  TextEditingController mAgeCont = TextEditingController();
+  // TextEditingController mAgeCont = TextEditingController();
 
   final FocusNode nameFocus = FocusNode();
-  final FocusNode ageFocus = FocusNode();
+  // final FocusNode ageFocus = FocusNode();
   final FocusNode languageFocus = FocusNode();
   final FocusNode englishLevelFocus = FocusNode();
 
@@ -160,7 +160,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     hideKeyboard(context);
     Map<String, dynamic> req = {
       'name': mNameCont.text.trim(),
-      'age': mAgeCont.text.trim(),
+      // 'age': mAgeCont.text.trim(),
       'nativeLanguage': selectedLanguage,
       'mobileNo': widget.mobileNumber.trim(),
       'country': widget.country.trim(),
@@ -272,33 +272,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       AppTextField(
                         focus: nameFocus,
                         controller: mNameCont,
-                        nextFocus: ageFocus,
+                        // nextFocus: ageFocus,
                         textFieldType: TextFieldType.NAME,
                         isValidationRequired: true,
                         decoration: defaultInputDecoration(context,
                             label: 'Enter name'),
                       ).paddingSymmetric(horizontal: 16, vertical: 4),
                       16.height,
-                      Row(
-                        children: [
-                          Text('Age',
-                              style: secondaryTextStyle(
-                                  color: textPrimaryColorGlobal)),
-                          2.width,
-                          Text('*', style: secondaryTextStyle(color: redColor))
-                        ],
-                      ).paddingSymmetric(horizontal: 16, vertical: 4),
-                      4.height,
-                      AppTextField(
-                        focus: ageFocus,
-                        nextFocus: languageFocus,
-                        controller: mAgeCont,
-                        textFieldType: TextFieldType.NAME,
-                        isValidationRequired: true,
-                        decoration: defaultInputDecoration(context,
-                            label: 'Enter your age'),
-                      ).paddingSymmetric(horizontal: 16, vertical: 4),
-                      16.height,
+                      // Row(
+                      //   children: [
+                      //     Text('Age',
+                      //         style: secondaryTextStyle(
+                      //             color: textPrimaryColorGlobal)),
+                      //     2.width,
+                      //     Text('*', style: secondaryTextStyle(color: redColor))
+                      //   ],
+                      // ).paddingSymmetric(horizontal: 16, vertical: 4),
+                      // 4.height,
+                      // AppTextField(
+                      //   focus: ageFocus,
+                      //   nextFocus: languageFocus,
+                      //   controller: mAgeCont,
+                      //   textFieldType: TextFieldType.NAME,
+                      //   isValidationRequired: true,
+                      //   decoration: defaultInputDecoration(context,
+                      //       label: 'Enter your age'),
+                      // ).paddingSymmetric(horizontal: 16, vertical: 4),
+                      // 16.height,
                       Row(
                         children: [
                           Text('Your Native Language',
