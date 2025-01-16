@@ -21,12 +21,21 @@ import React from "react";
 interface DialogCloseButtonProps {
   selectUserId: string; // Assuming `selectUserId` is a string representing the user ID
 }
+interface gameDetails {
+  gameName: string;
+}
+interface Response {
+  text: string;
+  createdAt: string | Date;
+}
 interface GameConversation {
   _id: string;
   userId: string;
-  userResponse: string[];
-  aiResponse: string[];
+  userResponse: Response[]; // Fixed from string[] to Response[]
+  aiResponse: Response[]; // Fixed from string[] to Response[]
   sessionId: string;
+  createdAt: string;
+  gameDetails?: gameDetails;
 }
 export function DialogCloseButton({ selectUserId }: DialogCloseButtonProps) {
   const [userId, setUserId] = React.useState<string>(selectUserId || "");
@@ -59,8 +68,19 @@ export function DialogCloseButton({ selectUserId }: DialogCloseButtonProps) {
       setLoading(false);
     }
   };
+  const formattedDate = (dateString: any) => {
+    const date = new Date(dateString);
+    return date.toLocaleString("en-US", {
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+      hour12: true,
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
 
-  console.log(gameConversations);
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -71,60 +91,6 @@ export function DialogCloseButton({ selectUserId }: DialogCloseButtonProps) {
           <DialogTitle>Userlog</DialogTitle>
           <DialogDescription>Userlog full details</DialogDescription>
         </DialogHeader>
-
-        {/* <div className="flex flex-col gap-2">
-          {gameConversations.map((game, index) => (
-            <Accordion
-              type="single"
-              collapsible
-              key={game._id}
-              className="w-full"
-            >
-              <AccordionItem value={`session-${index + 1}`}>
-                <AccordionTrigger className="font-semibold">
-                  Session {index + 1}
-                </AccordionTrigger>
-                <AccordionContent>
-                  <div className="flex flex-col gap-2">
-                    {game.userResponse.map((userResp, idx) => (
-                      <Accordion
-                        key={`user-response-${idx}`}
-                        type="single"
-                        collapsible
-                      >
-                        <AccordionItem value={`user-response-${idx + 1}`}>
-                          <AccordionTrigger className="bg-blue-100 p-2 rounded-md">
-                            User Response {idx + 1}
-                          </AccordionTrigger>
-                          <AccordionContent className="bg-gray-100 p-4 rounded-md mt-2">
-                            {userResp}
-                          </AccordionContent>
-                        </AccordionItem>
-                      </Accordion>
-                    ))}
-
-                    {game.aiResponse.map((aiResp, idx) => (
-                      <Accordion
-                        key={`ai-response-${idx}`}
-                        type="single"
-                        collapsible
-                      >
-                        <AccordionItem value={`ai-response-${idx + 1}`}>
-                          <AccordionTrigger className="bg-green-100 p-2 rounded-md">
-                            AI Response {idx + 1}
-                          </AccordionTrigger>
-                          <AccordionContent className="bg-gray-100 p-4 rounded-md mt-2">
-                            {aiResp}
-                          </AccordionContent>
-                        </AccordionItem>
-                      </Accordion>
-                    ))}
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          ))}
-        </div> */}
         <div className="flex flex-col gap-2">
           {gameConversations.map((game, index) => (
             <Accordion
@@ -135,10 +101,17 @@ export function DialogCloseButton({ selectUserId }: DialogCloseButtonProps) {
             >
               <AccordionItem value={`session-${index + 1}`}>
                 <AccordionTrigger className="font-semibold">
-                  Session {index + 1}
+                  <div className="flex min-w-24">Session {index + 1} </div>{" "}
+                  <span className="text-end my-2 w-full flex justify-end text-xs pr-4 text-gray-600">
+                    {game?.gameDetails?.gameName}
+                  </span>
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="flex flex-col gap-2">
+                    <span className="text-end my-2 w-full flex justify-end text-xs text-gray-600">
+                      {formattedDate(game.createdAt)}
+                    </span>
+
                     {game.userResponse.map((userResp, idx) => (
                       <React.Fragment key={`response-pair-${idx}`}>
                         {/* User Response */}
@@ -148,7 +121,10 @@ export function DialogCloseButton({ selectUserId }: DialogCloseButtonProps) {
                               User Response {idx + 1}
                             </AccordionTrigger>
                             <AccordionContent className="bg-gray-100 p-4 rounded-md mt-2">
-                              {userResp}
+                              <p> {userResp?.text}</p>
+                              <span className="text-end w-full flex justify-end text-xs text-gray-600 mt-4">
+                                {formattedDate(userResp?.createdAt)}
+                              </span>
                             </AccordionContent>
                           </AccordionItem>
                         </Accordion>
@@ -161,7 +137,12 @@ export function DialogCloseButton({ selectUserId }: DialogCloseButtonProps) {
                                 AI Response {idx + 1}
                               </AccordionTrigger>
                               <AccordionContent className="bg-gray-100 p-4 rounded-md mt-2">
-                                {game.aiResponse[idx]}
+                                <p>{game.aiResponse[idx]?.text} </p>
+                                <span className="text-end w-full flex justify-end text-xs text-gray-600 mt-4">
+                                  {formattedDate(
+                                    game.aiResponse[idx]?.createdAt
+                                  )}
+                                </span>
                               </AccordionContent>
                             </AccordionItem>
                           </Accordion>

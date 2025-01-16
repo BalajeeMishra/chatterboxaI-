@@ -106,14 +106,11 @@ export function UserTable() {
   const [allUser, setAlluser] = React.useState<User[]>([]);
   const [error, setError] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState<boolean>(true);
-  const [regDate, setRegDate] = React.useState(false);
-  const [recentActive, setRecentActive] = React.useState(false);
-
+  const [newFilter, setFilter] = React.useState("");
   React.useEffect(() => {
-    const filter = regDate ? "regDate" : recentActive ? "recentActive" : "";
-    loadUsers(filter);
-  }, [regDate, recentActive]);
-  
+    loadUsers(newFilter);
+  }, [newFilter]);
+
   const loadUsers = async (filter = "") => {
     try {
       const userData = await fetchAllUsers(filter);
@@ -125,7 +122,7 @@ export function UserTable() {
       setLoading(false);
     }
   };
-  
+
   const updatePlayingStatus = async (userId: string, status: boolean) => {
     const requestBody = {
       playingstatus: status === true ? "false" : "true",
@@ -186,48 +183,50 @@ export function UserTable() {
           className="max-w-sm"
         />
         <div className="flex items-center justify-center gap-3">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Filters <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="bg-white">
-            <DropdownMenuCheckboxItem onClick={() => setRegDate(true)}>
-              Reg. Date
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem onClick={() => setRecentActive(true)}>
-              Recent Active
-            </DropdownMenuCheckboxItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="ml-auto">
+                Filters <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="bg-white">
+              <DropdownMenuCheckboxItem onClick={() => setFilter("regDate")}>
+                Reg. Date
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                onClick={() => setFilter("recentActive")}
+              >
+                Recent Active
+              </DropdownMenuCheckboxItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="bg-white">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="ml-auto">
+                Columns <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="bg-white">
+              {table
+                .getAllColumns()
+                .filter((column) => column.getCanHide())
+                .map((column) => {
+                  return (
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      className="capitalize"
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(value) =>
+                        column.toggleVisibility(!!value)
+                      }
+                    >
+                      {column.id}
+                    </DropdownMenuCheckboxItem>
+                  );
+                })}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
       <div className="rounded-md border">
