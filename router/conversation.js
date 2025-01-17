@@ -65,7 +65,7 @@ router.post("/play", jwtHelper.verifyToken,lastActivity, async (req, res) => {
   // nativelanguage, listofword, firstword
   // let { question, userId, session,firstword } = req.body;
 
-  let { sessionId, mainContent, question, gameId } = req.body;
+  let { sessionId, mainContent, question, gameId,modality } = req.body;
   const userId = req.userId;
   let history = "";
 
@@ -139,16 +139,21 @@ router.post("/play", jwtHelper.verifyToken,lastActivity, async (req, res) => {
     if (userdatalog) {
       userdatalog.userResponse = [...userdatalog.userResponse, {text:question}];
       userdatalog.aiResponse = [...userdatalog.aiResponse,{text:response.text}];
+      userdatalog.count = userdatalog.count + 1 ;
       const allUsertext = userdatalog.userResponse.map((item) => item.text);
       const allAiText = userdatalog.aiResponse.map((item) => item.text);
-      responseforuser.userResponse = [...allUsertext, question];
-      responseforuser.aiResponse = [...allAiText, response.text];
+
+      responseforuser.userResponse = [...allUsertext];
+      responseforuser.aiResponse = [...allAiText];
       responseforuser.userId = userId;
       responseforuser.sessionId = sessionId;
       responseforuser.engprolevel = user.engprolevel;
+      responseforuser.modality = modality; 
+      responseforuser.count = userdatalog.count
+     
     } else {
       userdatalog = new UserLog({
-        userResponse: [{text:question}],
+        userResponse: [{text:question,modality}],
         aiResponse: [{text:response.text}],
         userId,
         sessionId: sessionId,
@@ -160,6 +165,8 @@ router.post("/play", jwtHelper.verifyToken,lastActivity, async (req, res) => {
       responseforuser.userId = userId;
       responseforuser.sessionId = sessionId;
       responseforuser.engprolevel = user.engprolevel;
+      responseforuser.modality = modality;
+      responseforuser.count = 0;
     }
     await userdatalog.save();
     return res.status(200).json({ response: responseforuser });

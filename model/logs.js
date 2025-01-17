@@ -8,6 +8,10 @@ const userDataLogSchema = new mongoose.Schema({
     },
     userResponse:[{
         text:String,
+        modality:{
+            type:String,
+            enum:["speak","write"]
+        },
         createdAt:{ type: Date, default: Date.now }
        }], 
     aiResponse:[
@@ -19,6 +23,10 @@ const userDataLogSchema = new mongoose.Schema({
     sessionId:String,
     engprolevel:String,
     gameId:String,
+    count:{
+     type:Number, 
+     default:0
+    },
     createdAt:{ type: Date, default: Date.now }
 }
 );
