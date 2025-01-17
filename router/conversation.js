@@ -69,6 +69,8 @@ router.post("/play", jwtHelper.verifyToken,lastActivity, async (req, res) => {
   const userId = req.userId;
   let history = "";
 
+  let responseforuser = {};
+
   const user = await User.findById(userId);
 
   const promptTemplate = await Prompt.findOne({
@@ -137,6 +139,13 @@ router.post("/play", jwtHelper.verifyToken,lastActivity, async (req, res) => {
     if (userdatalog) {
       userdatalog.userResponse = [...userdatalog.userResponse, {text:question}];
       userdatalog.aiResponse = [...userdatalog.aiResponse,{text:response.text}];
+      const allUsertext = userdatalog.userResponse.map((item) => item.text);
+      const allAiText = userdatalog.aiResponse.map((item) => item.text);
+      responseforuser.userResponse = [...allUsertext, question];
+      responseforuser.aiResponse = [...allAiText, response.text];
+      responseforuser.userId = userId;
+      responseforuser.sessionId = sessionId;
+      responseforuser.engprolevel = user.engprolevel;
     } else {
       userdatalog = new UserLog({
         userResponse: [{text:question}],
@@ -145,12 +154,16 @@ router.post("/play", jwtHelper.verifyToken,lastActivity, async (req, res) => {
         sessionId: sessionId,
         engprolevel:user.engprolevel,
         gameId
-      });
+      }); 
+      responseforuser.userResponse = [question];
+      responseforuser.aiResponse = [response.text];
+      responseforuser.userId = userId;
+      responseforuser.sessionId = sessionId;
+      responseforuser.engprolevel = user.engprolevel;
     }
     await userdatalog.save();
-    return res.status(200).json({ response: userdatalog });
+    return res.status(200).json({ response: responseforuser });
   } catch (error) {
-    console.log(error,"error");
     res.status(500).json({ error: "Something went wrong" });
   }
 });
