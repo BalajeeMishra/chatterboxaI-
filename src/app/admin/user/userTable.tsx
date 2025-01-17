@@ -191,12 +191,15 @@ export function UserTable() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-white">
               <DropdownMenuCheckboxItem onClick={() => setFilter("regDate")}>
-                Reg. Date
+                Registration Date
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem
                 onClick={() => setFilter("recentActive")}
               >
                 Recent Active
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem onClick={() => setFilter("both")}>
+                Registration Date & Recent Active
               </DropdownMenuCheckboxItem>
             </DropdownMenuContent>
           </DropdownMenu>
