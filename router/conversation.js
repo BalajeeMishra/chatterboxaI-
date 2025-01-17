@@ -201,6 +201,7 @@ router.post("/correctsentance", jwtHelper.verifyToken, async (req, res) => {
 router.get("/allconversation", async (req, res) => {
   try {
     const { sessionId } = req.query;
+    let userCompeleteConversation = {};
     const completeConversation = await UserLog.aggregate([
       {
         $match: {
@@ -227,7 +228,16 @@ router.get("/allconversation", async (req, res) => {
         },
       },
     ]).sort({createdAt:-1});
-    return res.status(200).json({ completeConversation });
+    // console.log(completeConversation,"completeConversation");
+    userCompeleteConversation.userResponse = completeConversation[0].userResponse.map((e)=>e.text);
+    userCompeleteConversation.aiResponse = completeConversation[0].aiResponse.map((e)=>e.text);
+    userCompeleteConversation.userId = completeConversation[0].userId;
+    userCompeleteConversation.sessionId = completeConversation[0].sessionId;
+    userCompeleteConversation.engprolevel = completeConversation[0].engprolevel;
+    userCompeleteConversation.gameDetails = completeConversation[0].gameDetails;
+    userCompeleteConversation.createdAt = completeConversation[0].createdAt;
+    // console.log(userCompeleteConversation,"responseforuserresponseforuser");
+    return res.status(200).json({ completeConversation:userCompeleteConversation });
   } catch (err) {
     throw err;
   }
