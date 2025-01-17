@@ -123,7 +123,7 @@ router.get("/allgameconversation", async (req, res) => {
           preserveNullAndEmptyArrays: true, // Include documents without a matching Game
         },
       },
-    ]);
+    ]).sort({createdAt:-1});
     return res.status(200).json({ completeConversation });
   } catch (err) {
     throw err;
@@ -136,14 +136,21 @@ router.get("/allgameconversation", async (req, res) => {
 router.get("/all", async (req, res) => {
   try {
     const {regDate,recentActive} = req.query;
+    
+    if(regDate && recentActive){
+      const allUser = await User.find({}).sort({createdAt:-1,lastActive:-1});
+      return res.status(200).json({ allUser });
+    }
     if(regDate){
       const allUser = await User.find({}).sort({createdAt:-1});
       return res.status(200).json({ allUser });
     }
     if(recentActive){
       const allUser = await User.find({}).sort({lastActive:-1});
+      console.log(allUser[0],"allUser");
       return res.status(200).json({ allUser });
     }
+   
     const allUser = await User.find({});
     return res.status(200).json({ allUser });
   } catch (err) {

@@ -61,10 +61,9 @@ function getUserSession(session, prompt) {
   return userSessions[session];
 }
 
-router.post("/play", jwtHelper.verifyToken,lastActivity, async (req, res) => {
+router.post("/play", jwtHelper.verifyToken,lastActivity,async (req, res,next) => {
   // nativelanguage, listofword, firstword
   // let { question, userId, session,firstword } = req.body;
-
   let { sessionId, mainContent, question, gameId,modality } = req.body;
   const userId = req.userId;
   let history = "";

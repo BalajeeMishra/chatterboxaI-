@@ -1,5 +1,4 @@
 import JWT from "jsonwebtoken";
-import User from "../model/User.js";
 
 export default {
   signAccessToken: async (userId) => {
