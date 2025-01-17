@@ -43,7 +43,11 @@ class _YoutubeVideoPlayerScreenState extends State<YoutubeVideoPlayerScreen> {
     super.initState();
     videoId = YoutubePlayer.convertUrlToId(
         widget.allGameModel.allGame![widget.index].youtubeUrl ?? "");
+    init();
 
+  }
+
+  init()async{
     if (videoId == null) {
       debugPrint("Invalid YouTube URL");
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -75,7 +79,6 @@ class _YoutubeVideoPlayerScreenState extends State<YoutubeVideoPlayerScreen> {
       _playerState = PlayerState.unknown;
     }
   }
-
   void listener() {
     if (videoId != null) {
       if (_isPlayerReady && mounted && !_controller!.value.isFullScreen) {
@@ -91,17 +94,18 @@ class _YoutubeVideoPlayerScreenState extends State<YoutubeVideoPlayerScreen> {
   }
 
   void _replayVideo() {
-    if (_controller != null && isVideoEnded) {
-      setState(() {
-        isVideoEnded = false;
-      });
-      _timer?.cancel();
-      _controller!.pause();
-      _controller!.seekTo(Duration.zero);
-      Future.delayed(Duration(milliseconds: 100), () {
-        _controller!.play();
-      });
-    } else if (_controller == null) {
+    if (_controller != null) {
+      if (isVideoEnded) {
+        print("Video is ended");
+        setState(() {
+          isVideoEnded = false;
+        });
+        _timer?.cancel();
+        init();
+      } else {
+        print("Video is not ended yet.");
+      }
+    } else {
       print("Controller is null");
     }
   }
@@ -142,7 +146,7 @@ class _YoutubeVideoPlayerScreenState extends State<YoutubeVideoPlayerScreen> {
           _countdown--;
         } else {
           timer.cancel();
-          // _closeVideo();
+          _closeVideo();
         }
       });
     });

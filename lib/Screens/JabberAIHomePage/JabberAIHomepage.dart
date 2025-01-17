@@ -37,6 +37,7 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
   @override
   void initState() {
     super.initState();
+    print("USERID IS ===>"+getStringAsync(USER_ID).toLowerCase());
     checkStatus();
     appStore.setLoading(false);
     Provider.of<JabberHomeAIvm>(context, listen: false).seInitialValue();
@@ -154,7 +155,7 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
                                         child: Column(
                                           children: [
                                             InkWell(
-                                              onTap: () {
+                                              onTap: () async{
                                                 // if (isStatus == false) {
                                                 //   ExpiredScreen()
                                                 //       .launch(context);
@@ -164,6 +165,34 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
                                                           builder: (context) =>
                                                               ChooseWordScreen(
                                                                   data.sId!,data.gameName!)));
+
+                                                  analytics.logEvent(
+                                                    name: 'game_selection',
+                                                    parameters: {
+                                                      'Game_name': data.gameName!,
+                                                      'User_id': getStringAsync(USER_ID),
+                                                      // 'timestamp': DateTime.now().toString(), // Add a timestamp to make it unique
+
+                                                    },
+                                                  ).then((_) {
+                                                    print('Logged event: game_selection with parameters: Game_name=${data.gameName!}, User_id=${getStringAsync(USER_ID)}');
+                                                  }).catchError((error) {
+                                                    print('Failed to log event: $error');
+                                                  });
+                                                  facebookAppEvents.logEvent(
+                                                    name: 'game_selection',
+                                                    parameters: {
+                                                      'Game_name': data.gameName!,
+                                                      'User_id': getStringAsync(USER_ID),
+                                                      // 'timestamp': DateTime.now().toString(), // Add a timestamp to make it unique
+
+                                                    },
+                                                  ).then((_) {
+                                                    print('Logged Facebook event: game_selection with parameters: Game_name=${data.gameName!}, User_id=${getStringAsync(USER_ID)}');
+                                                  }).catchError((error) {
+                                                    print('Failed to log event: $error');
+                                                  });
+
                                                 // }
                                               },
                                               child: Container(

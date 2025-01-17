@@ -6,6 +6,7 @@ import 'package:balajiicode/store/UserStore/UserStore.dart';
 import 'package:balajiicode/store/app_store.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:country_code_picker/country_code_picker.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -23,14 +24,18 @@ import 'extensions/common.dart';
 import 'extensions/shared_pref.dart';
 import 'extensions/system_utils.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:facebook_app_events/facebook_app_events.dart';
 
 AppStore appStore = AppStore();
 UserStore userStore = UserStore();
 late SharedPreferences sharedPreferences;
 final navigatorKey = GlobalKey<NavigatorState>();
+FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+final facebookAppEvents = FacebookAppEvents();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(
           name: 'jabber-ai',
           options: FirebaseOptions(
@@ -48,6 +53,8 @@ Future<void> main() async {
       .then((value) {
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
   });
+  // await FacebookSdk.sdkInitialize();
+
 
   SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(statusBarColor: Color(0xff755be8)));

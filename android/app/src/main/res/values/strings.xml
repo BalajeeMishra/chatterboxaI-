@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="facebook_app_id">935802761312369</string>
+    <string name="facebook_client_token">5615aafeb8ac082ec58ce8bd1e01d794</string>
+    <string name="fb_login_protocol_scheme">fb_935802761312369</string>
+    <string name="app_name">Zap AI</string>
+</resources>

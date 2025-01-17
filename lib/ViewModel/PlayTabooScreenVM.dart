@@ -1,20 +1,13 @@
-import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
-import 'package:balajiicode/extensions/loader_widget.dart';
 import 'package:balajiicode/main.dart';
 import 'package:emoji_regex/emoji_regex.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:flutter_tts/flutter_tts.dart';
 import '../Model/AllConversationModel.dart';
 import '../Model/AllGameModel.dart';
-import '../Constants/constant_text.dart';
 import '../Model/TabooGameChatPageModel.dart';
 import '../Repository/TaboogameChatPageRepository.dart';
 import '../Services/ApiResponseStatus.dart';
 import '../Utils/ShowSnackBar.dart';
-import '../Utils/app_constants.dart';
 import '../components/tts.dart';
-import '../extensions/shared_pref.dart';
 
 class PlayTabooScreenVM extends ChangeNotifier {
   /// Calling Repository =====================================
