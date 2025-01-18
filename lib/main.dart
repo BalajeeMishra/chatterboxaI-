@@ -35,7 +35,6 @@ final facebookAppEvents = FacebookAppEvents();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await Firebase.initializeApp(
           name: 'jabber-ai',
           options: FirebaseOptions(
@@ -53,12 +52,14 @@ Future<void> main() async {
       .then((value) {
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
   });
-  // await FacebookSdk.sdkInitialize();
+  FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
 
 
   SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(statusBarColor: Color(0xff755be8)));
   sharedPreferences = await SharedPreferences.getInstance();
+  await InstallDateHelper.saveInstallDate();
+
   setLogInValue();
 
   runApp(MyApp());
@@ -112,9 +113,6 @@ class MyAppState extends State<MyApp> {
     return MultiProvider(
       providers: appProvider,
       child: MaterialApp(
-        supportedLocales: [
-          Locale('en', 'US'),
-        ],
         navigatorKey: navigatorKey,
         title: APP_NAME,
         debugShowCheckedModeBanner: false,
@@ -152,95 +150,3 @@ class MyAppState extends State<MyApp> {
   }
 }
 
-// class MyApp extends StatelessWidget {
-//   late StreamSubscription<List<ConnectivityResult>> _connectivitySubscription;
-//   bool isCurrentlyOnNoInternet = false;
-//    MyApp({super.key});
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//     init();
-//   }
-//
-//   void init() async {
-//     _connectivitySubscription = Connectivity().onConnectivityChanged.listen((e) {
-//       if (e.contains(ConnectivityResult.none)) {
-//         log('not connected');
-//         isCurrentlyOnNoInternet = true;
-//         push(NoInternetScreen());
-//       } else {
-//         if (isCurrentlyOnNoInternet) {
-//           pop();
-//           isCurrentlyOnNoInternet = false;
-//           toast('Internet is connected');
-//         }
-//         log('connected');
-//       }
-//     });
-//   }
-//
-//
-//   @override
-//   void setState(fn) {
-//     if (mounted) super.setState(fn);
-//     _connectivitySubscription.cancel();
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return
-//       MultiProvider(
-//       providers: appProvider,
-//       child: MaterialApp(
-//         title: APP_NAME,
-//         debugShowCheckedModeBanner: false,
-//         home: LoginScreen(),
-//
-//         // getStringAsync(TOKEN).toString().isEmpty
-//         //     ? const SplashScreen()
-//         //     : JabberAIHomepage(),
-//         builder: EasyLoading.init(),
-//       ),
-//     );
-//   }
-//
-//   void configLoading() {
-//     EasyLoading.instance
-//       ..displayDuration = const Duration(milliseconds: 2000)
-//       ..indicatorType = EasyLoadingIndicatorType.ring
-//       ..loadingStyle = EasyLoadingStyle.custom
-//       ..indicatorSize = 45.0
-//       ..radius = 10.0
-//       ..progressColor = Colors.orange
-//       ..backgroundColor = Colors.grey[100]
-//       ..indicatorColor = Colors.blueAccent
-//       ..textColor = Colors.grey
-//       ..maskColor = Colors.blue.withOpacity(0.5)
-//       ..userInteractions = false
-//       ..dismissOnTap = false;
-//     // ..customAnimation = CustomAnimation();
-//   }
-// }
-// import 'package:flutter/services.dart';
-//
-// class AudioManager {
-//   static const MethodChannel _channel = MethodChannel('custom_audio_manager');
-//
-//   static Future<void> muteSystemSounds() async {
-//     try {
-//       await _channel.invokeMethod('muteSystemSounds');
-//     } on PlatformException catch (e) {
-//       print("Failed to mute system sounds: '${e.message}'.");
-//     }
-//   }
-//
-//   static Future<void> unmuteSystemSounds() async {
-//
-//     try {
-//       await _channel.invokeMethod('unmuteSystemSounds');
-//     } on PlatformException catch (e) {
-//       print("Failed to unmute system sounds: '${e.message}'.");
-//     }
-//   }
-// }

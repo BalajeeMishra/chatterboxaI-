@@ -33,7 +33,6 @@ import '../../main.dart';
 import '../../network/rest_api.dart';
 import '../TabooGameChatpage/TaboogamechatPage.dart';
 
-
 class PlayTabooScreen extends StatefulWidget {
   AllGameModel allGameModel;
   int index;
@@ -48,12 +47,10 @@ class PlayTabooScreen extends StatefulWidget {
 
 class _PlayTabooScreen extends State<PlayTabooScreen> {
   bool startListening = false;
-  // SpeechToText _speechToText = SpeechToText();
   bool _speechEnabled = false;
   String _lastWords = '';
   String _previousWords = '';
   String ques = "";
-  String sessionId = "";
   bool isLoading = false;
   bool apiCalled = false;
   bool isFirstTime = false;
@@ -191,62 +188,53 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   // GlobalKey _one = GlobalKey();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   String previousSentence = "";
+  String previousSessionId = "";
+  String currentSessionId = "";
+// bool isGameComplete = false;
+//   late GameEventManager gameEventManager;
 
   @override
   void initState() {
     super.initState();
     appStore.setLoading(false);
+    // gameEventManager = GameEventManager(currentSessionId: widget.sessionId,);
+
+    currentSessionId = widget.sessionId;
+    previousSessionId = getStringAsync(SESSION_ID);
+    //
+    print("=============CURRENT SESSION id is ==>"+currentSessionId.toString());
+    print("=============PREVIOUS SESSION id is ==>"+previousSessionId.toString());
+
     selectedLanguageForList = userStore.userNativeLanguage;
     englishLevel = userStore.userEnglishProficiency;
     newEnglishLevel = userStore.userEnglishProficiency;
-    print("User NAtive Language is==>" + userStore.userNativeLanguage);
-    print("User English Proficiency is==>" + userStore.userEnglishProficiency);
+    // print("User NAtive Language is==>" + userStore.userNativeLanguage);
+    // print("User English Proficiency is==>" + userStore.userEnglishProficiency);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-// _focusNode.unfocus();
       Provider.of<PlayTabooScreenVM>(context, listen: false)
           .seInitialValue(widget.allGameModel, widget.index, widget.sessionId);
 
       Provider.of<PlayTabooScreenVM>(context, listen: false).chatPageAPI(
-          context,
-          "Hi, Let's play the game!",
-          widget.sessionId,
-          widget.allGameModel,
-          widget.index,
-          true,
-          false);
+        context,
+        "Hi, Let's play the game!",
+        widget.sessionId,
+        widget.allGameModel,
+        widget.index,
+        true,
+        false,
+        "speak",
+        widget.gameName,
+      );
     });
     startListening = false;
     apiCalled = true;
-    // if (getStringAsync(USER_NATIVE_LANGUAGE).isNotEmpty) {
-    //   selectedLanguage = getStringAsync(USER_NATIVE_LANGUAGE);
-    //   setTtsLanguage(selectedLanguage);
-    // }else{
-    //   await flutterTts.setLanguage('en-US');
-    //
-    // }
 
-    // else{
-    //   selectedLanguage =
-    // }
     appStore.setLastWords("");
+
+
     setState(() {});
   }
-
-  // Future<void> muteSystemSounds() async {
-  //   const platform = MethodChannel('custom_audio_manager');
-  //   try {
-  //     await platform.invokeMethod('muteSystemSounds');
-  //   } catch (e) {}
-  // }
-  //
-  // static Future<void> unmuteSystemSounds() async {
-  //   const platform = MethodChannel('custom_audio_manager');
-  //
-  //   try {
-  //     await platform.invokeMethod('unmuteSystemSounds');
-  //   } on PlatformException catch (e) {}
-  // }
 
   Response convertToResponse(CompleteConversation completeConversation) {
     return Response(
@@ -273,149 +261,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
       setState(() {});
     });
   }
-
-  // Future<void> _initSpeech() async {
-  //   _previousWords = "";
-  //   _speechEnabled = await _speechToText.initialize();
-  //   if (_speechEnabled) {
-  //     setState(() {
-  //       startListening = true;
-  //     });
-  //     _startListening();
-  //     stopSpeaking();
-  //   }
-  // }
-
-  // Future<void> _startListening() async {
-  //   await _speechToText.listen(
-  //     localeId: 'en_US',
-  //     // listenFor: _listenForDuration,
-  //     // pauseFor: _pauseForDuration,
-  //     // listenOptions: SpeechListenOptions(
-  //     //   listenMode: ListenMode.deviceDefault,
-  //     //   autoPunctuation: true,
-  //     //   partialResults: true,
-  //     //   cancelOnError: false,
-  //     //   enableHapticFeedback: true,
-  //     //   onDevice: true,
-  //     // ),
-  //     onResult: _onSpeechResult,
-  //   );
-  //
-  //   // Future.delayed(Duration(seconds: 7), () {
-  //   //   if (!_speechToText.isListening) {
-  //   //     _startListening();
-  //   //   }
-  //   // });
-  //
-  //   // Future.delayed(Duration(seconds: 10), () {
-  //   //   if (!_speechToText.isListening) {
-  //   //     _stopListening();
-  //   //     // startListening = false;
-  //   //     // setState(() {
-  //   //     //
-  //   //     // });
-  //   //   }
-  //   // });
-  //
-  //   // setState(() {});
-  // }
-  //
-  // /// Stop listening to speech
-  // void _stopListening() {
-  //   if (_isListening) {
-  //     _speechToText.stop();
-  //     _isListening = false;
-  //     // setState(() {});
-  //   }
-  // }
-  //
-  //
-  //
-  // /// Process speech result
-  // void _onSpeechResult(SpeechRecognitionResult result) {
-  //   setState(() {
-  //     _startListening();
-  //
-  //     isLoading = true;
-  //
-  //     _lastWords = result.recognizedWords;
-  //     if (_lastWords.isNotEmpty) {
-  //       isFirstTime = false;
-  //     }
-  //
-  //     if (result.finalResult) {
-  //       if (_previousWords.isEmpty) {
-  //         _previousWords = result.recognizedWords;
-  //       } else {
-  //         _previousWords += ' ' + result.recognizedWords;
-  //       }
-  //
-  //       _lastWords = _previousWords;
-  //
-  //       setState(() {
-  //         isLoading = false;
-  //       });
-  //
-  //       _startListening();
-  //     }
-  //   });
-  // }
-
-  // Future<void> configureTts() async {
-  //   setTtsLanguage(selectedLanguage);
-  //   await flutterTts.setVolume(1.0);
-  //   await flutterTts.setSpeechRate(speechRate);
-  //   isSpeaking = true;
-  // }
-  //
-  // Future<void> setTtsLanguage(String language) async {
-  //   String ttsLanguage;
-  //
-  //   switch (language) {
-  //     case 'Hindi':
-  //       ttsLanguage = 'hi-IN';
-  //       break;
-  //     case 'English':
-  //       ttsLanguage = 'en-US';
-  //       break;
-  //     case 'Bengali':
-  //       ttsLanguage = 'bn-IN';
-  //       break;
-  //     case 'Kannada':
-  //       ttsLanguage = 'kn-IN';
-  //       break;
-  //     case 'Malayalam':
-  //       ttsLanguage = 'ml-IN';
-  //       break;
-  //     case 'Marathi':
-  //       ttsLanguage = 'mr-IN';
-  //       break;
-  //     case 'Nepali':
-  //       ttsLanguage = 'ne-NP';
-  //       break;
-  //     case 'Punjabi':
-  //       ttsLanguage = 'pa-IN';
-  //       break;
-  //     case 'Tamil':
-  //       ttsLanguage = 'ta-IN';
-  //       break;
-  //     case 'Telugu':
-  //       ttsLanguage = 'te-IN';
-  //       break;
-  //     case 'Urdu':
-  //       ttsLanguage = 'ur-IN';
-  //       break;
-  //     case 'Gujarati':
-  //       ttsLanguage = 'gu-IN';
-  //       break;
-  //     default:
-  //       ttsLanguage = 'en-US';
-  //       break;
-  //   }
-  //
-  //   await flutterTts.setLanguage(ttsLanguage);
-  // }
 
   /// Speak text with TTS
   Future<void> setTtsLanguage(String language) async {
@@ -467,21 +312,9 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   }
 
   Future<void> configureTts() async {
-    print("Configuration time ==>" + userStore.userNativeLanguage.toString());
-    // if (userStore.userNativeLanguage.isNotEmpty &&
-    //     userStore.userEnglishProficiency == "Beginner") {
-    //   selectedLanguage = userStore.userNativeLanguage;
-    //   setTtsLanguage(selectedLanguage);
-    // } else {
-    //   print("Amrican");
-    //   await ttsManager.setLanguage('en-US');
-    //   // await flutterTts.se;
-    // }
+
     await ttsManager.setLanguage('en-US');
 
-    // print("Selectd Language is ==>" + selectedLanguage.toString());
-
-    // await ttsManager.setSpeechRate(0.4);
     await ttsManager.setVolume(1.0);
   }
 
@@ -516,16 +349,13 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   /// Submit and call next function
 
   Future<void> adjustSpeechRate(double change) async {
-    print("Last Words: ${appStore.lastWords}");
     _lastWords = appStore.lastWords;
 
     speechRate = (speechRate + change).clamp(0.2, 2.0);
-    print("Speech Rate is: $speechRate");
 
     await ttsManager.setSpeechRate(speechRate);
 
     if (isSpeaking || userStore.isTTSPlaying == "YES") {
-      print("Inside If: Stopping TTS and restarting with new rate");
       await ttsManager.stop();
 
       String remainingText = _getRemainingText();
@@ -551,7 +381,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   }
 
   String _getRemainingText() {
-    print("Last Word is " + _lastWords.toString());
     if (_lastSpokenIndex < _lastWords.length) {
       return _lastWords.substring(_lastSpokenIndex);
     }
@@ -559,8 +388,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   }
 
   save() {
-    // unmuteSystemSounds();
-
     message = 'Correcting Speech recognition mistakes';
     ttsManager.setStartHandler(() {
       setState(() {
@@ -583,13 +410,16 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     Provider.of<PlayTabooScreenVM>(context, listen: false)
         .seInitialValue(widget.allGameModel, widget.index, widget.sessionId);
     Provider.of<PlayTabooScreenVM>(context, listen: false).chatPageAPI(
-        context,
-        ques,
-        widget.sessionId,
-        widget.allGameModel,
-        widget.index,
-        false,
-        isMuted);
+      context,
+      ques,
+      widget.sessionId,
+      widget.allGameModel,
+      widget.index,
+      false,
+      isMuted,
+      "speak",
+      widget.gameName,
+    );
     // configureTts();
     apiCalled = true;
 
@@ -600,10 +430,8 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
         message = 'Thinking...';
       });
     });
-    // unmuteSystemSounds();
     isMuted = getBoolAsync(IS_MUTE);
 
-    print("ISMUTED ==>" + isMuted.toString());
     setState(() {});
   }
 
@@ -613,32 +441,29 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     });
     message = 'Correcting Speech recognition mistakes';
     try {
-      print("into try");
       final correctedSentence = await correctSentence(correctedQues, sessionId);
-      print("into correct sence check" + correctedSentence.toString());
 
       if (correctedSentence != null) {
-        print("Corrected Sentence is ==>" + correctedSentence.toString());
         correctedQues = correctedSentence;
       }
 
       Provider.of<PlayTabooScreenVM>(context, listen: false)
           .seInitialValue(widget.allGameModel, widget.index, widget.sessionId);
       Provider.of<PlayTabooScreenVM>(context, listen: false).chatPageAPI(
-          context,
-          correctedQues!,
-          sessionId!,
-          widget.allGameModel,
-          widget.index,
-          false,
-          isMuted);
+        context,
+        correctedQues!,
+        sessionId!,
+        widget.allGameModel,
+        widget.index,
+        false,
+        isMuted,
+        "speak",
+        widget.gameName,
+      );
       // configureTts();
       apiCalled = true;
       _lastWords = appStore.lastWords;
       userStore.setPreviousSentence(_lastWords);
-      print("Last Words is here ==>" + _lastWords.toString());
-      print("Last Words appStore ==>" + appStore.lastWords.toString());
-
       startListening = false;
       Future.delayed(Duration(seconds: 2), () {
         setState(() {
@@ -646,9 +471,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
         });
       });
       isMuted = getBoolAsync(IS_MUTE);
-      print("ISMUTED ==>" + isMuted.toString());
 
-      // unmuteSystemSounds();
       setState(() {});
     } catch (e) {
       toast(e.toString());
@@ -664,13 +487,16 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
       Provider.of<PlayTabooScreenVM>(context, listen: false)
           .seInitialValue(widget.allGameModel, widget.index, widget.sessionId);
       Provider.of<PlayTabooScreenVM>(context, listen: false).chatPageAPI(
-          context,
-          correctedQues!,
-          sessionId!,
-          widget.allGameModel,
-          widget.index,
-          false,
-          isMuted);
+        context,
+        correctedQues!,
+        sessionId!,
+        widget.allGameModel,
+        widget.index,
+        false,
+        isMuted,
+        "speak",
+        widget.gameName,
+      );
       isLoaderShow = false;
       apiCalled = true;
       _lastWords = appStore.lastWords;
@@ -689,7 +515,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
       context: context,
       builder: (context) {
         String tempEnglishLevel = englishLevel;
-
         return Stack(
           children: [
             GestureDetector(
@@ -826,7 +651,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       10.height,
-
                       Text(
                         'How should I speak?',
                         style: secondaryTextStyle(
@@ -951,11 +775,9 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
     try {
       final value = await correctSentenceApi(req);
-      // print("Hello this is inside correct sentence ${value.response!.text}");
 
       return value.response?.text;
     } catch (e) {
-      // print("Error in correctSentence: $e");
       toast(e.toString());
       appStore.setLoading(false);
       return null;
@@ -1035,8 +857,13 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
             setState(() {});
           } else {
+            print("======================= HELLO GAME COMPLETE =======================");
+
+            print("======================= BYE =======================");
+
             pop(true);
             pop(true);
+            removeKey(SESSION_ID);
           }
           return false;
         },
@@ -1170,10 +997,12 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                                     fontSize: 18,
                                                     fontWeight: FontWeight.w400,
                                                   )
-                                                : (vm.tabooGameChatPageModel
+                                                : (vm
+                                                                .tabooGameChatPageModel
                                                                 .response!
                                                                 .aiResponse!
-                                                                .last == null ||
+                                                                .last ==
+                                                            null ||
                                                         vm
                                                                 .tabooGameChatPageModel
                                                                 .response!
@@ -1265,35 +1094,46 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                       SizedBox(
                                         width: !isMuted ? 29 : 22,
                                       ),
-                                      // GestureDetector(
-                                      //   onTap: () {
-                                      //     _initSpeech();
-                                      //     apiCalled = false;
-                                      //     isFirstTime = true;
-                                      //
-                                      //     _lastWords = "";
-                                      //     setState(() {});
-                                      //   },
-                                      //   child: Column(
-                                      //     children: [
-                                      //       Icon(
-                                      //         Icons.keyboard_voice,
-                                      //         size: 36,
-                                      //       ),
-                                      //       MyText(
-                                      //         text: "Speak",
-                                      //         fontSize: 12,
-                                      //       )
-                                      //     ],
-                                      //   ),
-                                      // ),
-                                      //
-                                      // SizedBox(
-                                      //   width: 24,
-                                      // ),
                                       GestureDetector(
                                           onTap: () {
-                                            // muteKeyboardSounds();
+                                            analytics.logEvent(
+                                              name: 'speak',
+                                              parameters: {
+                                                'content_name': widget
+                                                    .allGameModel
+                                                    .allGame![widget.index]
+                                                    .mainContent
+                                                    .toString(),
+                                                'Game_name': widget.gameName,
+                                                'User_id':
+                                                    getStringAsync(USER_ID),
+                                              },
+                                            ).then((_) {
+                                              print(
+                                                  'Logged event: speak with parameters:');
+                                            }).catchError((error) {
+                                              print(
+                                                  'Failed to log event: $error');
+                                            });
+                                            facebookAppEvents.logEvent(
+                                              name: 'speak',
+                                              parameters: {
+                                                'content_name': widget
+                                                    .allGameModel
+                                                    .allGame![widget.index]
+                                                    .mainContent
+                                                    .toString(),
+                                                'Game_name': widget.gameName,
+                                                'User_id':
+                                                    getStringAsync(USER_ID),
+                                              },
+                                            ).then((_) {
+                                              print(
+                                                  'Logged event: speak with parameters:');
+                                            }).catchError((error) {
+                                              print(
+                                                  'Failed to log event: $error');
+                                            });
                                             isKeyBoardTapped = true;
 
                                             _focusNode.requestFocus();
@@ -1326,14 +1166,50 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                                 fontSize: 12,
                                               )
                                             ],
-                                          )
-                                          // .paddingBottom(40),
-                                          ),
+                                          )),
                                       SizedBox(
                                         width: 24,
                                       ),
                                       GestureDetector(
                                         onTap: () async {
+                                          analytics.logEvent(
+                                            name: 'write',
+                                            parameters: {
+                                              'content_name': widget
+                                                  .allGameModel
+                                                  .allGame![widget.index]
+                                                  .mainContent
+                                                  .toString(),
+                                              'Game_name': widget.gameName,
+                                              'User_id':
+                                                  getStringAsync(USER_ID),
+                                            },
+                                          ).then((_) {
+                                            print(
+                                                'Logged event: write with parameters:');
+                                          }).catchError((error) {
+                                            print(
+                                                'Failed to log event: $error');
+                                          });
+                                          facebookAppEvents.logEvent(
+                                            name: 'write',
+                                            parameters: {
+                                              'content_name': widget
+                                                  .allGameModel
+                                                  .allGame![widget.index]
+                                                  .mainContent
+                                                  .toString(),
+                                              'Game_name': widget.gameName,
+                                              'User_id':
+                                                  getStringAsync(USER_ID),
+                                            },
+                                          ).then((_) {
+                                            print(
+                                                'Logged event: write with parameters:');
+                                          }).catchError((error) {
+                                            print(
+                                                'Failed to log event: $error');
+                                          });
                                           stopSpeaking();
                                           final bool? res =
                                               await TaboogamechatPage(
@@ -1376,8 +1252,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   }
 
   listeningWidget() {
-    return Align
-      (
+    return Align(
       alignment: Alignment.bottomCenter,
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 15),

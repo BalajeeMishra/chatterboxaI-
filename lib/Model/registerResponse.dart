@@ -32,6 +32,9 @@ class NewUser {
   String? engprolevel;
   bool? playingstatus;
   int? iV;
+  String? lastActive;
+  String? createdAt;
+  String? updatedAt;
 
   NewUser(
       {this.mobileNo,
@@ -42,7 +45,10 @@ class NewUser {
         this.role,
         this.country,
         this.userId,
-        this.iV});
+        this.iV,
+        this.lastActive,
+        this.createdAt,
+        this.updatedAt,});
 
   NewUser.fromJson(Map<String, dynamic> json) {
     mobileNo = json['mobileNo'];
@@ -56,6 +62,9 @@ class NewUser {
     playingstatus = json['playingstatus'];
     engprolevel=  json['engprolevel'];
     iV = json['__v'];
+    lastActive = json['lastActive'];
+    createdAt = json['createdAt'];
+    updatedAt = json['updatedAt'];
   }
 
   Map<String, dynamic> toJson() {
@@ -71,6 +80,9 @@ class NewUser {
     data['playingstatus'] = playingstatus;
     data['engprolevel']= engprolevel;
     data['__v'] = iV;
+    data['lastActive'] = lastActive;
+    data['createdAt'] = createdAt;
+    data['updatedAt'] = updatedAt;
     return data;
   }
 }

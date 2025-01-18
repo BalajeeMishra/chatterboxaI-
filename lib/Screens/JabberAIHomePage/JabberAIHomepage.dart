@@ -1,11 +1,6 @@
-import 'package:balajiicode/Constants/ImageConstant.dart';
-import 'package:balajiicode/Screens/contact_us_screen.dart';
-import 'package:balajiicode/Screens/expired_screen.dart';
 import 'package:balajiicode/Utils/app_common.dart';
 import 'package:balajiicode/Screens/ChooseWordScreen/ChooseWords.dart';
 import 'package:balajiicode/Utils/app_constants.dart';
-import 'package:balajiicode/extensions/app_text_field.dart';
-import 'package:balajiicode/extensions/extension_util/int_extensions.dart';
 import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
 import 'package:balajiicode/extensions/widgets.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +32,6 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
   @override
   void initState() {
     super.initState();
-    print("USERID IS ===>"+getStringAsync(USER_ID).toLowerCase());
     checkStatus();
     appStore.setLoading(false);
     Provider.of<JabberHomeAIvm>(context, listen: false).seInitialValue();
@@ -56,8 +50,7 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:
-      appBarWidget(
+      appBar: appBarWidget(
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -76,7 +69,6 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
         actions: [
           IconButton(
               onPressed: () {
-
                 AccountScreen().launch(context);
               },
               icon: Icon(
@@ -107,10 +99,7 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
           content: Text('Tap back again to leave',
               style: primaryTextStyle(color: Colors.white)),
         ),
-        child:
-
-
-        WillPopScope(
+        child: WillPopScope(
           onWillPop: () async {
             SystemNavigator.pop();
             return false;
@@ -155,43 +144,52 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
                                         child: Column(
                                           children: [
                                             InkWell(
-                                              onTap: () async{
+                                              onTap: () async {
                                                 // if (isStatus == false) {
                                                 //   ExpiredScreen()
                                                 //       .launch(context);
                                                 // } else {
-                                                  Navigator.of(context).push(
-                                                      MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              ChooseWordScreen(
-                                                                  data.sId!,data.gameName!)));
+                                                Navigator.of(context).push(
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            ChooseWordScreen(
+                                                                data.sId!,
+                                                                data.gameName!)));
 
-                                                  analytics.logEvent(
-                                                    name: 'game_selection',
-                                                    parameters: {
-                                                      'Game_name': data.gameName!,
-                                                      'User_id': getStringAsync(USER_ID),
-                                                      // 'timestamp': DateTime.now().toString(), // Add a timestamp to make it unique
-
-                                                    },
-                                                  ).then((_) {
-                                                    print('Logged event: game_selection with parameters: Game_name=${data.gameName!}, User_id=${getStringAsync(USER_ID)}');
-                                                  }).catchError((error) {
-                                                    print('Failed to log event: $error');
-                                                  });
-                                                  facebookAppEvents.logEvent(
-                                                    name: 'game_selection',
-                                                    parameters: {
-                                                      'Game_name': data.gameName!,
-                                                      'User_id': getStringAsync(USER_ID),
-                                                      // 'timestamp': DateTime.now().toString(), // Add a timestamp to make it unique
-
-                                                    },
-                                                  ).then((_) {
-                                                    print('Logged Facebook event: game_selection with parameters: Game_name=${data.gameName!}, User_id=${getStringAsync(USER_ID)}');
-                                                  }).catchError((error) {
-                                                    print('Failed to log event: $error');
-                                                  });
+                                                analytics.logEvent(
+                                                  name: 'game_selection',
+                                                  parameters: {
+                                                    'Game_name': data.gameName!,
+                                                    'User_id':
+                                                        getStringAsync(USER_ID),
+                                                    'days_since_install':
+                                                        await InstallDateHelper
+                                                            .getDaysSinceInstall()
+                                                  },
+                                                ).then((_) {
+                                                  print(
+                                                      'Logged event: game_selection with parameters: Game_name=${data.gameName!}, User_id=${getStringAsync(USER_ID)}');
+                                                }).catchError((error) {
+                                                  print(
+                                                      'Failed to log event: $error');
+                                                });
+                                                facebookAppEvents.logEvent(
+                                                  name: 'game_selection',
+                                                  parameters: {
+                                                    'Game_name': data.gameName!,
+                                                    'User_id':
+                                                        getStringAsync(USER_ID),
+                                                    'days_since_install':
+                                                        await InstallDateHelper
+                                                            .getDaysSinceInstall()
+                                                  },
+                                                ).then((_) {
+                                                  print(
+                                                      'Logged Facebook event: game_selection with parameters: Game_name=${data.gameName!}, User_id=${getStringAsync(USER_ID)}');
+                                                }).catchError((error) {
+                                                  print(
+                                                      'Failed to log event: $error');
+                                                });
 
                                                 // }
                                               },
@@ -273,7 +271,6 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
                 ),
                 Observer(
                   builder: (context) {
-                    // Show the custom Loader based on appStore.isLoading
                     return Loader().center().visible(appStore.isLoading);
                   },
                 ),

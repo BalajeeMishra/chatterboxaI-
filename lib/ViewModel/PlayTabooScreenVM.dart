@@ -7,7 +7,10 @@ import '../Model/TabooGameChatPageModel.dart';
 import '../Repository/TaboogameChatPageRepository.dart';
 import '../Services/ApiResponseStatus.dart';
 import '../Utils/ShowSnackBar.dart';
+import '../Utils/app_common.dart';
+import '../Utils/app_constants.dart';
 import '../components/tts.dart';
+import '../extensions/shared_pref.dart';
 
 class PlayTabooScreenVM extends ChangeNotifier {
   /// Calling Repository =====================================
@@ -24,20 +27,16 @@ class PlayTabooScreenVM extends ChangeNotifier {
   TabooGameChatPageModel tabooGameChatPageModel = TabooGameChatPageModel();
   bool apiHitStatus = false;
   List<Map<String, dynamic>> dynamicDta = [];
-  // bool isFirstCall = true;
   bool isMuted = false;
 
   String selectedLanguage = 'English';
 
   var dataToPass;
 
-  // setInitailData(){
-  //   tabooGameChatPageModel = TabooGameChatPageModel();
-  // }
-
   seInitialValue(AllGameModel allGameModel, int index, String sessionId) {
     String data = "";
-    print("this is detailed of content ${allGameModel.allGame![index].detailOfContent!.length}");
+    print(
+        "this is detailed of content ${allGameModel.allGame![index].detailOfContent!.length}");
     dynamicDta = [];
     for (var i = 0;
         i < allGameModel.allGame![index].detailOfContent!.length;
@@ -46,8 +45,6 @@ class PlayTabooScreenVM extends ChangeNotifier {
           ? "$data,${allGameModel.allGame![index].detailOfContent![i]}"
           : "$data ${allGameModel.allGame![index].detailOfContent![i]}";
     }
-    // dataToPass =
-    //     "Guess word is ${allGameModel.allGame![index].mainContent} and taboo words are [${data}] and user hint is an";
     dataToPass = "";
     apiHitStatus = false;
     tabooGameChatPageModel = TabooGameChatPageModel();
@@ -67,21 +64,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
 
   void updateResponse(CompleteConversation completeConversation) {
     tabooGameChatPageModel.response = convertToResponse(completeConversation);
-    // if (completeConversation.aiResponse != null && completeConversation.aiResponse != null) {
-    //   // var data = {
-    //   //   "server": 1,
-    //   //   "data":completeConversation. aiResponse!.last.characters
-    //   // };
-    //   // dynamicDta.add(data);
-    //   // apiHitStatus = true;
-    //   // tabooGameChatPageModel.response = tabooGameChatPageModel.response!;
-    //
-    //   dynamicDta.add({
-    //     "server": 1,
-    //     "data":completeConversation. aiResponse!.last.characters
-    //
-    //   });
-    // }
+
     notifyListeners();
   }
 
@@ -93,10 +76,9 @@ class PlayTabooScreenVM extends ChangeNotifier {
       int index,
       bool isFirst,
       bool isMute,
-      ) async {
-   isMuted= isMute ;
-   print("isMuted"+isMuted.toString());
-    // isFirstCall = isFirst;
+      String modality,
+      String gameName) async {
+    isMuted = isMute;
     if (dataGet == "") {
       MySnackBar.showSnackBar(context, "Please speak first!");
       return;
@@ -118,8 +100,10 @@ class PlayTabooScreenVM extends ChangeNotifier {
         "question": dataToAdd,
         "sessionId": sessionId,
         'gameId': allGameModel.allGame![index].gameId,
-        "mainContent": allGameModel.allGame![index].mainContent
+        "mainContent": allGameModel.allGame![index].mainContent,
+        "modality": modality,
       };
+
       ApiResponse<TabooGameChatPageModel> response =
           await _tabooGameChatPageRepository
               .tabooGameChatPageApiCallFunction(data);
@@ -135,10 +119,10 @@ class PlayTabooScreenVM extends ChangeNotifier {
           tabooGameChatPageModel = response.data!;
           notifyListeners();
           speakText(response.data!.response!.aiResponse!.last);
-          print("Response data is==>"+response.data!.toJson().toString());
+          print("Response data is==>" + response.data!.toJson().toString());
           appStore.setUserResponse(response.data!.response!.userResponse!.last);
           userStore.setTTSPlaying("YES");
-          print("is yes"+userStore.isTTSPlaying.toString());
+          print("is yes" + userStore.isTTSPlaying.toString());
 
           // if (!isFirstCall) {
           //   speakText(response.data!.response!.aiResponse!.last);
@@ -148,14 +132,12 @@ class PlayTabooScreenVM extends ChangeNotifier {
           // print("Is First call$isFirstCall");
           print("Is Mute ??/$isMuted");
 
-          if(isMuted){
+          if (isMuted) {
             stopSpeaking();
-
           }
-            break;
-        // tabooGameChatPageModel = response.data!;
-        // notifyListeners();
-        // EasyLoading.dismiss();
+
+
+          break;
 
         // break;
         case ApiResponseStatus.badRequest:
@@ -248,7 +230,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
   }
 
   Future<void> configureTts() async {
-    print("Configuration time ==>"+userStore.userNativeLanguage.toString());
+    print("Configuration time ==>" + userStore.userNativeLanguage.toString());
     // if (userStore.userNativeLanguage.isNotEmpty && userStore.userEnglishProficiency =="Beginner") {
     //   selectedLanguage = userStore.userNativeLanguage;
     //   setTtsLanguage(selectedLanguage);

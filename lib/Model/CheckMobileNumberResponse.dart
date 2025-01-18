@@ -31,6 +31,9 @@ class User {
   bool? playingstatus;
   String? engprolevel;
   int? iV;
+  String? lastActive;
+  // String? createdAt;
+  String? updatedAt;
 
   User(
       {this.sId,
@@ -43,7 +46,10 @@ class User {
         this.country,
         this.playingstatus,
         this.engprolevel,
-        this.iV});
+        this.iV,
+        this.lastActive,
+        // this.createdAt,
+        this.updatedAt,});
 
   User.fromJson(Map<String, dynamic> json) {
     sId = json['_id'];
@@ -57,6 +63,9 @@ class User {
     playingstatus = json['playingstatus'];
     engprolevel=  json['engprolevel'];
     iV = json['__v'];
+    lastActive = json['lastActive'];
+    // createdAt = json['createdAt'];
+    updatedAt = json['updatedAt'];
   }
 
   Map<String, dynamic> toJson() {
@@ -72,6 +81,9 @@ class User {
     data['playingstatus'] = playingstatus;
     data['engprolevel']= engprolevel;
     data['__v'] = iV;
+    data['lastActive'] = lastActive;
+    // data['createdAt'] = createdAt;
+    data['updatedAt'] = updatedAt;
     return data;
   }
 }

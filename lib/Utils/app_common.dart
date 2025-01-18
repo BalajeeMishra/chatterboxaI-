@@ -148,13 +148,14 @@ toast(String? value,
     fontSize: 16.0,
   );
 }
+
 void toastLeft(
-    String? value, {
-      ToastGravity? gravity,
-      int durationInSeconds = 1,
-      Color? bgColor,
-      Color? textColor,
-    }) {
+  String? value, {
+  ToastGravity? gravity,
+  int durationInSeconds = 1,
+  Color? bgColor,
+  Color? textColor,
+}) {
   int repeatCount = (durationInSeconds / 2).ceil();
   Timer.periodic(Duration(seconds: 2), (timer) {
     if (repeatCount > 0) {
@@ -181,7 +182,8 @@ setLogInValue() {
     userStore.setToken(getStringAsync(TOKEN));
     userStore.setUserID(getStringAsync(USER_ID));
     userStore.setUserNativeLanguage(getStringAsync(USER_NATIVE_LANGUAGE));
-    userStore.setUserEnglishProficiency(getStringAsync(USER_ENGLISH_PROFICIENCY));
+    userStore
+        .setUserEnglishProficiency(getStringAsync(USER_ENGLISH_PROFICIENCY));
   }
 }
 
@@ -276,6 +278,7 @@ String parseDocumentDate(DateTime dateTime) {
     return DateFormat('dd MMM, yyyy').format(dateTime);
   }
 }
+
 String formatDateTime(DateTime dateTime) {
   DateTime localDateTime = dateTime.toLocal();
 
@@ -295,11 +298,16 @@ String getGreetingMessage() {
 }
 
 String getDynamicDescription(String createdAt) {
-  final createdDate = DateTime.parse(createdAt).toUtc().add(Duration(hours: 5, minutes: 30)); // Convert UTC to IST
-  final today = DateTime.now().toUtc().add(Duration(hours: 5, minutes: 30)); // Current time in IST
+  final createdDate = DateTime.parse(createdAt)
+      .toUtc()
+      .add(Duration(hours: 5, minutes: 30)); // Convert UTC to IST
+  final today = DateTime.now()
+      .toUtc()
+      .add(Duration(hours: 5, minutes: 30)); // Current time in IST
 
   final todayDate = DateTime(today.year, today.month, today.day);
-  final createdAtDate = DateTime(createdDate.year, createdDate.month, createdDate.day);
+  final createdAtDate =
+      DateTime(createdDate.year, createdDate.month, createdDate.day);
 
   final differenceInDays = todayDate.difference(createdAtDate).inDays;
 
@@ -312,13 +320,13 @@ String getDynamicDescription(String createdAt) {
   }
 }
 
-
 String getDynamicHistoryDescription(String createdAt) {
   final createdDate = DateTime.parse(createdAt).toUtc();
   final today = DateTime.now().toUtc();
 
   final todayDate = DateTime(today.year, today.month, today.day);
-  final createdAtDate = DateTime(createdDate.year, createdDate.month, createdDate.day);
+  final createdAtDate =
+      DateTime(createdDate.year, createdDate.month, createdDate.day);
 
   final differenceInDays = todayDate.difference(createdAtDate).inDays;
 
@@ -349,10 +357,55 @@ String getMonthName(int month) {
   ];
   return monthNames[month];
 }
+
 String trimPhoneNumber(String fullNumber) {
-  // Check if the number starts with '+91' and remove it
   if (fullNumber.startsWith('+91')) {
-    return fullNumber.substring(3); // Remove the first 3 characters (+91)
+    return fullNumber.substring(3);
   }
-  return fullNumber; // Return the number as-is if it doesn't start with +91
+  return fullNumber;
 }
+
+String extractCountryCode(String fullNumber) {
+  fullNumber = fullNumber.replaceAll(' ', '');
+
+  RegExp regExp = RegExp(r'^\+(\d+)');
+  Match? match = regExp.firstMatch(fullNumber);
+
+  if (match != null && match.groupCount > 0) {
+    return '+${match.group(1)}';
+  } else {
+    throw FormatException('Invalid phone number format');
+  }
+}
+
+class InstallDateHelper {
+  /// Save the install date if not already saved
+  static Future<void> saveInstallDate() async {
+    String? installDateStr = getStringAsync(DAYS_SINCE_INSTALL);
+
+    if (installDateStr.isEmpty) {
+      await setValue(DAYS_SINCE_INSTALL, DateTime.now().toIso8601String());
+      print("Install date saved: ${DateTime.now().toIso8601String()}");
+    } else {
+      print("Install date already exists: $installDateStr");
+    }
+  }
+
+  /// Calculate days since install
+  static Future<int> getDaysSinceInstall() async {
+    String? installDateStr = getStringAsync(DAYS_SINCE_INSTALL);
+    print("Install Date: $installDateStr");
+
+    if (installDateStr.isNotEmpty) {
+      DateTime installDate = DateTime.parse(installDateStr);
+      DateTime currentDate = DateTime.now();
+      int daysSinceInstall = currentDate.difference(installDate).inDays;
+      return daysSinceInstall;
+    } else {
+      print("No install date found.");
+      return 0;
+    }
+  }
+}
+
+

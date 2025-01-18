@@ -9,9 +9,12 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 
 import '../../Utils/app_colors.dart';
+import '../../Utils/app_common.dart';
+import '../../Utils/app_constants.dart';
 import '../../ViewModel/AllGameVm.dart';
 import '../../components/tts.dart';
 import '../../extensions/loader_widget.dart';
+import '../../extensions/shared_pref.dart';
 import '../../main.dart';
 import '../youtube_video_player_screen.dart';
 import 'PlayTabooScreen.dart';
@@ -38,16 +41,16 @@ class _ChooseWordScreen extends State<ChooseWordScreen> {
         .allGamePageAPI(context, widget.dataId);
   }
 
-
-  timerFunction(){
+  timerFunction() {
     print("Timer function calling");
     int elapsedSeconds = 0;
     const int maxDuration = 10;
 
-    Timer.periodic(Duration(seconds: 2,milliseconds: 400), (Timer timer) async {
+    Timer.periodic(Duration(seconds: 2, milliseconds: 400),
+        (Timer timer) async {
       elapsedSeconds++;
 
-      if (userStore.isTTSPlaying =="YES") {
+      if (userStore.isTTSPlaying == "YES") {
         print("Into iF");
         userStore.setTTSPlaying("NO");
         await ttsManager.stop();
@@ -62,11 +65,9 @@ class _ChooseWordScreen extends State<ChooseWordScreen> {
     });
   }
 
-
-
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
+    return Scaffold(
       appBar: backCustomAppBar(
           backButtonshow: true,
           centerTile: false,
@@ -106,103 +107,131 @@ class _ChooseWordScreen extends State<ChooseWordScreen> {
                     ),
                     vm.apiHitStatus
                         ? vm.homePageModel.allGame == null
-                        ? Center(
-                      child: MyText(
-                        text: 'No Game Found',
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    )
-                        : ListView.builder(
-                        itemCount: vm.homePageModel.allGame!.length,
-                        shrinkWrap: true,
-                        scrollDirection: Axis.vertical,
-                        itemBuilder: (context, index) {
-                          var data = vm.homePageModel.allGame![index];
-                          Color containerColor = (index % 2 == 0)
-                              ? Color(0xffd3e2f5)
-                              : Color(0xffe4d7f1);
-
-                          return Column(
-                            children: [
-                              InkWell(
-                                onTap: () async {
-                                  final bool? res =
-                                  await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                YoutubeVideoPlayerScreen(
-                                                  vm.homePageModel,
-                                                  index,
-                                                  Uuid().v4(),
-                                                  widget.gameName,
-                                                )));
-
-                                  // await Navigator.push(
-                                  //     context,
-                                  //     MaterialPageRoute(
-                                  //         builder: (context) =>
-                                  //             PlayTabooScreen(
-                                  //               vm.homePageModel,
-                                  //               index,
-                                  //               Uuid().v4(),
-                                  //               widget.gameName,
-                                  //             )));
-                                  if (res == true) {
-                                    timerFunction();
-
-                                  }
-                                },
-                                child: Container(
-                                    width: MediaQuery.of(context)
-                                        .size
-                                        .width *
-                                        0.9,
-                                    decoration: BoxDecoration(
-                                        color: containerColor,
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(10.0))),
-                                    child: Padding(
-                                      padding:
-                                      const EdgeInsets.symmetric(
-                                          horizontal: 15.0,
-                                          vertical: 10.0),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            "${data.mainContent}",
-                                            style: TextStyle(
-                                                fontWeight:
-                                                FontWeight.w800,
-                                                color: Colors.black,
-                                                fontSize: 20),
-                                          ),
-                                          const SizedBox(
-                                            height: 10,
-                                          ),
-                                          Text(
-                                            "#${data.level}",
-                                            style: TextStyle(
-                                                fontSize: 14,
-                                                color:
-                                                Color(0xff646464),
-                                                fontWeight:
-                                                FontWeight.w400),
-                                          )
-                                        ],
-                                      ),
-                                    )),
-                              ),
-                              SizedBox(
-                                height: 15,
+                            ? Center(
+                                child: MyText(
+                                  text: 'No Game Found',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
                               )
-                            ],
-                          );
-                        }).expand()
+                            : ListView.builder(
+                                itemCount: vm.homePageModel.allGame!.length,
+                                shrinkWrap: true,
+                                scrollDirection: Axis.vertical,
+                                itemBuilder: (context, index) {
+                                  var data = vm.homePageModel.allGame![index];
+                                  Color containerColor = (index % 2 == 0)
+                                      ? Color(0xffd3e2f5)
+                                      : Color(0xffe4d7f1);
+
+                                  return Column(
+                                    children: [
+                                      InkWell(
+                                        onTap: () async {
+                                          setValue(SESSION_ID, Uuid().v4());
+                                          final bool? res =
+                                              await Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          YoutubeVideoPlayerScreen(
+                                                            vm.homePageModel,
+                                                            index,
+                                                            Uuid().v4(),
+                                                            widget.gameName,
+                                                          )));
+
+                                          if (res == true) {
+                                            timerFunction();
+                                          }
+                                          analytics.logEvent(
+                                            name: 'content_selection',
+                                            parameters: {
+                                              'content_name':
+                                                  data.mainContent.toString(),
+                                              'Game_name': widget.gameName,
+                                              'User_id':
+                                                  getStringAsync(USER_ID),
+                                              'days_since_install':
+                                                  await InstallDateHelper
+                                                      .getDaysSinceInstall()
+                                            },
+                                          ).then((_) {
+                                            print(
+                                                'Logged event: content_selection with parameters:');
+                                          }).catchError((error) {
+                                            print(
+                                                'Failed to log event: $error');
+                                          });
+                                          facebookAppEvents.logEvent(
+                                            name: 'content_selection',
+                                            parameters: {
+                                              'content_name':
+                                                  data.mainContent.toString(),
+                                              'Game_name': widget.gameName,
+                                              'User_id':
+                                                  getStringAsync(USER_ID),
+                                              'days_since_install':
+                                                  await InstallDateHelper
+                                                      .getDaysSinceInstall()
+                                            },
+                                          ).then((_) {
+                                            print(
+                                                'Logged event: content_selection with parameters:');
+                                          }).catchError((error) {
+                                            print(
+                                                'Failed to log event: $error');
+                                          });
+                                        },
+                                        child: Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.9,
+                                            decoration: BoxDecoration(
+                                                color: containerColor,
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(10.0))),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 15.0,
+                                                      vertical: 10.0),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    "${data.mainContent}",
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w800,
+                                                        color: Colors.black,
+                                                        fontSize: 20),
+                                                  ),
+                                                  const SizedBox(
+                                                    height: 10,
+                                                  ),
+                                                  Text(
+                                                    "#${data.level}",
+                                                    style: TextStyle(
+                                                        fontSize: 14,
+                                                        color:
+                                                            Color(0xff646464),
+                                                        fontWeight:
+                                                            FontWeight.w400),
+                                                  )
+                                                ],
+                                              ),
+                                            )),
+                                      ),
+                                      SizedBox(
+                                        height: 15,
+                                      )
+                                    ],
+                                  );
+                                }).expand()
                         : SizedBox()
                   ],
                 );
@@ -218,6 +247,5 @@ class _ChooseWordScreen extends State<ChooseWordScreen> {
         ),
       ),
     );
-
   }
 }

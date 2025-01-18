@@ -176,7 +176,8 @@ class _YoutubeVideoPlayerScreenState extends State<YoutubeVideoPlayerScreen> {
           titleTextStyle: TextStyle(
               fontSize: 18, fontWeight: FontWeight.w400, color: Colors.white),
         ),
-        body: Stack(
+        body:
+        videoId != null ?Stack(
           children: [
             !isVideoEnded
                 ? videoId != null
@@ -292,7 +293,7 @@ class _YoutubeVideoPlayerScreenState extends State<YoutubeVideoPlayerScreen> {
                   )
                 : SizedBox(),
           ],
-        ),
+        ):SizedBox(),
         floatingActionButton: !isVideoEnded
             ? AppButton(
                 shapeBorder: CircleBorder(),

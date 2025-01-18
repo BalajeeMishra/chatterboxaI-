@@ -213,9 +213,7 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
         setState(() {
 
         },);
-        // submit();
-        // submit();
-        // UserDetails().launch(context);
+
       },
     ).center();
   }
@@ -238,6 +236,8 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
         userStore.setUserNativeLanguage(value.user!.nativeLanguage.toString());
         setValue(USER_ENGLISH_PROFICIENCY, value.user!.engprolevel.toString());
         userStore.setUserEnglishProficiency(value.user!.engprolevel.toString());
+        // setValue(DAYS_SINCE_INSTALL, value.user!.createdAt.toString());
+        // userStore.setDaysSinceInstall(value.user!.createdAt.toString());
         await userStore.setLogin(true);
         JabberAIHomepage().launch(context);
         setState(() {});

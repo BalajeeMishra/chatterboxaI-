@@ -150,9 +150,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   ];
   String selectedLanguage = 'Hindi';
   String englishLevel = 'Beginner';
+  String countryCode ="";
 
   @override
   void initState() {
+    countryCode = extractCountryCode(widget.mobileNumber.toString());
     super.initState();
   }
 
@@ -160,7 +162,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     hideKeyboard(context);
     Map<String, dynamic> req = {
       'name': mNameCont.text.trim(),
-      // 'age': mAgeCont.text.trim(),
       'nativeLanguage': selectedLanguage,
       'mobileNo': widget.mobileNumber.trim(),
       'country': widget.country.trim(),
@@ -185,8 +186,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
               USER_ENGLISH_PROFICIENCY, value.newUser!.engprolevel.toString());
           userStore
               .setUserEnglishProficiency(value.newUser!.engprolevel.toString());
+
           await userStore.setLogin(true);
           JabberAIHomepage().launch(context);
+          analytics.logEvent(
+            name: 'Registration_complete',
+            parameters: {
+              'User_id': value.newUser!.userId.toString(),
+              'Native_language': value.newUser!.nativeLanguage.toString(),
+              'Proficiency': value.newUser!.engprolevel.toString(),
+              'country_code': countryCode
+            },
+          ).then((_) {
+            print('Logged event: Registration_complete with parameters:');
+          }).catchError((error) {
+            print('Failed to log event: $error');
+          });
+          facebookAppEvents.logEvent(
+            name: 'Registration_complete',
+            parameters: {
+              'User_id': value.newUser!.userId.toString(),
+              'Native_language': value.newUser!.nativeLanguage.toString(),
+              'Proficiency': value.newUser!.engprolevel.toString(),
+              'country_code': countryCode
+            },
+          ).then((_) {
+            print('Logged event: Registration_complete with parameters:');
+          }).catchError((error) {
+            print('Failed to log event: $error');
+          });
         } else {
           toast('Contact Admin');
         }

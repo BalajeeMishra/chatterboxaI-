@@ -12,7 +12,63 @@
           "package_name": "com.talkyplay.zapai"
         }
       },
-      "oauth_client": [],
+      "analytics": {
+        "collection_enabled": true
+      },
+      "oauth_client": [
+        {
+          "client_id": "349682106028-55dgue3rgodabvfmaotisnh53i5hdi10.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.talkyplay.zapai",
+            "certificate_hash": "1cf269c406d0dead9e1108e89951ef31d1b346c9"
+          }
+        },
+        {
+          "client_id": "349682106028-h5do8bnu90qt6k6e2c91d1doa858joqr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.talkyplay.zapai",
+            "certificate_hash": "c480866c0f3f95774fa79d7e42d3870bfcf76782"
+          }
+        },
+        {
+          "client_id": "349682106028-of7ostt4ls6f7pg51tp7kogoqnhersvm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.talkyplay.zapai",
+            "certificate_hash": "60b37760816effc6d368571d7b9d15d4e9c1d917"
+          }
+        },
+        {
+          "client_id": "349682106028-prf50oa6vhh6gj8a3uu3vi63so9dm6vn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.talkyplay.zapai",
+            "certificate_hash": "5e57a0eb2745b7599ad736096a523377306c334e"
+          }
+        },
+        {
+          "client_id": "349682106028-t0r8rh9jlj1uc44qau260bni71fsalkq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.talkyplay.zapai",
+            "certificate_hash": "d492b489aacdc98a0333b33616f18ba593546da0"
+          }
+        },
+        {
+          "client_id": "349682106028-vhirrkl2b116f3s6p0q0sn6bh4cflo44.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.talkyplay.zapai",
+            "certificate_hash": "a77ba6ce9b457e0f1b8ada43a99338557d02d545"
+          }
+        },
+        {
+          "client_id": "349682106028-r1466bk2jadihk20qps0794871urrms6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCY5DQ73GU_NMCjfdABkf_f172EJ_K5Y9s"
@@ -20,10 +76,23 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "349682106028-r1466bk2jadihk20qps0794871urrms6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "349682106028-9clpaqf01tjmgc0q4kps50kg95hrgeso.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.talkyplay.zapai"
+              }
+            }
+          ]
         }
       }
     }
+
   ],
   "configuration_version": "1"
 }
