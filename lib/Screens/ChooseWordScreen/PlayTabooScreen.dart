@@ -60,7 +60,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   String currentSpeechText = "";
 
   //Screen2 data
-  double speechRate = 0.4;
+  double speechRate = 0.3;
   final TTSManager ttsManager = TTSManager();
   bool isSpeaking = false;
   String message = '';
@@ -191,13 +191,11 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   String previousSessionId = "";
   String currentSessionId = "";
 // bool isGameComplete = false;
-//   late GameEventManager gameEventManager;
 
   @override
   void initState() {
     super.initState();
     appStore.setLoading(false);
-    // gameEventManager = GameEventManager(currentSessionId: widget.sessionId,);
 
     currentSessionId = widget.sessionId;
     previousSessionId = getStringAsync(SESSION_ID);

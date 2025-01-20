@@ -409,3 +409,90 @@ class InstallDateHelper {
 }
 
 
+class GameEventManager {
+  final String currentSessionId;
+  List<Map<String, dynamic>> gameEvents = [];
+
+  // Singleton instance
+  static GameEventManager? _instance;
+
+  GameEventManager._internal({required this.currentSessionId});
+
+  factory GameEventManager({required String currentSessionId}) {
+    return _instance ??= GameEventManager._internal(currentSessionId: currentSessionId);
+  }
+
+  /// Save a game event and check if it's time to log
+  Future<void> saveGameEvent({
+    required String contentName,
+    required String gameName,
+    required String userId,
+    required String modality,
+    required int daysSinceInstall,
+  }) async {
+    print("CURRENT SESSION ID IS == $currentSessionId");
+    print("Before adding: ${gameEvents.length}");
+
+    gameEvents.add({
+      'content_name': contentName,
+      'Game_name': gameName,
+      'User_id': userId,
+      'Modality': modality,
+      'days_since_install': await InstallDateHelper.getDaysSinceInstall(),
+    });
+
+    print("Game events added: $gameEvents");
+    print("Current gameEvents length: ${gameEvents.length}");
+
+    if (gameEvents.length >= 4) {
+      int completeEventNumber = gameEvents.length;
+      String eventName = 'Game_complete_$completeEventNumber';
+
+      print("Logging event: $eventName");
+
+      await logEvent(eventName, List<Map<String, dynamic>>.from(gameEvents));
+
+      gameEvents = gameEvents.sublist(4); // Keep leftover events
+    } else {
+      print("Not enough events to log. Current count: ${gameEvents.length}");
+    }
+  }
+
+  /// Log the event to analytics
+  Future<void> logEvent(String eventName, List<Map<String, dynamic>> events) async {
+    try {
+      for (var i = 0; i < events.length; i++) {
+        String eventJson = events[i].toString();
+
+        await analytics.logEvent(
+          name: '$eventName${i + 1}',
+          parameters: {
+            'event_data': eventJson,
+          },
+        );
+        print('Logged event: $eventName with parameters: $eventJson');
+      }
+    } catch (error) {
+      print('Failed to log event: $error');
+    }
+  }
+  Future<void> logFacebookEvent(String eventName, List<Map<String, dynamic>> events) async {
+    try {
+      for (var i = 0; i < events.length; i++) {
+        String eventJson = events[i].toString();
+
+        await facebookAppEvents.logEvent(
+          name: '$eventName${i + 1}',
+          parameters: {
+            'event_data': eventJson,
+          },
+        );
+        print('Logged event: $eventName with parameters: $eventJson');
+      }
+    } catch (error) {
+      print('Failed to log event: $error');
+    }
+  }
+
+
+}

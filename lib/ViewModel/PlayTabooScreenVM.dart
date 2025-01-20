@@ -28,6 +28,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
   bool apiHitStatus = false;
   List<Map<String, dynamic>> dynamicDta = [];
   bool isMuted = false;
+  late GameEventManager gameEventManager;
 
   String selectedLanguage = 'English';
 
@@ -135,6 +136,15 @@ class PlayTabooScreenVM extends ChangeNotifier {
           if (isMuted) {
             stopSpeaking();
           }
+          gameEventManager = GameEventManager(currentSessionId: sessionId);
+
+          await gameEventManager.saveGameEvent(
+            contentName: allGameModel.allGame![index].mainContent.toString(),
+            gameName: gameName,
+            userId: getStringAsync(USER_ID),
+            modality: response.data!.response!.modality.toString(),
+            daysSinceInstall: await InstallDateHelper.getDaysSinceInstall(),
+          );
 
 
           break;
@@ -245,7 +255,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
 
     // print("Selectd Language is ==>"+selectedLanguage.toString());
 
-    await ttsManager.setSpeechRate(0.4);
+    await ttsManager.setSpeechRate(0.3);
     await ttsManager.setVolume(1.0);
   }
 

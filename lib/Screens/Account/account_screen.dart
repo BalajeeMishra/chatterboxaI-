@@ -123,7 +123,7 @@ class _AccountScreenState extends State<AccountScreen> {
                        Text(
                          "We Are An Early App. Help The Developer By Sharing Your Feedback On How We Can Improve Your Experience! Thank You.",
                          textAlign: TextAlign.center,
-                         style: TextStyle(fontSize: 12, color: Colors.grey),
+                         style: TextStyle(fontSize: 12,fontWeight: FontWeight.bold, color: Colors.black),
                        ),
 
                        32.height,
@@ -154,7 +154,7 @@ class _AccountScreenState extends State<AccountScreen> {
                            Expanded(
                              child: Text(
                                "Important: Deleting Your Account Is Permanent. All Your Progress And Data Will Be Erased And Cannot Be Recovered.",
-                               style: TextStyle(color: redColor, fontSize: 12),
+                               style: TextStyle(color: Colors.grey, fontSize: 12),
                              ),
                            ),
                          ],
