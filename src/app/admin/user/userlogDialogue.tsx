@@ -92,68 +92,90 @@ export function DialogCloseButton({ selectUserId }: DialogCloseButtonProps) {
           <DialogDescription>Userlog full details</DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-2">
-          {gameConversations.map((game, index) => (
-            <Accordion
-              type="single"
-              collapsible
-              key={game._id}
-              className="w-full"
-            >
-              <AccordionItem value={`session-${index + 1}`}>
-                <AccordionTrigger className="font-semibold">
-                  <div className="flex min-w-24">Session {index + 1} </div>{" "}
-                  <span className="text-end my-2 w-full flex justify-end text-xs pr-4 text-gray-600">
-                    {game?.gameDetails?.gameName}
-                  </span>
-                </AccordionTrigger>
-                <AccordionContent>
-                  <div className="flex flex-col gap-2">
-                    <span className="text-end my-2 w-full flex justify-end text-xs text-gray-600">
-                      {formattedDate(game.createdAt)}
+          {gameConversations
+            .slice()
+            .reverse()
+            .map((game, index) => (
+              <Accordion
+                type="single"
+                collapsible
+                key={game._id}
+                className="w-full"
+              >
+                <AccordionItem
+                  value={`session-${gameConversations.length - index}`}
+                >
+                  <AccordionTrigger className="font-semibold">
+                    <div className="flex min-w-24">
+                      Session {gameConversations.length - index}{" "}
+                      {/* Reverse numbering */}
+                    </div>
+                    <span className="text-end my-2 w-full flex justify-end text-xs pr-4 text-gray-600">
+                      {game?.gameDetails?.gameName}
                     </span>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="flex flex-col gap-2">
+                      <span className="text-end my-2 w-full flex justify-end text-xs text-gray-600">
+                        {formattedDate(game.createdAt)}
+                      </span>
 
-                    {game.userResponse.map((userResp, idx) => (
-                      <React.Fragment key={`response-pair-${idx}`}>
-                        {/* User Response */}
-                        <Accordion type="single" collapsible>
-                          <AccordionItem value={`user-response-${idx + 1}`}>
-                            <AccordionTrigger className="bg-blue-100 p-2 rounded-md">
-                              User Response {idx + 1}
-                            </AccordionTrigger>
-                            <AccordionContent className="bg-gray-100 p-4 rounded-md mt-2">
-                              <p> {userResp?.text}</p>
-                              <span className="text-end w-full flex justify-end text-xs text-gray-600 mt-4">
-                                {formattedDate(userResp?.createdAt)}
-                              </span>
-                            </AccordionContent>
-                          </AccordionItem>
-                        </Accordion>
+                      {/* Reverse and map responses */}
+                      {game.userResponse
+                        .slice()
+                        .reverse()
+                        .map((userResp, idx) => (
+                          <React.Fragment key={`response-pair-${idx}`}>
+                            {/* User Response */}
+                            <Accordion type="single" collapsible>
+                              <AccordionItem
+                                value={`user-response-${
+                                  game.userResponse.length - idx
+                                }`}
+                              >
+                                <AccordionTrigger className="bg-blue-100 p-2 rounded-md">
+                                  User Response {game.userResponse.length - idx}{" "}
+                                  {/* Reverse numbering */}
+                                </AccordionTrigger>
+                                <AccordionContent className="bg-gray-100 p-4 rounded-md mt-2">
+                                  <p>{userResp?.text}</p>
+                                  <span className="text-end w-full flex justify-end text-xs text-gray-600 mt-4">
+                                    {formattedDate(userResp?.createdAt)}
+                                  </span>
+                                </AccordionContent>
+                              </AccordionItem>
+                            </Accordion>
 
-                        {/* AI Response */}
-                        {game.aiResponse[idx] && (
-                          <Accordion type="single" collapsible>
-                            <AccordionItem value={`ai-response-${idx + 1}`}>
-                              <AccordionTrigger className="bg-green-100 p-2 rounded-md">
-                                AI Response {idx + 1}
-                              </AccordionTrigger>
-                              <AccordionContent className="bg-gray-100 p-4 rounded-md mt-2">
-                                <p>{game.aiResponse[idx]?.text} </p>
-                                <span className="text-end w-full flex justify-end text-xs text-gray-600 mt-4">
-                                  {formattedDate(
-                                    game.aiResponse[idx]?.createdAt
-                                  )}
-                                </span>
-                              </AccordionContent>
-                            </AccordionItem>
-                          </Accordion>
-                        )}
-                      </React.Fragment>
-                    ))}
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          ))}
+                            {/* AI Response */}
+                            {game.aiResponse[idx] && (
+                              <Accordion type="single" collapsible>
+                                <AccordionItem
+                                  value={`ai-response-${
+                                    game.aiResponse.length - idx
+                                  }`}
+                                >
+                                  <AccordionTrigger className="bg-green-100 p-2 rounded-md">
+                                    AI Response {game.aiResponse.length - idx}{" "}
+                                    {/* Reverse numbering */}
+                                  </AccordionTrigger>
+                                  <AccordionContent className="bg-gray-100 p-4 rounded-md mt-2">
+                                    <p>{game.aiResponse[idx]?.text}</p>
+                                    <span className="text-end w-full flex justify-end text-xs text-gray-600 mt-4">
+                                      {formattedDate(
+                                        game.aiResponse[idx]?.createdAt
+                                      )}
+                                    </span>
+                                  </AccordionContent>
+                                </AccordionItem>
+                              </Accordion>
+                            )}
+                          </React.Fragment>
+                        ))}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            ))}
         </div>
 
         <DialogFooter className="sm:justify-start">
