@@ -412,6 +412,8 @@ class InstallDateHelper {
 class GameEventManager {
   final String currentSessionId;
   List<Map<String, dynamic>> gameEvents = [];
+  Map<String, int> gameEventCounts = {}; // Track event counts for each game
+  String? lastGameName;
 
   // Singleton instance
   static GameEventManager? _instance;
@@ -422,7 +424,7 @@ class GameEventManager {
     return _instance ??= GameEventManager._internal(currentSessionId: currentSessionId);
   }
 
-  /// Save a game event and check if it's time to log
+  /// Save a game event and handle per-game event tracking
   Future<void> saveGameEvent({
     required String contentName,
     required String gameName,
@@ -430,69 +432,97 @@ class GameEventManager {
     required String modality,
     required int daysSinceInstall,
   }) async {
-    print("CURRENT SESSION ID IS == $currentSessionId");
-    print("Before adding: ${gameEvents.length}");
+    // Initialize or reset the count for a new game name
+    if (lastGameName != gameName) {
+      print("Game name changed from $lastGameName to $gameName. Resetting event count.");
+      lastGameName = gameName;
+    }
 
+    // Ensure the gameName exists in the map with a count
+    gameEventCounts.putIfAbsent(gameName, () => 0);
+
+    // Add the event to the list
     gameEvents.add({
       'content_name': contentName,
       'Game_name': gameName,
       'User_id': userId,
       'Modality': modality,
-      'days_since_install': await InstallDateHelper.getDaysSinceInstall(),
+      'days_since_install': daysSinceInstall,
     });
 
     print("Game events added: $gameEvents");
     print("Current gameEvents length: ${gameEvents.length}");
 
-    if (gameEvents.length >= 4) {
-      int completeEventNumber = gameEvents.length;
-      String eventName = 'Game_complete_$completeEventNumber';
+    // Process events in batches of 4
+    while (gameEvents.length >= 4) {
+      int batchSize = 4;
+      int currentBatchCount = gameEventCounts[gameName]! + batchSize;
 
-      print("Logging event: $eventName");
+      String eventName = 'Game_complete_$currentBatchCount';
+      print("Logging event: $eventName for $gameName");
 
-      await logEvent(eventName, List<Map<String, dynamic>>.from(gameEvents));
+      await logEvent(eventName, gameEvents.sublist(0, batchSize));
+      await logFacebookEvent(eventName, gameEvents.sublist(0, batchSize));
 
-      gameEvents = gameEvents.sublist(4); // Keep leftover events
+      // Update the count for the specific game
+      gameEventCounts[gameName] = currentBatchCount;
+
+      // Remove the logged events from the list
+      gameEvents = gameEvents.sublist(batchSize);
+
+      print("Logged event count for $gameName: ${gameEventCounts[gameName]}");
+    }
+
+    if (gameEvents.isNotEmpty) {
+      print("Remaining events to be logged for $gameName: ${gameEvents.length}");
     } else {
-      print("Not enough events to log. Current count: ${gameEvents.length}");
+      print("All events logged for $gameName.");
     }
   }
 
   /// Log the event to analytics
   Future<void> logEvent(String eventName, List<Map<String, dynamic>> events) async {
     try {
-      for (var i = 0; i < events.length; i++) {
-        String eventJson = events[i].toString();
+      for (var event in events) {
+        final validParameters = event.map<String, Object>((key, value) {
+          if (value is Object) {
+            return MapEntry(key, value);
+          } else {
+            throw ArgumentError('Invalid value for key $key: $value');
+          }
+        });
 
         await analytics.logEvent(
-          name: '$eventName${i + 1}',
-          parameters: {
-            'event_data': eventJson,
-          },
+          name: eventName,
+          parameters: validParameters,
         );
-        print('Logged event: $eventName with parameters: $eventJson');
+        print('Logged event: $eventName with parameters: $validParameters');
       }
     } catch (error) {
       print('Failed to log event: $error');
     }
   }
+
   Future<void> logFacebookEvent(String eventName, List<Map<String, dynamic>> events) async {
     try {
-      for (var i = 0; i < events.length; i++) {
-        String eventJson = events[i].toString();
+      for (var event in events) {
+        final validParameters = event.map<String, Object>((key, value) {
+          if (value is Object) {
+            return MapEntry(key, value);
+          } else {
+            throw ArgumentError('Invalid value for key $key: $value');
+          }
+        });
 
         await facebookAppEvents.logEvent(
-          name: '$eventName${i + 1}',
-          parameters: {
-            'event_data': eventJson,
-          },
+          name: eventName,
+          parameters: validParameters,
         );
-        print('Logged event: $eventName with parameters: $eventJson');
+        print('Logged event: $eventName with parameters: $validParameters');
       }
     } catch (error) {
       print('Failed to log event: $error');
     }
   }
-
 
 }

@@ -35,13 +35,11 @@ class _TaboogamechatPage extends State<TaboogamechatPage>
   int _previousMessageCount = 0;
   bool isFirst = true;
   final TextEditingController _textController = TextEditingController();
-  // late GameEventManager gameEventManager;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    // gameEventManager = GameEventManager(currentSessionId: widget.sessionId);
 
     _scrollController = ScrollController();
     Provider.of<TabooGameChatPageVM>(context, listen: false)
