@@ -79,6 +79,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
       bool isMute,
       String modality,
       String gameName) async {
+    print("iSfIRT ==>" + isFirst.toString());
     isMuted = isMute;
     if (dataGet == "") {
       MySnackBar.showSnackBar(context, "Please speak first!");
@@ -137,15 +138,15 @@ class PlayTabooScreenVM extends ChangeNotifier {
             stopSpeaking();
           }
           gameEventManager = GameEventManager(currentSessionId: sessionId);
-
-          await gameEventManager.saveGameEvent(
-            contentName: allGameModel.allGame![index].mainContent.toString(),
-            gameName: gameName,
-            userId: getStringAsync(USER_ID),
-            modality: response.data!.response!.modality.toString(),
-            daysSinceInstall: await InstallDateHelper.getDaysSinceInstall(),
-          );
-
+          if (isFirst == false) {
+            await gameEventManager.saveGameEvent(
+              contentName: allGameModel.allGame![index].mainContent.toString(),
+              gameName: gameName,
+              userId: getStringAsync(USER_ID),
+              modality: response.data!.response!.modality.toString(),
+              daysSinceInstall: await InstallDateHelper.getDaysSinceInstall(),
+            );
+          }
 
           break;
 

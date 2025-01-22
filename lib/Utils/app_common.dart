@@ -285,17 +285,7 @@ String formatDateTime(DateTime dateTime) {
   return DateFormat('hh:mm a dd MMM yyyy').format(localDateTime);
 }
 
-String getGreetingMessage() {
-  final DateTime now = DateTime.now();
-  final int hour = now.hour;
 
-  if (hour >= 5 && hour < 12) {
-    return 'Good Morning ☀️';
-  } else if (hour >= 12 && hour < 17) {
-    return 'Good Afternoon 🌞';
-  } else
-    return 'Good Evening 🌇';
-}
 
 String getDynamicDescription(String createdAt) {
   final createdDate = DateTime.parse(createdAt)
@@ -412,10 +402,9 @@ class InstallDateHelper {
 class GameEventManager {
   final String currentSessionId;
   List<Map<String, dynamic>> gameEvents = [];
-  Map<String, int> gameEventCounts = {}; // Track event counts for each game
+  Map<String, int> gameEventCounts = {};
   String? lastGameName;
 
-  // Singleton instance
   static GameEventManager? _instance;
 
   GameEventManager._internal({required this.currentSessionId});
@@ -424,7 +413,8 @@ class GameEventManager {
     return _instance ??= GameEventManager._internal(currentSessionId: currentSessionId);
   }
 
-  /// Save a game event and handle per-game event tracking
+  bool isFirstBatch = true;
+
   Future<void> saveGameEvent({
     required String contentName,
     required String gameName,
@@ -432,16 +422,16 @@ class GameEventManager {
     required String modality,
     required int daysSinceInstall,
   }) async {
-    // Initialize or reset the count for a new game name
     if (lastGameName != gameName) {
       print("Game name changed from $lastGameName to $gameName. Resetting event count.");
+      gameEvents.clear();
+      gameEventCounts[gameName] = 0;
       lastGameName = gameName;
+      isFirstBatch = true;
     }
 
-    // Ensure the gameName exists in the map with a count
     gameEventCounts.putIfAbsent(gameName, () => 0);
 
-    // Add the event to the list
     gameEvents.add({
       'content_name': contentName,
       'Game_name': gameName,
@@ -451,78 +441,77 @@ class GameEventManager {
     });
 
     print("Game events added: $gameEvents");
-    print("Current gameEvents length: ${gameEvents.length}");
 
-    // Process events in batches of 4
+    if (isFirstBatch) {
+      isFirstBatch = false;
+      print("Skipping batching for the first set of events.");
+      return;
+    }
+
     while (gameEvents.length >= 4) {
-      int batchSize = 4;
-      int currentBatchCount = gameEventCounts[gameName]! + batchSize;
+      List<Map<String, dynamic>> batch = gameEvents.sublist(0, 4);
 
-      String eventName = 'Game_complete_$currentBatchCount';
-      print("Logging event: $eventName for $gameName");
+      if (batch.any((event) => event['Game_name'] != gameName)) {
+        print("Invalid batch. Skipping.");
+        return;
+      }
 
-      await logEvent(eventName, gameEvents.sublist(0, batchSize));
-      await logFacebookEvent(eventName, gameEvents.sublist(0, batchSize));
+      int nextCount = gameEventCounts[gameName]! + 4;
+      await logEvent('Game_complete_$nextCount', batch);
+      await logFacebookEvent('Game_complete_$nextCount', batch);
 
-      // Update the count for the specific game
-      gameEventCounts[gameName] = currentBatchCount;
+      gameEventCounts[gameName] = nextCount;
+      gameEvents.removeRange(0, 4);
 
-      // Remove the logged events from the list
-      gameEvents = gameEvents.sublist(batchSize);
-
-      print("Logged event count for $gameName: ${gameEventCounts[gameName]}");
+      print("Logged batch: Game_complete_$nextCount");
     }
 
     if (gameEvents.isNotEmpty) {
-      print("Remaining events to be logged for $gameName: ${gameEvents.length}");
-    } else {
-      print("All events logged for $gameName.");
+      print("Waiting for more events to form a batch for $gameName.");
     }
   }
 
-  /// Log the event to analytics
+
   Future<void> logEvent(String eventName, List<Map<String, dynamic>> events) async {
     try {
-      for (var event in events) {
-        final validParameters = event.map<String, Object>((key, value) {
-          if (value is Object) {
-            return MapEntry(key, value);
-          } else {
-            throw ArgumentError('Invalid value for key $key: $value');
-          }
-        });
+      final combinedParameters = <String, Object>{
+        'Game_name': events.first['Game_name'],
+        'Modality': events.first['Modality'],
+        'User_id': events.first['User_id'],
+        'content_name': events.map((e) => e['content_name']).toList().toString(),
+        'days_since_install': events.first['days_since_install'],
+      };
 
-        await analytics.logEvent(
-          name: eventName,
-          parameters: validParameters,
-        );
-        print('Logged event: $eventName with parameters: $validParameters');
-      }
+      await analytics.logEvent(
+        name: eventName,
+        parameters: combinedParameters,
+      );
+
+      print('Logged event: $eventName with parameters: $combinedParameters');
     } catch (error) {
       print('Failed to log event: $error');
     }
   }
-
   Future<void> logFacebookEvent(String eventName, List<Map<String, dynamic>> events) async {
     try {
-      for (var event in events) {
-        final validParameters = event.map<String, Object>((key, value) {
-          if (value is Object) {
-            return MapEntry(key, value);
-          } else {
-            throw ArgumentError('Invalid value for key $key: $value');
-          }
-        });
+      final combinedParameters = <String, Object>{
+        'Game_name': events.first['Game_name'],
+        'Modality': events.first['Modality'],
+        'User_id': events.first['User_id'],
+        'content_name': events.map((e) => e['content_name']).toList().toString(),
+        'days_since_install': events.first['days_since_install'],
+      };
 
-        await facebookAppEvents.logEvent(
-          name: eventName,
-          parameters: validParameters,
-        );
-        print('Logged event: $eventName with parameters: $validParameters');
-      }
+      await facebookAppEvents.logEvent(
+        name: eventName,
+        parameters: combinedParameters,
+      );
+
+      print('Logged event: $eventName with parameters: $combinedParameters');
     } catch (error) {
       print('Failed to log event: $error');
     }
   }
+
 
 }

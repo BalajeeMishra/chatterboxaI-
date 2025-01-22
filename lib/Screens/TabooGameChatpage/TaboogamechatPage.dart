@@ -312,12 +312,12 @@ class _TaboogamechatPage extends State<TaboogamechatPage>
                 });
 
                 chatPageVM.chatPageAPI(context, widget.sessionId, messageText,
-                    widget.allGameModel, widget.index, 'write',widget.gameName);
+                    widget.allGameModel, widget.index, 'write',widget.gameName,isFirst);
                 isFirst = false;
                 setState(() {});
               } else {
                 chatPageVM.chatPageAPI(context, widget.sessionId, messageText,
-                    widget.allGameModel, widget.index, 'write',widget.gameName);
+                    widget.allGameModel, widget.index, 'write',widget.gameName,isFirst);
               }
               chatPageVM.controller.clear();
             },

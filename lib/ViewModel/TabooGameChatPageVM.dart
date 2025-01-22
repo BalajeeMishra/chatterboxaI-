@@ -36,7 +36,6 @@ class TabooGameChatPageVM extends ChangeNotifier {
     dynamicData = [...transactions];
 
     notifyListeners();
-
   }
 
   Future<void> chatPageAPI(
@@ -46,7 +45,8 @@ class TabooGameChatPageVM extends ChangeNotifier {
       AllGameModel allGameModel,
       int index,
       String modality,
-      String gameName) async {
+      String gameName,
+      bool isFirst) async {
     if (messageText.isEmpty) {
       MySnackBar.showSnackBar(context, "Please Enter Your Response");
       return;
@@ -112,5 +112,3 @@ class TabooGameChatPageVM extends ChangeNotifier {
     }
   }
 }
-
-
