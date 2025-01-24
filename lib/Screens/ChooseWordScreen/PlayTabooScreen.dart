@@ -48,6 +48,7 @@ class PlayTabooScreen extends StatefulWidget {
 class _PlayTabooScreen extends State<PlayTabooScreen> {
   bool startListening = false;
   bool _speechEnabled = false;
+  double firstSoundLevel = 0.3;
   String _lastWords = '';
   String _previousWords = '';
   String ques = "";
@@ -208,7 +209,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     newEnglishLevel = userStore.userEnglishProficiency;
     // print("User NAtive Language is==>" + userStore.userNativeLanguage);
     // print("User English Proficiency is==>" + userStore.userEnglishProficiency);
-
+    ttsManager.setSpeechRate(firstSoundLevel);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<PlayTabooScreenVM>(context, listen: false)
           .seInitialValue(widget.allGameModel, widget.index, widget.sessionId);
@@ -314,6 +315,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     await ttsManager.setLanguage('en-US');
 
     await ttsManager.setVolume(1.0);
+    // await ttsManager.setSpeechRate(speechRate);
   }
 
   Future<void> speakText(String text) async {
@@ -369,12 +371,12 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   }
 
   _onIncreaseRatePressed() {
-    adjustSpeechRate(0.2);
+    adjustSpeechRate(0.1);
     setState(() {});
   }
 
   _onDecreaseRatePressed() {
-    adjustSpeechRate(-0.2);
+    adjustSpeechRate(-0.1);
     setState(() {});
   }
 

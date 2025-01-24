@@ -41,6 +41,7 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
 
   // final TextEditingController _otpController = TextEditingController();
 
+
   Telephony telephony = Telephony.instance;
 
   String otpCode = '';
