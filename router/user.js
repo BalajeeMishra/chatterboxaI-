@@ -130,9 +130,6 @@ router.get("/allgameconversation", async (req, res) => {
   }
 });
 
-
-
-
 router.get("/all", async (req, res) => {
   try {
     const {regDate,recentActive} = req.query;

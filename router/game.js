@@ -5,7 +5,7 @@ import Template from "../model/Template.js";
 import striptags from 'striptags';
 import he from'he';
 import Pronounciation from "../model/PronounciationTemplate.js";
-
+import jwtHelper from "../helper/jwt_helper.js";
 
 
 const router = Router();
@@ -86,13 +86,15 @@ catch(err){
 router.post("/new-game-content/:id",async(req,res,next)=>{
   try{
   const {id}= req.params;
-  const {level,mainContent,detailOfContent,youtubeUrl} = req.body;
+  const {level,mainContent,detailOfContent,youtubeUrl,listeningCharacter,talkingCharacter} = req.body;
   const gameContent = new GameContent({
     gameId:id,
     level,
     mainContent,
     detailOfContent,
-    youtubeUrl
+    youtubeUrl,
+    listeningCharacter,
+    talkingCharacter
   });
   await gameContent.save();
   return res.status(200).json({gameContent});
@@ -121,8 +123,8 @@ router.get("/allgamecontent/:id",async(req,res,next)=>{
 router.put("/edit-game-content/:id",async(req,res,next)=>{
   try{
   const id = req.params.id;
-  const {level,mainContent,detailOfContent,youtubeUrl} = req.body;
-  const editedGameContent = await GameContent.findByIdAndUpdate(id, {level,mainContent,detailOfContent,youtubeUrl},{new:true});
+  const {level,mainContent,detailOfContent,youtubeUrl,listeningCharacter,talkingCharacter} = req.body;
+  const editedGameContent = await GameContent.findByIdAndUpdate(id, {level,mainContent,detailOfContent,youtubeUrl,listeningCharacter,talkingCharacter},{new:true});
   if(!editedGameContent){
     return res.status(500).json({messagae:"Something went wrong."})
   }
@@ -249,7 +251,19 @@ router.put("/pronounciationtemplate/:id", async(req,res,next)=>{
   catch{
     throw err;
   }
-})
+});
+
+router.get("/detailcontent/:id",jwtHelper.verifyToken,async(req,res,next)=>{
+  try{
+    const {id} = req.params;
+    const detailContent = await GameContent.findById(id);
+    return res.status(200).json({detailContent});
+  } 
+  catch(err){
+    throw err;
+  }
+}
+)
 
 
 export default router;

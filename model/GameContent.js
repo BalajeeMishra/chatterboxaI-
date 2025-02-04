@@ -16,6 +16,13 @@ const gameContentSchema = new mongoose.Schema({
   
   youtubeUrl:{
     type: String,
+  },
+  talkingCharacter:{
+    type: String,
+  },
+
+  listeningCharacter:{
+    type: String,
   }
 });
 
