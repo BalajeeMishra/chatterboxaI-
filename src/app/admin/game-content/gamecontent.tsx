@@ -45,10 +45,11 @@ export interface Game {
   mainContent: string;
   level: string;
   detailOfContent: string[];
-  youtubeUrl?:any
+  youtubeUrl?: any;
+  listeningCharacter?: any;
+  talkingCharacter?: any;
 }
 
-// // Define the columns for the new table structure
 export const columns: ColumnDef<Game>[] = [
   {
     accessorKey: "_id",
@@ -83,8 +84,46 @@ export const columns: ColumnDef<Game>[] = [
     header: "Youtube URL",
 
     cell: ({ row }) => {
-      const details = row.getValue("youtubeUrl") as string[] | undefined; // Allow it to be undefined
-      return <div>{details ? details : "No details available"}</div>;
+      const details = row.getValue("youtubeUrl") as string | undefined; // Allow it to be undefined
+
+      return details ? (
+        <a className="hover:underline px-2 py-1" href={details} target="_blank">
+          View
+        </a>
+      ) : (
+        <div> N/A</div>
+      );
+    },
+  },
+
+  {
+    accessorKey: "talkingCharacter",
+    header: "Talking Character",
+
+    cell: ({ row }) => {
+      const details = row.getValue("talkingCharacter") as string | undefined; // Allow it to be undefined
+      return details ? (
+        <a className="hover:underline px-2 py-1" href={details} target="_blank">
+          View
+        </a>
+      ) : (
+        <div> N/A</div>
+      );
+    },
+  },
+  {
+    accessorKey: "listeningCharacter",
+    header: "Listening Character",
+
+    cell: ({ row }) => {
+      const details = row.getValue("listeningCharacter") as string | undefined; // Allow it to be undefined
+      return details ? (
+        <a className="hover:underline px-2 py-1" href={details} target="_blank">
+          View
+        </a>
+      ) : (
+        <div> N/A</div>
+      );
     },
   },
 ];
@@ -99,6 +138,10 @@ interface NewGameContentFormProps {
   setEditgameId: any;
   edityoutubeUrl?: any;
   seteditYoutubeUrl?: any;
+  editlisteningCharacter?: any;
+  edittalkingCharacter?: any;
+  setEditlisteningCharacter?: any;
+  setEdittalkingCharacter?: any;
 }
 
 export const GameContentTable: React.FC<NewGameContentFormProps> = ({
@@ -110,6 +153,10 @@ export const GameContentTable: React.FC<NewGameContentFormProps> = ({
   setEditgameId,
   edityoutubeUrl,
   seteditYoutubeUrl,
+  editlisteningCharacter,
+  edittalkingCharacter,
+  setEditlisteningCharacter,
+  setEdittalkingCharacter,
 }) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] =
@@ -196,6 +243,13 @@ export const GameContentTable: React.FC<NewGameContentFormProps> = ({
     seteditDetailOfContent(game.detailOfContent);
     setEditgameId(game._id);
     seteditYoutubeUrl(game.youtubeUrl);
+    game?.listeningCharacter
+      ? setEditlisteningCharacter(game?.listeningCharacter)
+      : setEditlisteningCharacter("");
+    setEditlisteningCharacter(game?.listeningCharacter);
+    game?.talkingCharacter
+      ? setEdittalkingCharacter(game?.talkingCharacter)
+      : setEdittalkingCharacter(game?.talkingCharacter);
   };
 
   const table = useReactTable({

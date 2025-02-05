@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { Game } from "./gamecontent";
-import { fetchGameContent } from "./gamecontentApi";
 import { fetchAllGames } from "../newgame/gamesApi";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -22,6 +21,10 @@ interface NewGameContentFormProps {
   setData: React.Dispatch<React.SetStateAction<Game[]>>;
   edityoutubeUrl?: any;
   seteditYoutubeUrl?: any;
+  editlisteningCharacter?: any;
+  edittalkingCharacter?: any;
+  setEditlisteningCharacter?: any;
+  setEdittalkingCharacter?: any;
 }
 
 export interface Games {
@@ -31,9 +34,8 @@ export interface Games {
   description: string;
   status: string;
   order: number;
-
-  __v: number;
 }
+
 
 const NewGameContentForm: React.FC<NewGameContentFormProps> = ({
   setData,
@@ -47,6 +49,10 @@ const NewGameContentForm: React.FC<NewGameContentFormProps> = ({
   seteditDetailOfContent,
   edityoutubeUrl,
   seteditYoutubeUrl,
+  editlisteningCharacter,
+  edittalkingCharacter,
+  setEditlisteningCharacter,
+  setEdittalkingCharacter,
 }) => {
   const [mainContent, setMainContent] = useState<string>(editmainContent || "");
   const [level, setLevel] = useState<"easy" | "medium" | "hard">(
@@ -61,15 +67,30 @@ const NewGameContentForm: React.FC<NewGameContentFormProps> = ({
   const [newgameData, setNewgameData] = useState<Games[]>([]);
   const [youtubeUrl, setYoutubeUrl] = useState<string>(edityoutubeUrl); // 🔥 Added YouTube URL State
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [talkingCharacter, setTalkingCharacter] =
+    useState<string>(edittalkingCharacter);
+  const [listeningCharacter, setListeningCharacter] = useState<string>(
+    editlisteningCharacter
+  );
 
   useEffect(() => {
-    console.log(edityoutubeUrl)
+    console.log(edityoutubeUrl);
     setMainContent(editmainContent);
     setLevel(editlevel);
     setDetailOfContent(editdetailOfContent);
     setSelectgameId(editgameId);
     setYoutubeUrl(edityoutubeUrl);
-  }, [editmainContent, editlevel,edityoutubeUrl, editdetailOfContent, editgameId]);
+    setTalkingCharacter(edittalkingCharacter);
+    setListeningCharacter(editlisteningCharacter);
+  }, [
+    editmainContent,
+    editlevel,
+    edityoutubeUrl,
+    editdetailOfContent,
+    editgameId,
+    editlisteningCharacter,
+    edittalkingCharacter,
+  ]);
 
   useEffect(() => {
     const loadGames = async () => {
@@ -132,7 +153,14 @@ const NewGameContentForm: React.FC<NewGameContentFormProps> = ({
         url,
         method,
         headers: { "Content-Type": "application/json" },
-        data: { mainContent, level, detailOfContent, youtubeUrl }, // 🔥 Send YouTube URL
+        data: {
+          mainContent,
+          level,
+          detailOfContent,
+          youtubeUrl,
+          listeningCharacter,
+          talkingCharacter,
+        },
       });
 
       toast.success("Game content saved successfully");
@@ -144,8 +172,10 @@ const NewGameContentForm: React.FC<NewGameContentFormProps> = ({
       seteditMainContent("");
       seteditLevel("medium");
       seteditDetailOfContent([]);
-      seteditYoutubeUrl("")
+      seteditYoutubeUrl("");
       setEditgameId("");
+      setTalkingCharacter("");
+      setListeningCharacter("");
     } catch (error) {
       toast.error("Failed to save game content. Please try again.");
     }
@@ -200,56 +230,7 @@ const NewGameContentForm: React.FC<NewGameContentFormProps> = ({
           </div>
         </div>
         <div className="grid grid-cols-2 gap-4 ">
-          {/* Detail of Content */}
-          {/* <div className="mb-4">
-            <label
-              htmlFor="detailOfContent"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Detail of Content
-            </label>
-            <div className="flex items-center">
-              <input
-                type="text"
-                value={newDetail}
-                onChange={(e) => setNewDetail(e.target.value)}
-                className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-                placeholder="Add a detail"
-              />
-              <button
-                type="button"
-                onClick={handleAddDetail}
-                className="ml-2 py-2 px-4 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-md hover:bg-blue-700"
-              >
-                Add
-              </button>
-            </div>
-            {errors.detailOfContent && (
-              <div className="text-red-600 text-sm">
-                {errors.detailOfContent}
-              </div>
-            )}
-
-         
-            <div className="mt-2 max-h-40 px-4 overflow-scroll">
-              {detailOfContent.map((detail) => (
-                <div
-                  key={detail}
-                  className="flex items-center justify-between mb-1"
-                >
-                  <span className="text-gray-700">{detail}</span>
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveDetail(detail)}
-                    className="text-red-600 hover:underline"
-                  >
-                    Remove
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div> */}
-
+  
           <div className="mb-4">
             <label
               htmlFor="youtubeUrl"
@@ -267,6 +248,50 @@ const NewGameContentForm: React.FC<NewGameContentFormProps> = ({
             />
             {errors.youtubeUrl && (
               <div className="text-red-600 text-sm">{errors.youtubeUrl}</div>
+            )}
+          </div>
+          <div className="mb-4">
+            <label
+              htmlFor="talkingCharacter"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Talking Character
+            </label>
+            <input
+              type="text"
+              id="talkingCharacter"
+              value={talkingCharacter}
+              onChange={(e) => setTalkingCharacter(e.target.value)}
+              placeholder="Talking Character"
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+            />
+            {errors.talkingCharacter && (
+              <div className="text-red-600 text-sm">
+                {errors.talkingCharacter}
+              </div>
+            )}
+          </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4 ">
+          <div className="mb-4">
+            <label
+              htmlFor="listeningCharacter"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Listening Character
+            </label>
+            <input
+              type="text"
+              id="listeningCharacter"
+              value={listeningCharacter}
+              onChange={(e) => setListeningCharacter(e.target.value)}
+              placeholder="Listening Character"
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+            />
+            {errors.listeningCharacter && (
+              <div className="text-red-600 text-sm">
+                {errors.listeningCharacter}
+              </div>
             )}
           </div>
 
