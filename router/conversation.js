@@ -79,7 +79,7 @@ router.post("/play", jwtHelper.verifyToken,lastActivity,async (req, res,next) =>
 
   const promptTemplateContent = promptTemplate.content;
 
-  const template = `User native language is {nativeLanguage} {maincontent} {detailOfContent} User english proficiency is ${user.engprolevel} ${promptTemplateContent} Previous conversation:
+  const template = `User native language is {nativeLanguage}. user is from this ${user.country}. user name is ${user.name}. maincontent is {maincontent}. detailofcontent is {detailOfContent}. User english proficiency is ${user.engprolevel}. ${promptTemplateContent} Previous conversation:
 {chat_history} current question is {question} `;
 
   const prompt = new PromptTemplate({
