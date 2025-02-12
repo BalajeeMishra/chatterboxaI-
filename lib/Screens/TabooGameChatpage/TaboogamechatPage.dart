@@ -175,7 +175,8 @@ class _TaboogamechatPage extends State<TaboogamechatPage>
                       children: [
                         SizedBox(height: 10),
                         Expanded(
-                          child: Consumer<TabooGameChatPageVM>(
+                          child:
+                          Consumer<TabooGameChatPageVM>(
                             builder: (context, vm, child) {
                               WidgetsBinding.instance.addPostFrameCallback((_) {
                                 _scrollToBottomIfNeeded(vm.dynamicData.length);
@@ -206,7 +207,7 @@ class _TaboogamechatPage extends State<TaboogamechatPage>
                     ),
                   ),
                 ),
-                _buildMessageInput(context),
+                // _buildMessageInput(context),
               ],
             ),
             Positioned(

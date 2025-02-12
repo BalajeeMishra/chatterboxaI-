@@ -1,6 +1,8 @@
+import 'package:http/http.dart'as http;
 import 'package:balajiicode/main.dart';
 import 'package:emoji_regex/emoji_regex.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import '../Model/AllConversationModel.dart';
 import '../Model/AllGameModel.dart';
 import '../Model/TabooGameChatPageModel.dart';
@@ -11,7 +13,7 @@ import '../Utils/app_common.dart';
 import '../Utils/app_constants.dart';
 import '../components/tts.dart';
 import '../extensions/shared_pref.dart';
-
+import 'package:flutter/services.dart';
 class PlayTabooScreenVM extends ChangeNotifier {
   /// Calling Repository =====================================
   final TabooGameChatPageRepository _tabooGameChatPageRepository =
@@ -33,6 +35,49 @@ class PlayTabooScreenVM extends ChangeNotifier {
   String selectedLanguage = 'English';
 
   var dataToPass;
+//khush created vars
+  bool isListening = true;
+  bool isBreakLoop = false;
+  bool ifDelayOfASecond = false;
+  // List<Map<String,dynamic>> textForBold=[];
+  // int textForBoldIndex = 0;
+
+  // String currentWord='';
+  int currentIndex = 0;
+  int currentParaIndex = 0;
+
+  // void setCurrentWord(String word){
+  //   currentWord = word;
+  //   notifyListeners();
+  // }
+  void setCurrentIndex(int index){
+    currentIndex = index;
+    notifyListeners();
+  }
+  void setCurrentParaIndex(int index){
+    currentParaIndex = index;
+    notifyListeners();
+  }
+
+
+  void setIsListening(bool val){
+    isListening = val;
+    notifyListeners();
+  }
+  void setIfDelayOfASecond(bool val){
+    ifDelayOfASecond = val;
+    notifyListeners();
+  }
+  void setIsBreakLoop(bool val){
+    isBreakLoop = val;
+    notifyListeners();
+  }
+  // void clearTextForBold(){
+  //   textForBold = [];
+  //   textForBoldIndex= 0;
+  //   notifyListeners();
+  // }
+
 
   seInitialValue(AllGameModel allGameModel, int index, String sessionId) {
     String data = "";
@@ -192,6 +237,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
   }
 
   final TTSManager ttsManager = TTSManager();
+  // final FlutterTts flutterTts = FlutterTts();
   Future<void> setTtsLanguage(String language) async {
     String ttsLanguage;
 
@@ -238,6 +284,8 @@ class PlayTabooScreenVM extends ChangeNotifier {
     }
 
     await ttsManager.setLanguage(ttsLanguage);
+    //edited by khush
+    // await flutterTts.setLanguage(ttsLanguage);
   }
 
   Future<void> configureTts() async {
@@ -258,20 +306,176 @@ class PlayTabooScreenVM extends ChangeNotifier {
 
     await ttsManager.setSpeechRate(0.3);
     await ttsManager.setVolume(1.0);
+    ttsManager.awaitSpeakCompletion(true);
+    //edited by khush
+    // await flutterTts.setLanguage('en-US');
+    // await flutterTts.setSpeechRate(0.3);
+    // await flutterTts.setVolume(1.0);
   }
 
   void speakText(String text) async {
     print("Into Vm Calling");
+    // clearTextForBold();
+    // text = text.replaceAll(RegExp(r'\*\*'), '');
+    // List<String> res = text.split(RegExp(r'\n+'));
+    // for(String i in res){
+    //   print("this is I $i");
+    //   textForBold.add({'text':i,'isActive':false});
+    // }
+    // notifyListeners();
+
     configureTts();
     String updatedText = cleanTextForTTS(text);
     appStore.setLastWords(text);
+    print("text of speaking $text" );
+    // estimateTTSDuration(updatedText, 0.3);
+    speakParagraphs(updatedText, ttsManager,0);
+    // setIsListening(false);
+    // increseIndexForBoldText(updatedText,400);
+    // await ttsManager.speak(updatedText);
+    // ttsManager.setCompletionHandler(() {
+    //   print("text completed$isListening");
+    //   setIsListening(true);
+    //   stopSpeaking();
+    //       });
 
-    await ttsManager.speak(updatedText);
+
   }
 
   Future<void> stopSpeaking() async {
+    setIsListening(true);
+    setIsBreakLoop(true);
     await ttsManager.stop();
   }
+
+
+  Future<void> speakParagraphs(String text,TTSManager flutterTts,int currentIndex) async {
+    // List<String> paragraphs = text.split(RegExp(r'\n+'));
+    List<String> paragraphs = text.split(RegExp(r'(?:\n+|\.)'));
+    paragraphs = paragraphs.where((p) => p.trim().isNotEmpty).toList();
+    print("this is paragraph$paragraphs");
+    setIsBreakLoop(false);
+    flutterTts.setCompletionHandler(() {
+      print("Paragraph completed");
+      setIsListening(true);
+    });
+
+    flutterTts.setProgressHandler((word) {
+      setCurrentIndex(currentIndex++);
+    });
+    for (int i = 0; i < paragraphs.length; i++) {
+      // if (paragraphs[i].trim().isEmpty) continue;
+      setCurrentParaIndex(i);
+      if(isBreakLoop) break;
+      setIsListening(false);
+
+      if (i == 0) {
+        await Future.delayed(const Duration(milliseconds: 500));
+      }
+
+      await flutterTts.speak(paragraphs[i]);
+      await flutterTts.awaitSpeakCompletion(true);
+      //
+      // ttsManager.setCompletionHandler(() {
+      //   print("text completed$isListening");
+      //   setIsListening(true);
+      // });
+      //
+      // flutterTts.setProgressHandler((word){
+      //   // print("CurrentWord : $word");
+      //   // setCurrentWord(word);
+      //   setCurrentIndex(currentIndex++);
+      // });
+
+      // if(textForBoldIndex<textForBold.length){
+      //   textForBold[textForBoldIndex] = {'text':textForBold[textForBoldIndex++]['text'],'isActive':true};
+      //   notifyListeners();
+      // }
+      // setIsListening(true);
+      if (i < paragraphs.length - 1) {
+        setIsListening(true);
+        setIfDelayOfASecond(true);
+        await Future.delayed(Duration(milliseconds: 750));
+        setIfDelayOfASecond(false);
+      }
+    }
+    setIsListening(true);
+  }
+
+  Uint8List? listeningGif;
+  Uint8List? talkingGif;
+  String talkingString = "";
+  String listeningString = "";
+
+  bool isGifDownloaded = false; // Flag to check if GIFs are downloaded
+
+  void clearUint8list() {
+    listeningGif = null;
+    talkingGif = null;
+    isGifDownloaded = false; // Reset flag
+    notifyListeners();
+  }
+
+  Future<void> saveGifs() async {
+    Uint8List? listening = await saveGif(listeningString);
+    Uint8List? talking = await saveGif(talkingString);
+
+    if (listening != null && talking != null) {
+      listeningGif = listening;
+      talkingGif = talking;
+      isGifDownloaded = true; // Mark as downloaded
+      print("All GIFs downloaded successfully.");
+    } else {
+      isGifDownloaded = false; // If any fails, keep it false
+      print("Failed to download one or both GIFs.");
+    }
+    notifyListeners();
+  }
+
+  Future<Uint8List?> saveGif(String url) async {
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        print("GIF downloaded from $url");
+        return response.bodyBytes;
+      }
+    } catch (e) {
+      print("Error downloading GIF from $url: $e");
+    }
+    return null;
+  }
+  //Track index for bold text
+  // int currentIndex = 0;
+
+  // Future<void> increseIndexForBoldText(String text,int timeForDelay) async {
+  //   List<String> words = text.split(' ');
+  //
+  //     currentIndex = 0;
+  //
+  //     notifyListeners();
+  //
+  //   for (int i = 0; i < words.length; i++) {
+  //     await Future.delayed(Duration(milliseconds: timeForDelay));
+  //     if(ifDelayOfASecond){
+  //       await Future.delayed(Duration(milliseconds: 1500));
+  //     }
+  //
+  //       currentIndex++;
+  //       notifyListeners();
+  //   }
+  // }
+  // int estimateTTSDuration(String text, double speechRate) {
+  //   int wordCount = text.trim().split(RegExp(r'\s+')).length;
+  //   double baseWPM = 180;
+  //   double wpm = baseWPM * (2 * speechRate);
+  //
+  //   int duration = ((wordCount * 60000) / wpm).round();
+  //   print("This Is Duration $duration");
+  //   return duration;
+  // }
+  //
+
+
 }
 
 String cleanTextForTTS(String text) {
@@ -279,3 +483,4 @@ String cleanTextForTTS(String text) {
 
   return textWithoutEmojis.replaceAll('**', '');
 }
+

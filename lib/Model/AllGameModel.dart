@@ -30,7 +30,8 @@ class AllGame {
   List<String>? detailOfContent;
   int? iV;
   String? youtubeUrl;
-
+  String? listeningCharacter;
+  String? talkingCharacter;
   AllGame(
       {this.sId,
         this.gameId,
@@ -39,6 +40,8 @@ class AllGame {
         this.detailOfContent,
         this.iV,
       this.youtubeUrl,
+      this.listeningCharacter,
+      this.talkingCharacter,
       });
 
   AllGame.fromJson(Map<String, dynamic> json) {
@@ -49,6 +52,8 @@ class AllGame {
     detailOfContent = json['detailOfContent'].cast<String>();
     iV = json['__v'];
     youtubeUrl=json['youtubeUrl'];
+    listeningCharacter=json['listeningCharacter'];
+    talkingCharacter=json['talkingCharacter'];
   }
 
   Map<String, dynamic> toJson() {
@@ -60,6 +65,8 @@ class AllGame {
     data['detailOfContent'] = detailOfContent;
     data['__v'] = iV;
     data['youtubeUrl']=youtubeUrl;
+    data['listeningCharacter']=listeningCharacter;
+    data['talkingCharacter']=talkingCharacter;
     return data;
   }
 }

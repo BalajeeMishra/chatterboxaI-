@@ -51,12 +51,12 @@ class _YoutubeVideoPlayerScreenState extends State<YoutubeVideoPlayerScreen> {
     if (videoId == null) {
       debugPrint("Invalid YouTube URL");
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        PlayTabooScreen(
-          widget.allGameModel,
-          widget.index,
-          Uuid().v4(),
-          widget.gameName,
-        ).launch(context);
+       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>PlayTabooScreen(
+         widget.allGameModel,
+         widget.index,
+         Uuid().v4(),
+         widget.gameName,
+       )));
       });
     } else {
       _controller = YoutubePlayerController(
@@ -111,8 +111,12 @@ class _YoutubeVideoPlayerScreenState extends State<YoutubeVideoPlayerScreen> {
   }
 
   void _closeVideo() async {
+    if (_controller != null && _isPlayerReady) {
+      _controller!.pause();
+      _controller!.dispose();
+    }
     _controller!.pause();
-    Navigator.push(
+    Navigator.pushReplacement(
         context,
         MaterialPageRoute(
             builder: (context) => PlayTabooScreen(
@@ -265,7 +269,7 @@ class _YoutubeVideoPlayerScreenState extends State<YoutubeVideoPlayerScreen> {
                               // width: 160,
                               child: Text(
                                 'Replay',
-                                style: secondaryTextStyle(color: Colors.white),
+                                style:TextStyle(fontSize: 16,color: Colors.white,fontFamily: "Inter"),
                               ),
                             ),
                             10.width,

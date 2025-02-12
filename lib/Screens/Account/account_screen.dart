@@ -2,8 +2,11 @@ import 'dart:convert';
 
 import 'package:balajiicode/Screens/Account/delete_account_screen.dart';
 import 'package:balajiicode/Services/network/http_client.dart';
+import 'package:balajiicode/ShareAndReview/share_and_review.dart';
 import 'package:balajiicode/Utils/app_images.dart';
+import 'package:balajiicode/Widget/text_widget.dart';
 import 'package:balajiicode/extensions/colors.dart';
+import 'package:balajiicode/extensions/common.dart';
 import 'package:balajiicode/extensions/extension_util/context_extensions.dart';
 import 'package:balajiicode/extensions/extension_util/int_extensions.dart';
 import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
@@ -11,10 +14,12 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../Model/error_model.dart';
 import '../../Services/ApiResponseStatus.dart';
 import '../../Utils/app_common.dart';
 import '../../Widget/appbar.dart';
+import '../../Widget/text_gradient.dart';
 import '../../extensions/loader_widget.dart';
 import '../../main.dart';
 
@@ -45,14 +50,20 @@ class _AccountScreenState extends State<AccountScreen> {
 
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
-      appBar: backCustomAppBar(
-        backButtonshow: true,
-        centerTile: true,
-        onPressed: () {
-          Navigator.pop(context,true);
-        },
-        title:  "Account",
+      appBar: AppBar(
+        backgroundColor: Colors.grey.shade100,
+        title: GradientText(
+          "Account",
+          style: TextStyle(fontWeight: FontWeight.bold),
+          softWrap: false,
+          ),
+        centerTitle: true,
+        leading:  GradientIcon(ontap: (){
+          pop();
+        }, icon: Icons.close),
+
       ),
+
       body: Stack(
         children:[ Padding(
           padding: const EdgeInsets.all(16.0),
@@ -85,13 +96,14 @@ class _AccountScreenState extends State<AccountScreen> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           // Greeting text
-                          Text(
-                            "Hello,",
-                            style: TextStyle(fontSize: 17, fontWeight: FontWeight.normal),
+                          MyText(
+                            text: "Hello,",
+                            fontSize: 20,
                           ),
-                          Text(
-                            name,
-                            style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+                          MyText(
+                            text:name,
+                            fontSize: 26,
+                            fontWeight: FontWeight.bold,
                           ),
                           SizedBox(height: 16),
                         ],
@@ -116,14 +128,16 @@ class _AccountScreenState extends State<AccountScreen> {
                    child: Column(
                      children: [
                        16.height,
+                       _buildActionButton(share_logo, "Share The App", '',shareDialoge: true),
+                       16.height,
                        _buildActionButton(privacy_logo, "Privacy Policy",'https://zapai.chat/privacy-policy'),
                        _buildActionButton(whatsapp_logo, "Contact The Developer",'https://wa.me/918300111204'),
                       16.height,
 
-                       Text(
-                         "We Are An Early App. Help The Developer By Sharing Your Feedback On How We Can Improve Your Experience! Thank You.",
-                         textAlign: TextAlign.center,
-                         style: TextStyle(fontSize: 12,fontWeight: FontWeight.bold, color: Colors.black),
+                       MyText(
+                        text:  "We Are An Early App. Help The Developer By Sharing Your Feedback On How We Can Improve Your Experience! Thank You.",
+                        textAlign: TextAlign.center,
+                        fontSize: 12,fontWeight: FontWeight.bold, color: Colors.black,
                        ),
 
                        32.height,
@@ -134,9 +148,9 @@ class _AccountScreenState extends State<AccountScreen> {
                              DeleteAccountScreen(name:name).launch(context);
                            },
                            icon: Icon(Icons.delete, color: redColor),
-                           label: Text(
-                             "Delete Account",
-                             style: TextStyle(color: redColor),
+                           label: MyText(
+                             text:  "Delete Account",
+                             color: redColor,
                            ),
                            style: OutlinedButton.styleFrom(
                              minimumSize: Size(double.infinity, 50),
@@ -152,9 +166,9 @@ class _AccountScreenState extends State<AccountScreen> {
                            Icon(Icons.warning, color:redColor),
                            SizedBox(width: 8),
                            Expanded(
-                             child: Text(
-                               "Important: Deleting Your Account Is Permanent. All Your Progress And Data Will Be Erased And Cannot Be Recovered.",
-                               style: TextStyle(color: Colors.grey, fontSize: 12),
+                             child: MyText(
+                              text:  "Important: Deleting Your Account Is Permanent. All Your Progress And Data Will Be Erased And Cannot Be Recovered.",
+                              color: Colors.grey, fontSize: 12,
                              ),
                            ),
                          ],
@@ -182,7 +196,7 @@ class _AccountScreenState extends State<AccountScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(fontSize: 16)),
+        MyText(text: label, fontSize: 16),
         SizedBox(height: 8),
         DropdownButtonFormField<String>(
           value: selectedValue,
@@ -192,7 +206,7 @@ class _AccountScreenState extends State<AccountScreen> {
           items: options.map((String value) {
             return DropdownMenuItem<String>(
               value: value,
-              child: Text(value),
+              child: MyText(text: value),
             );
           }).toList(),
           onChanged: (String? newValue) {},
@@ -201,7 +215,7 @@ class _AccountScreenState extends State<AccountScreen> {
     );
   }
 
-  Widget _buildActionButton(String image, String label,String url) {
+  Widget _buildActionButton(String image, String label,String url,{bool shareDialoge = false}) {
     return Container(
       height: context.height()*0.08,
       padding: EdgeInsets.symmetric(vertical: 8),
@@ -213,11 +227,16 @@ class _AccountScreenState extends State<AccountScreen> {
       ),
       child: ListTile(
         leading: Image.asset(image,width: 24,height: 24,),
-        title: Text(label),
+        title: MyText(text: label),
 
       ),
     ).onTap((){
-      launchUrls(url);
+      if(shareDialoge){
+        ShareAndReview().share();
+      }
+      else{
+        launchUrls(url);
+      }
     });
   }
 
@@ -246,5 +265,7 @@ class _AccountScreenState extends State<AccountScreen> {
 
     }
   }
+
+
 
 }

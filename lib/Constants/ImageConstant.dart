@@ -18,6 +18,14 @@ static String microphoneIcon = "assets/images/microphone.png";
  static String pitch3 = "assets/images/pitchthree.png";
  static String IconCancel = "assets/images/Iconcancel.png";
  static String doneButton = "assets/images/DoneButton.png";
+ static String listening_female = "assets/images/listening_female.webp";
+ static String speaking_female = "assets/images/speaking_female.webp";
+ static String share_backgorund_dialogue = "assets/images/share_backgorund_dialogue.png";
+ static String forward_icon = "assets/images/forward_icon.png";
+ static String backward_icon = "assets/images/backward_icon.png";
+ static String speaker = "assets/images/speaker.png";
+ static String speaker_close = "assets/images/speaker_close.png";
+ static String closeButton = "assets/images/closeButton.png";
 
 
 }

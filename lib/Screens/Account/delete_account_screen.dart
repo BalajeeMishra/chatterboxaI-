@@ -17,6 +17,7 @@ import '../../Services/network/http_client.dart';
 import '../../Utils/app_common.dart';
 import '../../Utils/app_constants.dart';
 import '../../Utils/app_images.dart';
+import '../../Widget/text_widget.dart';
 import '../../main.dart';
 
 
@@ -38,9 +39,9 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       appBar: isLoading?null:AppBar(
-        title: Text(
-          "Delete Account",
-          style: TextStyle(color: lightRedColor),
+        title: MyText(
+          text:"Delete Account",
+          color: lightRedColor,
         ),
         centerTitle: true,
         backgroundColor: Colors.white,
@@ -84,13 +85,13 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         // Greeting text
-                        Text(
-                          "Hello,",
-                          style: TextStyle(fontSize: 17, fontWeight: FontWeight.normal),
+                        MyText(
+                          text: "Hello,",
+                          fontSize: 17, fontWeight: FontWeight.normal,
                         ),
-                        Text(
-                          widget.name,
-                          style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+                        MyText(
+                          text:widget.name,
+                         fontSize: 26, fontWeight: FontWeight.bold,
                         ),
                         SizedBox(height: 16),
                       ],
@@ -112,13 +113,13 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                   Icon(Icons.delete_outline, color: lightRedColor, size: 40),
                   SizedBox(width: 8),
                   Expanded(
-                    child: Text(
-                      !isDeleted?"Are You Sure You Want To Delete Your Account?":"Your Account Has Been Deleted",
-                      style: TextStyle(
+                    child: MyText(
+                      text:!isDeleted?"Are You Sure You Want To Delete Your Account?":"Your Account Has Been Deleted",
+
                         color: lightRedColor,
                         fontSize: 24  ,
                         fontWeight: FontWeight.bold,
-                      ),
+
                     )
                   ),
                 ],
@@ -158,9 +159,9 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                   backgroundColor: lightRedColor,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
-                child: Text(
-                  "Delete Account",
-                  style: TextStyle(color: whiteColor, fontSize: 16),
+                child: MyText(
+                 text:  "Delete Account",
+                 color: whiteColor, fontSize: 16,
                 ),
               ),
               16.height,
@@ -173,9 +174,9 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                   side: BorderSide(color: Colors.grey.shade400),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
-                child: Text(
-                 isDeleted?"Okay": "Cancel",
-                  style: TextStyle(color: blackColor, fontSize: 16),
+                child: MyText(
+                text: isDeleted?"Okay": "Cancel",
+                  color: blackColor, fontSize: 16,
                 ),
               ),
               16.height
@@ -196,14 +197,14 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                         strokeWidth: 4,
                       ),
                       SizedBox(height: 16),
-                      Text(
-                        "Account Deletion In Progress",
-                        style: TextStyle(
+                      MyText(
+                       text:  "Account Deletion In Progress",
+
                           color: Colors.red,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
-                      ),
+
                     ],
                   ),
                 ),
@@ -226,9 +227,9 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
         ), // Larger bullet point
         Padding(
           padding: const EdgeInsets.only(bottom: 10),
-          child: Text(
-            text,
-            style: TextStyle(fontSize: 16),
+          child: MyText(
+            text: text,
+            fontSize: 16,
           ),
         ),
       ],

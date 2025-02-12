@@ -1,6 +1,10 @@
+import 'package:balajiicode/ShareAndReview/share_and_review.dart';
+import 'package:balajiicode/ShareAndReview/share_dialogue.dart';
 import 'package:balajiicode/Utils/app_common.dart';
 import 'package:balajiicode/Screens/ChooseWordScreen/ChooseWords.dart';
 import 'package:balajiicode/Utils/app_constants.dart';
+import 'package:balajiicode/extensions/colors.dart';
+import 'package:balajiicode/extensions/extension_util/int_extensions.dart';
 import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
 import 'package:balajiicode/extensions/widgets.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +13,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 
 import '../../Utils/app_colors.dart';
+import '../../Utils/app_images.dart';
 import '../../ViewModel/JabberHomeAIvm.dart';
 import '../../Widget/text_widget.dart';
 import '../../components/double_back_to_close_app.dart';
@@ -33,6 +38,7 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
   void initState() {
     super.initState();
     checkStatus();
+    checkAndShowPopup();
     appStore.setLoading(false);
     Provider.of<JabberHomeAIvm>(context, listen: false).seInitialValue();
     Provider.of<JabberHomeAIvm>(context, listen: false).homepageAPI(context);
@@ -112,36 +118,37 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
               await Provider.of<JabberHomeAIvm>(context, listen: false)
                   .homepageAPI(context);
             },
-            child: Stack(
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16.0),
-                  child: Consumer<JabberHomeAIvm>(
-                    builder: (context, vm, child) {
-                      return vm.apiHitStatus
-                          ? vm.homePageModel.allGame == null
-                              ? Center(
-                                  child: MyText(
-                                    text: 'No Game Found',
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                )
-                              : ListView.builder(
-                                  itemCount: vm.homePageModel.allGame!.length,
-                                  scrollDirection: Axis.vertical,
-                                  shrinkWrap: true,
-                                  itemBuilder: (context, index) {
-                                    var data = vm.homePageModel.allGame![index];
-                                    Color containerColor = (index % 2 == 0)
-                                        ? Color(0xffd3e2f5)
-                                        : Color(0xffe4d7f1);
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0,vertical: 8),
+              child: Column(
+                children: [
+                Expanded(
+                  flex: 7,
+                  child: Stack(
+                    children: [
+                      Consumer<JabberHomeAIvm>(
+                        builder: (context, vm, child) {
+                          return vm.apiHitStatus
+                              ? vm.homePageModel.allGame == null
+                                  ? Center(
+                                      child: MyText(
+                                        text: 'No Game Found',
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                    )
+                                  : ListView.builder(
+                                      itemCount: vm.homePageModel.allGame!.length,
+                                      scrollDirection: Axis.vertical,
+                                      shrinkWrap: true,
+                                      itemBuilder: (context, index) {
+                                        var data = vm.homePageModel.allGame![index];
+                                        Color containerColor = (index % 2 == 0)
+                                            ? Color(0xffd3e2f5)
+                                            : Color(0xffe4d7f1);
 
-                                    return Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 20.0),
-                                        child: Column(
+                                        return Column(
                                           children: [
                                             InkWell(
                                               onTap: () async {
@@ -149,12 +156,17 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
                                                 //   ExpiredScreen()
                                                 //       .launch(context);
                                                 // } else {
-                                                Navigator.of(context).push(
+
+                                               print("Data: ${data.sId}  ${data.gameName}");
+                                          bool ispop   = await  Navigator.of(context).push(
                                                     MaterialPageRoute(
                                                         builder: (context) =>
                                                             ChooseWordScreen(
                                                                 data.sId!,
                                                                 data.gameName!)));
+                                             if(ispop){
+                                               checkAndShowPopup();
+                                             }
 
                                                 analytics.logEvent(
                                                   name: 'game_selection',
@@ -214,30 +226,30 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
                                                                 CrossAxisAlignment
                                                                     .start,
                                                             children: [
-                                                              Text(
-                                                                "${data.gameName}",
-                                                                style: TextStyle(
+                                                              MyText(
+                                                                text: "${data.gameName}",
+
                                                                     fontWeight:
                                                                         FontWeight
                                                                             .w800,
                                                                     color: Colors
                                                                         .black,
                                                                     fontSize:
-                                                                        20),
+                                                                        20
                                                               ),
                                                               SizedBox(
                                                                 height: 10,
                                                               ),
-                                                              Text(
-                                                                "${data.description}",
-                                                                style: TextStyle(
+                                                              MyText(
+                                                                text: "${data.description}",
+
                                                                     fontSize:
                                                                         14,
                                                                     color: Color(
                                                                         0xff000000),
                                                                     fontWeight:
                                                                         FontWeight
-                                                                            .w400),
+                                                                            .w400
                                                               )
                                                             ],
                                                           ),
@@ -263,22 +275,87 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
                                               height: 15.0,
                                             )
                                           ],
-                                        ));
-                                  })
-                          : SizedBox();
-                    },
+                                        );
+                                      })
+                              : SizedBox();
+                        },
+                      ),
+                      Observer(
+                        builder: (context) {
+                          return Loader().center().visible(appStore.isLoading);
+                        },
+                      ),
+                    ],
                   ),
                 ),
-                Observer(
-                  builder: (context) {
-                    return Loader().center().visible(appStore.isLoading);
-                  },
-                ),
-              ],
+                  Expanded(
+                       flex: 1,
+                      child:
+                      InkWell(
+                        onTap: (){
+                          ShareAndReview().share();
+                          // Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ShareAndReviewScreen()));
+                        },
+                        child: Container(
+                          width: MediaQuery.of(context).size.width*.9,
+                          height: 84,
+                          margin: EdgeInsets.only(bottom: 0),
+                          decoration: BoxDecoration(
+                            color: Color(0xFF01875F),
+                            borderRadius: BorderRadius.circular(15)
+                          ),
+                          child: Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 10),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      MyText(text:"Sharing is Caring!" ,fontSize: 18,fontWeight: FontWeight.bold,color: Colors.white,),
+                                      MyText(text:"Share The Zao AI App" ,fontSize: 15,color: Colors.white)
+                                    ],
+                                  ),
+                                ),
+                               Expanded(child: SizedBox()),
+                                Container(
+                                  height: 52,width: 96,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(25),
+                                    color: Color(0xFF19BD73),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      5.width,
+                                      Image.asset(home_share_logo,fit: BoxFit.cover,height: 25,width: 25,),
+                                      // Icon(Icons.share,color: Colors.white,),
+                                      5.width,
+                                      MyText(text: "Share",fontSize:16,color: Colors.white)
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(width:20),
+                              ],
+                            ),
+                          ),
+                        ),
+                      )
+                  )
+               ]
+              ),
             ),
           ),
         ),
       ),
     );
+  }
+
+  void checkAndShowPopup() async{
+
+    ShareAndReview().checkAndShowPopup(context);
+
   }
 }

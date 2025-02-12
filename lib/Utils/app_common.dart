@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 // import 'package:html/parser.dart';
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
+import '../ShareAndReview/share_and_review.dart';
 import '../extensions/extension_util/int_extensions.dart';
 // import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -457,6 +459,12 @@ class GameEventManager {
       }
 
       int nextCount = gameEventCounts[gameName]! + 4;
+      print("this is khush next count $nextCount");
+      if(nextCount%8 == 0){
+        print("increase counter called");
+        await ShareAndReview().increaseGameCounter();
+        // await ShareAndReview().checkAndShowPopup();
+      }
       await logEvent('Game_complete_$nextCount', batch);
       await logFacebookEvent('Game_complete_$nextCount', batch);
 
