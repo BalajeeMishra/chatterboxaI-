@@ -269,7 +269,7 @@ class _YoutubeVideoPlayerScreenState extends State<YoutubeVideoPlayerScreen> {
                               // width: 160,
                               child: Text(
                                 'Replay',
-                                style:TextStyle(fontSize: 16,color: Colors.white,fontFamily: "Inter"),
+                                style:TextStyle(fontSize: 16,color: Colors.white,fontFamily: "inter"),
                               ),
                             ),
                             10.width,

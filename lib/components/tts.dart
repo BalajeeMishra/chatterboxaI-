@@ -64,6 +64,10 @@ class TTSManager {
   Future<void> stop() async {
     await flutterTts.stop();
   }
+  Future<void> stopAndReset() async {
+    await flutterTts.stop();
+    flutterTts = FlutterTts();
+  }
 
   Future<void> setLanguage(String language) async {
     await flutterTts.setLanguage(language);

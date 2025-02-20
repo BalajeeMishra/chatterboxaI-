@@ -7,6 +7,7 @@ import '../Model/AllConversationModel.dart';
 import '../Model/AllGameModel.dart';
 import '../Model/TabooGameChatPageModel.dart';
 import '../Repository/TaboogameChatPageRepository.dart';
+import '../Screens/ChooseWordScreen/PlayTabooScreen.dart';
 import '../Services/ApiResponseStatus.dart';
 import '../Utils/ShowSnackBar.dart';
 import '../Utils/app_common.dart';
@@ -29,7 +30,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
   TabooGameChatPageModel tabooGameChatPageModel = TabooGameChatPageModel();
   bool apiHitStatus = false;
   List<Map<String, dynamic>> dynamicDta = [];
-  bool isMuted = false;
+  // bool isMuted = false;
   late GameEventManager gameEventManager;
 
   String selectedLanguage = 'English';
@@ -45,6 +46,19 @@ class PlayTabooScreenVM extends ChangeNotifier {
   // String currentWord='';
   int currentIndex = 0;
   int currentParaIndex = 0;
+
+
+  bool isPlayScreen = true;
+
+  void setIsPlayScreen(bool val){
+    isPlayScreen = val;
+    notifyListeners();
+  }
+
+
+
+
+
 
   // void setCurrentWord(String word){
   //   currentWord = word;
@@ -80,6 +94,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
 
 
   seInitialValue(AllGameModel allGameModel, int index, String sessionId) {
+    setIsPlayScreen(true);
     String data = "";
     print(
         "this is detailed of content ${allGameModel.allGame![index].detailOfContent!.length}");
@@ -125,7 +140,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
       String modality,
       String gameName) async {
     print("iSfIRT ==>" + isFirst.toString());
-    isMuted = isMute;
+    // isMuted = isMute;
     if (dataGet == "") {
       MySnackBar.showSnackBar(context, "Please speak first!");
       return;
@@ -154,6 +169,8 @@ class PlayTabooScreenVM extends ChangeNotifier {
       ApiResponse<TabooGameChatPageModel> response =
           await _tabooGameChatPageRepository
               .tabooGameChatPageApiCallFunction(data);
+
+
       switch (response.status) {
         case ApiResponseStatus.success:
           dataGet = "";
@@ -165,7 +182,11 @@ class PlayTabooScreenVM extends ChangeNotifier {
           apiHitStatus = true;
           tabooGameChatPageModel = response.data!;
           notifyListeners();
-          speakText(response.data!.response!.aiResponse!.last);
+          print("this is value of isPlaygame : $isPlayScreen");
+          if(isPlayScreen){
+            speakText(response.data!.response!.aiResponse!.last);
+          }
+
           print("Response data is==>" + response.data!.toJson().toString());
           appStore.setUserResponse(response.data!.response!.userResponse!.last);
           userStore.setTTSPlaying("YES");
@@ -177,11 +198,11 @@ class PlayTabooScreenVM extends ChangeNotifier {
           //   isFirstCall = false;
           // }
           // print("Is First call$isFirstCall");
-          print("Is Mute ??/$isMuted");
-
-          if (isMuted) {
-            stopSpeaking();
-          }
+          // print("Is Mute ??/$isMuted");
+          //
+          // if (isMuted) {
+          //   stopSpeaking();
+          // }
           gameEventManager = GameEventManager(currentSessionId: sessionId);
           if (isFirst == false) {
             await gameEventManager.saveGameEvent(
@@ -236,8 +257,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
     appStore.setLoading(false);
   }
 
-  final TTSManager ttsManager = TTSManager();
-  // final FlutterTts flutterTts = FlutterTts();
+
   Future<void> setTtsLanguage(String language) async {
     String ttsLanguage;
 
@@ -342,19 +362,20 @@ class PlayTabooScreenVM extends ChangeNotifier {
 
   }
 
-  Future<void> stopSpeaking() async {
-    setIsListening(true);
-    setIsBreakLoop(true);
-    await ttsManager.stop();
-  }
+  // Future<void> stopSpeaking() async {
+  //   setIsListening(true);
+  //   // setIsBreakLoop(true);
+  //   await ttsManager.stop();
+  // }
 
 
   Future<void> speakParagraphs(String text,TTSManager flutterTts,int currentIndex) async {
     // List<String> paragraphs = text.split(RegExp(r'\n+'));
+     text = cleanTextForTTS(text);
     List<String> paragraphs = text.split(RegExp(r'(?:\n+|\.)'));
     paragraphs = paragraphs.where((p) => p.trim().isNotEmpty).toList();
     print("this is paragraph$paragraphs");
-    setIsBreakLoop(false);
+
     flutterTts.setCompletionHandler(() {
       print("Paragraph completed");
       setIsListening(true);
@@ -363,12 +384,15 @@ class PlayTabooScreenVM extends ChangeNotifier {
     flutterTts.setProgressHandler((word) {
       setCurrentIndex(currentIndex++);
     });
+
+    setIsBreakLoop(false);
     for (int i = 0; i < paragraphs.length; i++) {
+      print("this is break loop bool $isBreakLoop");
+
       // if (paragraphs[i].trim().isEmpty) continue;
-      setCurrentParaIndex(i);
       if(isBreakLoop) break;
       setIsListening(false);
-
+      setCurrentParaIndex(i);
       if (i == 0) {
         await Future.delayed(const Duration(milliseconds: 500));
       }
@@ -474,13 +498,16 @@ class PlayTabooScreenVM extends ChangeNotifier {
   //   return duration;
   // }
   //
+  String cleanTextForTTS(String text) {
+    String textWithoutEmojis = text.replaceAll(emojiRegex(), "");
+    String textWithoutdoubleQuat = textWithoutEmojis.replaceAll("\"", "");
+    String textWithoutSingleQuat = textWithoutdoubleQuat.replaceAll(RegExp(r"[‘’']"), "");
 
+
+    return textWithoutSingleQuat.replaceAll(RegExp(r'\*+'), '');
+  }
 
 }
 
-String cleanTextForTTS(String text) {
-  String textWithoutEmojis = text.replaceAll(emojiRegex(), "");
 
-  return textWithoutEmojis.replaceAll('**', '');
-}
 

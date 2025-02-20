@@ -26,6 +26,7 @@ static String microphoneIcon = "assets/images/microphone.png";
  static String speaker = "assets/images/speaker.png";
  static String speaker_close = "assets/images/speaker_close.png";
  static String closeButton = "assets/images/closeButton.png";
+ static String person = "assets/images/person.png";
 
 
 }

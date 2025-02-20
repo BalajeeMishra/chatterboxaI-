@@ -53,7 +53,7 @@ class MyText extends StatelessWidget {
         color: color ?? Colors.black,
         fontWeight: fontWeight ?? FontWeight.w400,
         letterSpacing: letterSpacing ?? 0.2,
-        fontFamily: "roboto",
+        fontFamily: "inter",
       ),
     );
   }

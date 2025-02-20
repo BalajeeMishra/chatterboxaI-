@@ -12,9 +12,6 @@
           "package_name": "com.talkyplay.zapai"
         }
       },
-      "analytics": {
-        "collection_enabled": true
-      },
       "oauth_client": [
         {
           "client_id": "349682106028-55dgue3rgodabvfmaotisnh53i5hdi10.apps.googleusercontent.com",
@@ -92,7 +89,6 @@
         }
       }
     }
-
   ],
   "configuration_version": "1"
 }

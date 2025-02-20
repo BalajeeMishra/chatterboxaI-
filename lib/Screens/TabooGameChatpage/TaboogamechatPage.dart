@@ -12,6 +12,8 @@ import '../../Utils/app_colors.dart';
 import '../../Utils/app_common.dart';
 import '../../ViewModel/TabooGameChatPageVM.dart';
 import '../../Widget/appbar.dart';
+import '../../Widget/text_gradient.dart';
+import '../../extensions/common.dart';
 import '../../main.dart';
 import '../../network/rest_api.dart';
 
@@ -87,7 +89,7 @@ class _TaboogamechatPage extends State<TaboogamechatPage>
       } else {}
     }).catchError((e) {
       appStore.setLoading(false);
-      toast(e.toString());
+      // toast(e.toString());
       setState(() {});
     });
   }
@@ -151,13 +153,24 @@ class _TaboogamechatPage extends State<TaboogamechatPage>
     return Scaffold(
       // resizeToAvoidBottomInset: false,
 
-      appBar: backCustomAppBar(
-        backButtonshow: true,
-        centerTile: false,
-        onPressed: () {
-          Navigator.pop(context, true);
-        },
-        title: widget.gameName,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(40.0),
+        child: AppBar(
+          centerTitle: true,
+          leading: GradientIcon(
+              ontap: () {
+               Navigator.pop(context,true);
+              }, icon: Icons.arrow_back
+          ),
+
+          title: GradientText(
+            softWrap: true,
+            "Chat History",
+            style: const TextStyle(),
+
+          ),
+
+        ),
       ),
       body: WillPopScope(
         onWillPop: () async {
@@ -170,7 +183,7 @@ class _TaboogamechatPage extends State<TaboogamechatPage>
               children: [
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.all(10.0),
+                    padding: const EdgeInsets.only(left:16,right:16,bottom:10),
                     child: Column(
                       children: [
                         SizedBox(height: 10),
@@ -187,7 +200,7 @@ class _TaboogamechatPage extends State<TaboogamechatPage>
                                 itemCount: vm.dynamicData.length,
                                 itemBuilder: (context, index) {
                                   var data = vm.dynamicData[index];
-                                  return data['server'] == 0
+                                  return data['server'] != 0
                                       ? Align(
                                           alignment: Alignment.centerRight,
                                           child: _buildMessageBubble(
@@ -230,46 +243,41 @@ class _TaboogamechatPage extends State<TaboogamechatPage>
   }
 
   Widget _buildMessageBubble(String message, bool isUserMessage) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      child: ConstrainedBox(
-        constraints:
-            BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
-        child: Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
-            decoration: BoxDecoration(
-              color: isUserMessage ? Color(0xffd3e2f5) : Colors.transparent,
-              border: isUserMessage
-                  ? null
-                  : Border.all(color: primaryColor, width: 2),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: RichText(
-              text: TextSpan(
-                children: _buildBoldText(message),
-                style: TextStyle(
-                  height: 1.4,
-                  fontWeight: FontWeight.w400,
-                  fontSize: 15,
-                  fontFamily: "roboto",
-                  color: Colors.black,
-                ),
+    return ConstrainedBox(
+      constraints:
+          BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
+      child: Container(
+          padding: EdgeInsets.only(left: isUserMessage?20.0:0,right: 20, bottom: 24.0,top:10),
+          decoration: BoxDecoration(
+            color: isUserMessage ? Color(0xff2496DF) : Colors.transparent,
+
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: RichText(
+            textAlign: TextAlign.left,
+            text: TextSpan(
+              children: _buildBoldText(message),
+              style: TextStyle(
+                height: 20/16,
+                fontWeight: FontWeight.w400,
+                fontSize: 15,
+                fontFamily: "inter",
+                color: isUserMessage ? Colors.white : Colors.black,
               ),
-            )
-            // ;MyText(
-            //   text: message,
-            //   fontWeight: FontWeight.w400,
-            //   fontSize: 15,
-            // ),
             ),
-      ),
+          )
+          // ;MyText(
+          //   text: message,
+          //   fontWeight: FontWeight.w400,
+          //   fontSize: 15,
+          // ),
+          ),
     );
   }
 
   Widget _buildMessageInput(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(15),
+      padding: EdgeInsets.symmetric(horizontal: 16,vertical: 24),
       child: Row(
         children: [
           Expanded(

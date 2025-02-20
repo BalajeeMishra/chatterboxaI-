@@ -32,10 +32,14 @@ backCustomAppBar({title,backButtonshow = false,centerTile = false,onPressed}){
         child: Image(image: AssetImage(ImageConstant.backButtonIcon)),
       ):SizedBox(),
       flexibleSpace: Container(
-        decoration:  BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(ImageConstant.appbarBackgroundImage),
-            fit: BoxFit.cover,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color(0xff9840EB),
+              Color(0xff09C8C8),
+            ],
+            begin: Alignment.bottomLeft,
+            end: Alignment.bottomRight,
           ),
         ),
       ),

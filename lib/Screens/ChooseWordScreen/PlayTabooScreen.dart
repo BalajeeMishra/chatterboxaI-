@@ -36,6 +36,8 @@ import '../../main.dart';
 import '../../network/rest_api.dart';
 import '../TabooGameChatpage/TaboogamechatPage.dart';
 import 'package:http/http.dart'as http;
+
+final TTSManager ttsManager = TTSManager();
 class PlayTabooScreen extends StatefulWidget {
   AllGameModel allGameModel;
   int index;
@@ -59,13 +61,11 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   bool apiCalled = false;
   bool isFirstTime = false;
   bool isLoaderShow = false;
-
   bool isMuted = false;
   String currentSpeechText = "";
 
   //Screen2 data
   double speechRate = 0.3;
-  final TTSManager ttsManager = TTSManager();
   bool isSpeaking = false;
   String message = '';
   int _lastSpokenIndex = 0;
@@ -73,10 +73,11 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
   // bool _isListening = false;
   bool isSpeechInitialized = false;
+  bool isPopAvailable = false;
 
 
   bool showSubtitle = false;
-  int timeFordelay = 400;
+  // int timeFordelay = 400;
 
   //store gif in local var
 
@@ -197,7 +198,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
   //showcase
   // GlobalKey _one = GlobalKey();
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   String previousSentence = "";
   String previousSessionId = "";
   String currentSessionId = "";
@@ -207,11 +208,14 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   @override
   void initState() {
     super.initState();
+
     appStore.setLoading(false);
+    print("this is game name : ${widget.gameName}");
+
     // setState(() {
     //   listeningGif = widget.allGameModel.allGame![widget.index].listeningCharacter.bodyBy
     // });
-
+    setisPop();
     currentSessionId = widget.sessionId;
     previousSessionId = getStringAsync(SESSION_ID);
     //
@@ -227,10 +231,10 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     // print("User English Proficiency is==>" + userStore.userEnglishProficiency);
     ttsManager.setSpeechRate(firstSoundLevel);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<PlayTabooScreenVM>(context, listen: false)
-          .seInitialValue(widget.allGameModel, widget.index, widget.sessionId);
 
-      Provider.of<PlayTabooScreenVM>(context, listen: false).chatPageAPI(
+    var vm =  Provider.of<PlayTabooScreenVM>(context, listen: false);
+    vm.seInitialValue(widget.allGameModel, widget.index, widget.sessionId);
+     vm.chatPageAPI(
         context,
         "Hi, Let's play the game!",
         widget.sessionId,
@@ -246,8 +250,17 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     apiCalled = true;
 
     appStore.setLastWords("");
+      setState(() {
+      });
 
-    setState(() {});
+  }
+  void setisPop(){
+    Future.delayed(Duration(seconds: 4)).then((e){
+      isPopAvailable = true;
+      setState(() {
+
+      });
+    });
   }
 
 
@@ -272,8 +285,10 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
       } else {}
     }).catchError((e) {
       appStore.setLoading(false);
-      toast(e.toString());
-      setState(() {});
+      // toast(e.toString());
+      if(mounted){
+        setState(() {});
+      }
     });
   }
 
@@ -333,20 +348,24 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     // await ttsManager.setSpeechRate(speechRate);
   }
 
-  Future<void> speakText(String text) async {
+  Future<void> speakText() async {
     var vm = Provider.of<PlayTabooScreenVM>(context, listen: false);
     configureTts();
+    String text = vm.tabooGameChatPageModel.response!.aiResponse!.last;
     String updatedText = cleanTextForTTS(text);
-    vm.setIsListening(true);
-    await ttsManager.stop();
+
+    stopSpeaking();
     print("This speak to text called");
     // vm.increseIndexForBoldText(text,timeFordelay);
     if (text.isNotEmpty) {
       _lastWords = updatedText;
       vm.setIsListening(false);
       // await ttsManager.speak(updatedText);
-      vm.speakParagraphs(updatedText, ttsManager,vm.currentIndex);
+      vm.speakParagraphs(updatedText, ttsManager,0);
       isSpeaking = true;
+      setState(() {
+
+      });
 
       // ttsManager.setCompletionHandler(() {
       //   vm.setIsListening(true);
@@ -370,6 +389,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   /// Stop speaking
   Future<void> stopSpeaking() async {
     var vm = Provider.of<PlayTabooScreenVM>(context, listen: false);
+    print("Called stop speaking");
     vm.setIsListening(true);
     vm.setIsBreakLoop(true);
     await ttsManager.stop();
@@ -387,35 +407,54 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     await ttsManager.setSpeechRate(speechRate);
 
     if (isSpeaking || userStore.isTTSPlaying == "YES") {
-      vm.setIsListening(true);
-      await ttsManager.stop();
+
+      stopSpeaking();
+
 
       String remainingText = _getRemainingText();
 
-      Future.delayed(Duration(milliseconds: 200), () async {
-        if (remainingText.isNotEmpty) {
+      Future.delayed(Duration(milliseconds: 1000), () async {
+        // if (remainingText.isNotEmpty) {
           await ttsManager.setSpeechRate(speechRate);
-          await speakText(remainingText);
-          setState(() {});
-        }
+          await speakText();
+          if(mounted){
+            setState(() {});
+          }
+        // }
       });
+    }
+  }
+  int lastTapTime = 0;
+
+  void _onDecreaseRatePressed() {
+    int currentTime = DateTime.now().millisecondsSinceEpoch;
+
+    if (currentTime - lastTapTime < 1500) {
+      return;
+    }
+
+    lastTapTime = currentTime;
+    adjustSpeechRate(-0.1);
+    if(mounted) {
+      setState(() {});
     }
   }
 
 
   _onIncreaseRatePressed() {
+    int currentTime = DateTime.now().millisecondsSinceEpoch;
+
+    if (currentTime - lastTapTime < 1500) {
+      return;
+    }
+    lastTapTime = currentTime;
     adjustSpeechRate(0.1);
-    timeFordelay -=50;
-    setState(() {});
-    Future.delayed(Duration(seconds: 1));
+    if(mounted) {
+      setState(() {});
+    }
   }
 
-  _onDecreaseRatePressed() {
-    adjustSpeechRate(-0.1);
-    timeFordelay +=50;
-    setState(() {});
-    Future.delayed(Duration(seconds: 1));
-  }
+
 
   String _getRemainingText() {
     if (_lastSpokenIndex < _lastWords.length) {
@@ -429,9 +468,11 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     var vm = Provider.of<PlayTabooScreenVM>(context, listen: false);
     message = 'Correcting Speech recognition mistakes';
     ttsManager.setStartHandler(() {
-      setState(() {
-        isSpeaking = true;
-      });
+     if(mounted){
+       setState(() {
+         isSpeaking = true;
+       });
+     }
     });
 
     ttsManager.setCompletionHandler(() {
@@ -468,13 +509,18 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     _lastWords = appStore.lastWords;
     startListening = false;
     Future.delayed(Duration(seconds: 2), () {
-      setState(() {
-        message = 'Thinking...';
-      });
+     if(mounted){
+       setState(() {
+         message = 'Thinking...';
+       });
+     }
     });
-    isMuted = getBoolAsync(IS_MUTE);
+    // // isMuted = getBoolAsync(IS_MUTE);
+    if(mounted){
+      setState(() {
 
-    setState(() {});
+      });
+    }
   }
 
   save2(String? correctedQues, String? sessionId) async {
@@ -508,13 +554,19 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
       userStore.setPreviousSentence(_lastWords);
       startListening = false;
       Future.delayed(Duration(seconds: 2), () {
-        setState(() {
+        if(mounted) {
+          setState(() {
           message = 'Thinking...';
         });
+        }
       });
-      isMuted = getBoolAsync(IS_MUTE);
 
-      setState(() {});
+      if(mounted){
+        setState(() {
+
+        });
+      }
+
     } catch (e) {
       toast(e.toString());
     }
@@ -544,9 +596,12 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
       _lastWords = appStore.lastWords;
       userStore.setPreviousSentence(_lastWords);
       startListening = false;
-      isMuted = getBoolAsync(IS_MUTE);
+      // isMuted = getBoolAsync(IS_MUTE);
+      if(mounted){
+        setState(() {
 
-      setState(() {});
+        });
+      }
     } catch (e) {
       toast(e.toString());
     }
@@ -561,7 +616,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
           children: [
             GestureDetector(
               onTap: () {
-                pop();
+              pop();
               },
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
@@ -692,7 +747,9 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
       print("UserResponse is =>" + ques.toString());
       if (ques.isNotEmpty) {
         vm.setIsListening(true);
+        vm.setIsBreakLoop(true);
         ttsManager.stop();
+
         save3(ques, widget.sessionId);
       }
 
@@ -728,33 +785,43 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
   @override
   void dispose() {
-    super.dispose();
-
     stopSpeaking();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    // final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
+    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
     return Consumer<PlayTabooScreenVM>(
       builder: (context,vm,child)=>
        Scaffold(
-        key: _scaffoldKey,
+        // key: scaffoldKey,
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(40.0),
           child: AppBar(
             centerTitle: false,
-            leading: GradientIcon(
-                ontap: () {
+            leading:
+            // vm.tabooGameChatPageModel.response == null?SizedBox():
+           isPopAvailable? GradientIcon(
+                ontap: () async{
+                 await ttsManager.stopAndReset();
                   stopSpeaking();
-                  pop(true);
+                 await ttsManager.stopAndReset();
+                 vm.setIsPlayScreen(false);
+                 if (mounted) {
+                   pop(true);
+                 }
                 }, icon: Icons.close
-            ),
+            ):SizedBox(),
 
             title: GradientText(
               softWrap: true,
               widget.gameName,
               style: const TextStyle(
-                  fontSize: 18, fontWeight: FontWeight.w400, color: Colors.white),
+                  fontSize: 18, fontWeight: FontWeight.w700,height: 20/16, color: Colors.white),
 
             ),
             actions: [
@@ -788,9 +855,16 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                   "======================= HELLO GAME COMPLETE =======================");
 
               print("======================= BYE =======================");
-              stopSpeaking();
-              pop(true);
-              removeKey(SESSION_ID);
+             // if(vm.tabooGameChatPageModel.response != null){
+              if(isPopAvailable){
+                stopSpeaking();
+                vm.setIsPlayScreen(false);
+                if(mounted ){
+                  pop(true);
+                }
+                removeKey(SESSION_ID);
+              }
+             // }
             return false;
           },
           child: Flex(
@@ -807,11 +881,11 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                   SizedBox(
                                     height: 20,
                                   ),
-                                  if(showSubtitle)
+                                  if(showSubtitle && !isLandscape)
                                     SizedBox(height: MediaQuery
                                         .of(context)
                                         .size
-                                        .height * 0.18,),
+                                        .height * 0.175   ,),
 
                                     Padding(
                                       padding: EdgeInsets.symmetric(horizontal: 16),
@@ -830,8 +904,8 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                                     8),
                                                 child: Image.asset(
                                                     fit: BoxFit.cover,
-                                                    height: 212,
-                                                    width: 320,
+                                                    height: height* (212 / 812),
+                                                    // width: 320,
                                                     ImageConstant.listening_female                                           ),
                                               ),
                                               if(!vm.isGifDownloaded && vm.isListening)
@@ -840,8 +914,8 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                                       8),
                                                   child: Image.asset(
                                                       fit: BoxFit.cover,
-                                                      height: 212,
-                                                      width: 320,
+                                                      height: height* (212 / 812),
+                                                      // width: 320,
                                                       ImageConstant.listening_female
                                                   ),
                                                 ),
@@ -851,8 +925,8 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                                       8),
                                                   child: Image.asset(
                                                       fit: BoxFit.cover,
-                                                      height: 212,
-                                                      width: 320,
+                                                      height: height* (212 / 812),
+                                                      // width: 320,
                                                       ImageConstant.speaking_female
                                                   ),
                                                 ),
@@ -862,8 +936,8 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                                       8),
                                                   child: Image.memory(
                                                       fit: BoxFit.cover,
-                                                      height: 212,
-                                                      width: 320,
+                                                      height: height* (212 / 812),
+                                                      // width: 320,
                                                       vm.listeningGif!
 
                                                   ),
@@ -874,8 +948,8 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                                       8),
                                                   child: Image.memory(
                                                       fit: BoxFit.cover,
-                                                      height: 212,
-                                                      width: 320,
+                                                      height: height * (212 / 812),
+                                                      // width: 320,
                                                       vm.talkingGif!
 
                                                   ),
@@ -910,15 +984,12 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                           ),
                                           if (apiCalled)
                                             Row(
-                                              mainAxisAlignment: MainAxisAlignment
-                                                  .center,
-                                              crossAxisAlignment: CrossAxisAlignment
-                                                  .center,
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              crossAxisAlignment: CrossAxisAlignment.center,
                                               children: [
 
                                                 Column(
-                                                  crossAxisAlignment: CrossAxisAlignment
-                                                      .start,
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
                                                     // IconButton(
                                                     //   alignment: Alignment.bottomLeft,
@@ -949,57 +1020,80 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                                   ],
                                                 ),
                                                 SizedBox(width: 25,),
-                                                Column(
-                                                  crossAxisAlignment: CrossAxisAlignment
-                                                      .start,
-                                                  children: [
-                                                    // IconButton(
-                                                    //   alignment: Alignment.bottomLeft,
-                                                    //
-                                                    //   padding: EdgeInsets.all(0),
-                                                    //   // constraints: BoxConstraints(maxWidth: 0,minWidth: 0),
-                                                    //
-                                                    //   icon:
-                                                    InkWell(
-                                                      onTap: () {
-                                                        setState(() {
-                                                          _lastWords =
-                                                              appStore.lastWords;
+                                                Container(
+                                                 width: width*0.13,
+                                                 height: height * 0.07,                                                  child: Center(
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment
+                                                          .start,
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      children: [
+                                                        // IconButton(
+                                                        //   alignment: Alignment.bottomLeft,
+                                                        //
+                                                        //   padding: EdgeInsets.all(0),
+                                                        //   // constraints: BoxConstraints(maxWidth: 0,minWidth: 0),
+                                                        //
+                                                        //   icon:
+                                                        InkWell(
+                                                          onTap: () {
+                                                            int currentTime = DateTime.now().millisecondsSinceEpoch;
 
-                                                          // isMuted= getBoolAsync(IS_MUTE);
+                                                            if (currentTime - lastTapTime < 500) {
+                                                              return;
+                                                            }
 
-                                                          isMuted = !isMuted;
-                                                          setValue(
-                                                              IS_MUTE, isMuted);
+                                                            lastTapTime = currentTime;
+                                                            setState(() {
+                                                              _lastWords =
+                                                                  appStore.lastWords;
 
-                                                          if (isMuted) {
-                                                            stopSpeaking();
-                                                          } else if (_lastWords
-                                                              .isNotEmpty &&
-                                                              _lastSpokenIndex <
-                                                                  _lastWords
-                                                                      .length) {
-                                                            speakText(_lastWords
-                                                                .substring(
-                                                                _lastSpokenIndex));
-                                                          }
-                                                        });
-                                                      },
-                                                      child: Image.asset(
-                                                        !isMuted ? ImageConstant.speaker:ImageConstant.speaker_close,
-                                                        width: 35,
-                                                        height: 35,
-                                                      ),
+                                                              // isMuted= getBoolAsync(IS_MUTE);
+
+                                                              isMuted = !isMuted;
+                                                              setValue(IS_MUTE, isMuted);
+
+                                                              if (isMuted) {
+
+                                                                  stopSpeaking();
+                                                                                                                       }
+                                                              // else if (_lastWords
+                                                              //     .isNotEmpty &&
+                                                              //     _lastSpokenIndex <
+                                                              //         _lastWords
+                                                              //             .length) {
+                                                              //   // speakText(_lastWords.substring(_lastSpokenIndex));
+                                                              //   speakText();
+                                                              // }
+                                                              else{
+                                                                stopSpeaking();
+                                                                Future.delayed(Duration(seconds: 1),(){
+                                                                  speakText();
+                                                                });
+                                                              }
+                                                            });
+                                                          },
+                                                          child: Center(
+                                                            child: Image.asset(
+                                                              !isMuted ? ImageConstant.speaker:ImageConstant.speaker_close,
+                                                              width: 35,
+                                                              height: 35,
+                                                            ),
+                                                          ),
+                                                        ),
+
+                                                        //   onPressed: () => _onDecreaseRatePressed(),
+                                                        // ),
+                                                        Center(
+                                                          child: MyText(
+                                                            text:
+                                                            !isMuted ? "Mute" : "Unmute",
+                                                            fontSize: 12,
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
-
-                                                    //   onPressed: () => _onDecreaseRatePressed(),
-                                                    // ),
-                                                    MyText(
-                                                      text:
-                                                      !isMuted ? "Mute" : "Unmute",
-                                                      fontSize: 12,
-                                                    ),
-                                                  ],
+                                                  ),
                                                 ),
                                                 SizedBox(width: 25,),
                                                 Column(
@@ -1062,8 +1156,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                       ],
                                     ).paddingSymmetric(
                                         horizontal: 16, vertical: 14),
-                                  if (apiCalled &&
-                                      !isLoaderShow && !showSubtitle)
+                                  if (apiCalled && !isLoaderShow && !showSubtitle && !isLandscape)
                                     Consumer<PlayTabooScreenVM>(
                                       builder: (context, vm, child) {
                                         return vm.tabooGameChatPageModel
@@ -1088,8 +1181,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                                       .tabooGameChatPageModel
                                                       .response!
                                                       .aiResponse!
-                                                      .last ==
-                                                      null ||
+                                                      .last == null ||
                                                       vm
                                                           .tabooGameChatPageModel
                                                           .response!
@@ -1106,6 +1198,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                                       child:
                                                       // Text(vm.tabooGameChatPageModel.response!.aiResponse!.last)
                                                       RichText(
+                                                       textAlign: TextAlign.left,
                                                         text: TextSpan(
                                                           children: buildHighlightedTextSpans(
                                                               vm
@@ -1186,7 +1279,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                                     'Failed to log event: $error');
                                               });
                                               stopSpeaking();
-                                              final bool? res =
+                                              final bool res =
                                               await TaboogamechatPage(
                                                   widget.allGameModel,
                                                   widget.index,
@@ -1200,95 +1293,110 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                                 }
                                               } else {}
                                             },
-                                            child: Column(
-                                              children: [
-                                                Icon(
-                                                  Icons.chat,
-                                                  size: 36,
-                                                ),
-                                                MyText(
-                                                  text: "History",
-                                                  fontSize: 12,
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                          SizedBox(width: 60,),
-                                          GestureDetector(
-                                              onTap: () async{
-                                                // ShareAndReview().removeAllKeys();
-                                                analytics.logEvent(
-                                                  name: 'speak',
-                                                  parameters: {
-                                                    'content_name': widget
-                                                        .allGameModel
-                                                        .allGame![widget.index]
-                                                        .mainContent
-                                                        .toString(),
-                                                    'Game_name': widget.gameName,
-                                                    'User_id':
-                                                    getStringAsync(USER_ID),
-                                                  },
-                                                ).then((_) {
-                                                  print(
-                                                      'Logged event: speak with parameters:');
-                                                }).catchError((error) {
-                                                  print(
-                                                      'Failed to log event: $error');
-                                                });
-                                                facebookAppEvents.logEvent(
-                                                  name: 'speak',
-                                                  parameters: {
-                                                    'content_name': widget
-                                                        .allGameModel
-                                                        .allGame![widget.index]
-                                                        .mainContent
-                                                        .toString(),
-                                                    'Game_name': widget.gameName,
-                                                    'User_id':
-                                                    getStringAsync(USER_ID),
-                                                  },
-                                                ).then((_) {
-                                                  print(
-                                                      'Logged event: speak with parameters:');
-                                                }).catchError((error) {
-                                                  print(
-                                                      'Failed to log event: $error');
-                                                });
-                                                stopSpeaking();
-                                                _lastWords = "";
-                                               String res = await  Navigator.push(context, MaterialPageRoute(builder: (context)=>BuildMassageScreen()));
-                                                _lastWords = res;
-                                                setState(() {
-                                                  ques = _lastWords;
-                                                  _lastWords = "";
-                                                });
-                                                if (ques.isNotEmpty) {
-                                                  save2(ques, widget.sessionId);
-                                                }
-
-                                              },
+                                            child: Container(
+                                              width: width* (81/ 375),
+                                              height: height * (55/ 812),
                                               child: Column(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                crossAxisAlignment: CrossAxisAlignment.center,
                                                 children: [
-                                                  Container(
-                                                    padding: EdgeInsets.all(14),
-                                                    decoration: BoxDecoration(
-                                                        borderRadius:
-                                                        BorderRadius.circular(
-                                                            50),
-                                                        color: Color(0XFFe0ddf5)),
-                                                    child:  Icon(
-                                                      Icons.keyboard_voice,
-                                                      size: 50,
-                                                      color: primaryColor,
-                                                    ),
+                                                  Icon(
+                                                    Icons.chat,
+                                                    size: 35,
                                                   ),
                                                   MyText(
-                                                    text: "Speak",
+                                                    text: "History",
                                                     fontSize: 12,
                                                   )
                                                 ],
-                                              )),
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(width: 40,),
+                                          Container(
+                                            child: GestureDetector(
+                                              onTap: () async{
+                                                  // ShareAndReview().removeAllKeys();
+                                                  analytics.logEvent(
+                                                    name: 'speak',
+                                                    parameters: {
+                                                      'content_name': widget
+                                                          .allGameModel
+                                                          .allGame![widget.index]
+                                                          .mainContent
+                                                          .toString(),
+                                                      'Game_name': widget.gameName,
+                                                      'User_id':
+                                                      getStringAsync(USER_ID),
+                                                    },
+                                                  ).then((_) {
+                                                    print(
+                                                        'Logged event: speak with parameters:');
+                                                  }).catchError((error) {
+                                                    print(
+                                                        'Failed to log event: $error');
+                                                  });
+                                                  facebookAppEvents.logEvent(
+                                                    name: 'speak',
+                                                    parameters: {
+                                                      'content_name': widget
+                                                          .allGameModel
+                                                          .allGame![widget.index]
+                                                          .mainContent
+                                                          .toString(),
+                                                      'Game_name': widget.gameName,
+                                                      'User_id':
+                                                      getStringAsync(USER_ID),
+                                                    },
+                                                  ).then((_) {
+                                                    print(
+                                                        'Logged event: speak with parameters:');
+                                                  }).catchError((error) {
+                                                    print(
+                                                        'Failed to log event: $error');
+                                                  });
+                                                  stopSpeaking();
+                                                  _lastWords = "";
+                                                 String res = await  Navigator.push(context, MaterialPageRoute(builder: (context)=>BuildMassageScreen()));
+                                                   vm.setIsPlayScreen(true);
+                                                  _lastWords = res;
+                                                   isMuted = false;
+                                                   print("Mute state $isMuted");
+                                                   speechRate = 0.3;
+                                                   ques = _lastWords;
+                                                   _lastWords = "";
+
+                                                  setState(() {
+
+                                                  });
+                                                  if (ques.isNotEmpty) {
+                                                    save2(ques, widget.sessionId);
+                                                  }
+
+                                                },
+                                              child: Column(
+                                                  children: [
+                                                    Container(
+                                                      padding: EdgeInsets.all(14),
+                                                      decoration: BoxDecoration(
+                                                          borderRadius:
+                                                          BorderRadius.circular(
+                                                              50),
+                                                          color: Color(0XFFe0ddf5)),
+                                                      child:  Icon(
+                                                        Icons.keyboard_voice,
+                                                        size: 50,
+                                                        color: primaryColor,
+                                                      ),
+                                                    ),
+                                                    MyText(
+                                                      text: "Speak",
+                                                      fontSize: 12,
+                                                    )
+                                                  ],
+                                                ),
+                                            ),
+                                          ),
                                           SizedBox(width: 40,),
                                           GestureDetector(
                                             onTap: () async {
@@ -1296,30 +1404,40 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                                 showSubtitle = !showSubtitle;
                                               });
                                             },
-                                            child: Column(
-                                              children: [
-                                                Icon(
-                                                  showSubtitle ? Icons
-                                                      .subtitles_off : Icons
-                                                      .subtitles,
-                                                  size: 36,
-                                                  color: showSubtitle ? Colors
-                                                      .black : Colors.blue,
+                                            child: Container(
+                                              // width:72,
+                                              // height:60,
+                                              width: width* (81/ 375),
+                                              height: height * (55/ 812),
+                                              // color:Colors.red,
+                                              child: Center(
+                                                child: Column(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                                  children: [
+                                                    Icon(
+                                                      showSubtitle ? Icons
+                                                          .subtitles_off : Icons
+                                                          .subtitles,
+                                                      size: 35,
+                                                      color: showSubtitle ? Colors
+                                                          .black : Colors.blue,
+                                                    ),
+                                                    MyText(
+                                                      text: showSubtitle
+                                                          ? "Show Subtitle"
+                                                          : "Hide Subtitle",
+                                                      fontSize: 12,
+                                                      color: showSubtitle ? Colors
+                                                          .black : Colors.blue,
+                                                    )
+                                                  ],
                                                 ),
-                                                MyText(
-                                                  text: showSubtitle
-                                                      ? "Show Subtitle"
-                                                      : "Hide Subtitle",
-                                                  fontSize: 12,
-                                                  color: showSubtitle ? Colors
-                                                      .black : Colors.blue,
-                                                )
-                                              ],
+                                              ),
                                             ),
                                           ),
                                         ],
-                                      ).paddingOnly(
-                                          left: 20, right: 20, bottom: 20),
+                                      ).paddingOnly(left: 16, right: 16, bottom: 20),
                                     );
                                   })
                           ],
@@ -1627,9 +1745,15 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   List<TextSpan> buildHighlightedTextSpans(String res) {
     var vm = Provider.of<PlayTabooScreenVM>(context, listen: false);
     List<TextSpan> spans = [];
-    // res = cleanTextForTTS(res);
+    // String text1 = "Hello I am Kushwanth . 😂 \n\n\n";  // Should remove emoji
+    // String text2 = "Hello I am Kushwanth . 😂hii \n"; // Should not remove emoji
+    //
+    // print(removeEmojisAfterPeriodBeforeNewline(text1)); // "Hello I am Kushwanth . \n"
+    // print(removeEmojisAfterPeriodBeforeNewline(text2));
+    res = removeEmojisAfterPeriodBeforeNewline(res);
+    res = cleanTextForTTS(res);
     List<String> paragraphs = splitAndPreserveDelimiters(res);
-    print("This is inside bold para $paragraphs");
+    // print("This is inside bold para $paragraphs");
     // List<String> paragraphs = res.split(RegExp(r'\n+'));
     paragraphs = paragraphs.where((p) => p.trim().isNotEmpty).toList();
     // for(int i =0;i<paragraphs.length;i++){
@@ -1663,18 +1787,30 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
       bool isBold = (j== vm.currentParaIndex);
       spans.add(
         TextSpan(
-          text: '${paragraph}',
+
+          text: paragraph,
           style: TextStyle(
+
             fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
             color: isBold ?Color(0Xff1A1A1A):Color(0Xff707070),
-            fontSize: 18,
-          ),
+            fontSize: 16,
+            fontFamily: "inter",
+            height: 20 / 16,
+
+             ),
         ),
       );
       // spans.add(const TextSpan(text: '\n'));
     }
+    // spans.add(TextSpan(text: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab alias aspernatur blanditiis commodi delectus deleniti deserunt distinctio, ducimus eaque enim ex fuga fugiat fugit labore minima neque non perspiciatis possimus quibusdam quisquam, quo quos rem repellendus suscipit vel, veniam veritatis voluptatem. Assumenda ducimus expedita iure molestias mollitia, nulla pariatur tenetur?"));
 
     return spans;
+  }
+  String cleanTextForTTS(String text) {
+    String textWithoutdoubleQuat = text.replaceAll("\"", "");
+    String textWithoutSingleQuat = textWithoutdoubleQuat.replaceAll(RegExp(r"[‘’']"), "");
+
+    return textWithoutSingleQuat.replaceAll(RegExp(r'\*+'), '');
   }
 
   // List<String> splitAndPreserveNewlines(String res) {
@@ -1710,6 +1846,23 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   //
   //   return paragraphs;
   // }
+
+
+  String removeEmojisAfterPeriodBeforeNewline(String text) {
+
+
+    return text.replaceAllMapped(RegExp(r'\.([\s\S]*?)\n+', multiLine: true), (match) {
+      String segment = match.group(1) ?? "";
+
+      // Check if segment contains only emojis/spaces
+      if (segment.trim().isNotEmpty && segment.trim().replaceAll(emojiRegex(), "").isEmpty) {
+        segment = segment.replaceAll(emojiRegex(), ""); // Remove emojis
+      }
+
+      return ".${segment}\n";
+    });
+  }
+
   List<String> splitAndPreserveDelimiters(String res) {
     List<String> paragraphs = [];
     RegExp regex = RegExp(r'(\n+|\.)'); // Match . or one/more \n
@@ -1785,11 +1938,6 @@ List<TextSpan> _buildBoldText(String response) {
   return textSpans;
 }
 
-String cleanTextForTTS(String text) {
-  String textWithoutEmojis = text.replaceAll(emojiRegex(), "");
-
-  return textWithoutEmojis.replaceAll('**', '');
-}
 
 
 class BuildMassageScreen extends StatefulWidget {
@@ -1834,6 +1982,13 @@ class _BuildMassageScreenState extends State<BuildMassageScreen> {
 
 
                 return TextField(
+                  textAlign: TextAlign.left,
+                  textAlignVertical: TextAlignVertical.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    height: 20 / 16,
+                    fontFamily: 'inter',
+                  ),
                   cursorColor: primaryColor,
                   cursorHeight: 30,
                   cursorWidth: 4,
@@ -1842,9 +1997,10 @@ class _BuildMassageScreenState extends State<BuildMassageScreen> {
                   maxLines: null,
                   decoration: InputDecoration(
                     isDense: true,
-                    contentPadding: EdgeInsets.only(
-                        top: 80, bottom: 0, left: 10, right: 10),
+                    contentPadding: EdgeInsets.only(top: 80, bottom: 0, left: 10, right: 10),
                     hintText: "",
+                    hintStyle: secondaryTextStyle(size: 16,height: 20 / 16,fontFamily: 'inter'),
+                    labelStyle: secondaryTextStyle(size: 16,height: 20 / 16,fontFamily: 'inter'),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
                       borderSide: BorderSide(
@@ -1886,7 +2042,7 @@ class _BuildMassageScreenState extends State<BuildMassageScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Image.asset('assets/images/voice.gif', width: 40),
-                        Text("Use keyboard's voice typing"),
+                        MyText(text: "Use keyboard's voice typing",fontSize: 14,),
                         4.width,
                         Icon(
                           Icons.help_outlined,
@@ -1964,13 +2120,16 @@ class _BuildMassageScreenState extends State<BuildMassageScreen> {
               SizedBox(width: 10),
               GestureDetector(
                 onTap: () {
-                  // FocusScope.of(context).unfocus();
+                  FocusScope.of(context).unfocus();
+                  // Future.delayed(Duration(seconds:1)).then((e){
+                    var chatPageVM =
+                    Provider.of<PlayTabooScreenVM>(context, listen: false);
+                    String messageText = chatPageVM.controller.text.trim();
+                    chatPageVM.controller.clear();
+                    Navigator.pop(context,messageText);
+                  // });
                   // unmuteSystemSounds();
-                  var chatPageVM =
-                  Provider.of<PlayTabooScreenVM>(context, listen: false);
-                  String messageText = chatPageVM.controller.text.trim();
-                  chatPageVM.controller.clear();
-                  Navigator.pop(context,messageText);
+
                 },
                 child: Container(
                   padding: EdgeInsets.all(13),

@@ -24,7 +24,7 @@ class GradientText extends StatelessWidget {
       child: Text(
         softWrap: softWrap,
         text,
-        style: style.copyWith(color: Colors.white,fontSize: 16,fontFamily: "Inter"),
+        style: style.copyWith(color: Colors.white,fontSize: 17,fontFamily: "inter",fontWeight: FontWeight.w700),
       ),
     );
   }

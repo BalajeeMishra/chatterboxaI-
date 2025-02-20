@@ -103,7 +103,10 @@ class ShareAndReviewScreen extends StatelessWidget {
                clipBehavior: Clip.none,
 
                children:[
-                 Lottie.asset("assets/lottiefile/confettie.json"),
+                 Container(
+                     //  height: double.infinity,
+                     // width: double.infinity,
+                     child: Lottie.asset("assets/lottiefile/confettie.json")),
                Column(
                  children: [
                    SizedBox(height: 60,),
@@ -116,7 +119,7 @@ class ShareAndReviewScreen extends StatelessWidget {
                    SizedBox(height: MediaQuery.of(context).size.height*.2,),
                    Container(
                      height: MediaQuery.of(context).size.height*.45,
-                     width: MediaQuery.of(context).size.width/1.14,
+                     // width: MediaQuery.of(context).size.width/1.14,
                      decoration: BoxDecoration(
                        borderRadius: BorderRadius.circular(12),
                        color: Colors.white
@@ -184,7 +187,7 @@ class ShareAndReviewScreen extends StatelessWidget {
                         ),
                       ],
                                ),
-                   ),
+                   ).paddingSymmetric(horizontal: 16),
                  ],
                ),
       ]

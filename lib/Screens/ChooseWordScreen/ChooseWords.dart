@@ -35,7 +35,6 @@ class ChooseWordScreen extends StatefulWidget {
 }
 
 class _ChooseWordScreen extends State<ChooseWordScreen> {
-  final TTSManager ttsManager = TTSManager();
 
   @override
   void initState() {
@@ -50,15 +49,17 @@ class _ChooseWordScreen extends State<ChooseWordScreen> {
     print("Timer function calling");
     int elapsedSeconds = 0;
     const int maxDuration = 10;
+    var vm = Provider.of<PlayTabooScreenVM>(context,listen: false);
 
     Timer.periodic(Duration(seconds: 2, milliseconds: 400),
         (Timer timer) async {
       elapsedSeconds++;
-
       if (userStore.isTTSPlaying == "YES") {
         print("Into iF");
         userStore.setTTSPlaying("NO");
+        vm.setIsBreakLoop(true);
         await ttsManager.stop();
+        await ttsManager.stopAndReset();
         print("Condition met. Stopping TTS and timer.");
         timer.cancel();
       }
@@ -149,7 +150,7 @@ class _ChooseWordScreen extends State<ChooseWordScreen> {
                                                  playVm.saveGifs();
                                                }
 
-                                              final bool? res =
+                                              final bool res =
                                                   await Navigator.push(
                                                       context,
                                                       MaterialPageRoute(
@@ -162,6 +163,7 @@ class _ChooseWordScreen extends State<ChooseWordScreen> {
                                                               )));
 
                                               if (res == true) {
+                                                await ttsManager.stopAndReset();
                                                 timerFunction();
                                               }
                                               analytics.logEvent(
@@ -203,10 +205,12 @@ class _ChooseWordScreen extends State<ChooseWordScreen> {
                                                     'Failed to log event: $error');
                                               });
                                             },
-                                            child: Container(
-                                                width: MediaQuery.of(context)
-                                                        .size
-                                                        .width * 0.9,
+                                            child:
+                                            Container(
+                                                // width: MediaQuery.of(context)
+                                                //         .size
+                                                //         .width * 0.9,
+                                                width: double.infinity,
                                                 decoration: BoxDecoration(
                                                     color: containerColor,
                                                     borderRadius: BorderRadius.all(
@@ -240,7 +244,7 @@ class _ChooseWordScreen extends State<ChooseWordScreen> {
                                                       )
                                                     ],
                                                   ),
-                                                )),
+                                                )).paddingSymmetric(horizontal: 16),
                                           ),
                                           SizedBox(
                                             height: 15,

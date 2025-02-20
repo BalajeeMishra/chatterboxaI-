@@ -2,6 +2,7 @@ import 'package:balajiicode/Constants/shared_pref_constrants.dart';
 import 'package:balajiicode/ShareAndReview/share_dialogue.dart';
 import 'package:balajiicode/extensions/shared_pref.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,16 +17,16 @@ class ShareAndReview{
 
   Future<void> checkAndShowPopup(BuildContext context) async {
 
-    int lastPopupTime = getIntAsync(last_review_or_share_pop_up_timestamp);
-    int lastGameTime = getIntAsync(last_game_complete_8_timestamp);
-    int gameCounter = getIntAsync(game_complete_8_counter) ;
-    bool showReview = getBoolAsync(show_review);
+    int lastPopupTime = getIntAsync(last_review_or_share_pop_up_timestamp)??0;
+    int lastGameTime = getIntAsync(last_game_complete_8_timestamp)??0;
+    int gameCounter = getIntAsync(game_complete_8_counter)??0 ;
+    bool showReview = getBoolAsync(show_review)??false;
 
     print("lastpopupTime : $lastPopupTime lastGameTime: $lastGameTime gameCounter: $gameCounter ");
 
     if (lastPopupTime > lastGameTime) return;
 
-    if (gameCounter == 1 || !showReview) {
+    if (gameCounter == 1 || (!showReview && gameCounter >=1)) {
       setValue(show_review, true);
       await showReviewPopup();
     } else if (gameCounter > 0 && gameCounter % 3 == 0) {
@@ -36,7 +37,6 @@ class ShareAndReview{
   Future<void> increaseGameCounter() async {
     int counter = getIntAsync(game_complete_8_counter) + 1;
     int timestamp = DateTime.now().millisecondsSinceEpoch;
-
      setValue(game_complete_8_counter, counter);
      setValue(last_game_complete_8_timestamp, timestamp);
   }
@@ -44,18 +44,18 @@ class ShareAndReview{
   Future<void> showReviewPopup() async {
     if (await inAppReview.isAvailable()) {
       inAppReview.requestReview().then((e){
+
         setValue(last_review_or_share_pop_up_timestamp, DateTime.now().millisecondsSinceEpoch);
-        toast("Review Submitted");
+
       });
     }
-    else{
-      toast("Review is not Available");
-    }
+
   }
 
   Future<void> showSharePopup(BuildContext context) async {
-    shareDialogue(context);
     setValue(last_review_or_share_pop_up_timestamp, DateTime.now().millisecondsSinceEpoch);
+    Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ShareAndReviewScreen()));
+
   }
 
   Future<bool> isReviewFeatureEnabled() async {
@@ -73,7 +73,7 @@ class ShareAndReview{
      print("Removed");
   }
   void share(){
-    Share.share("I practice speaking English with AI on this App and found it helpful. Check it out: https://play.google.com/store/apps/details?id=com.talkyplay.zapai&gl=IN");
+    Share.share("I practice speaking English with AI on this App and found it helpful. Check it out: https://play.google.com/store/apps/details?id=com.talkyplay.zapai&utm_source=internal_share");
 
   }
 }

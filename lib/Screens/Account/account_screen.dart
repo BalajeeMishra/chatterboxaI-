@@ -131,7 +131,7 @@ class _AccountScreenState extends State<AccountScreen> {
                        _buildActionButton(share_logo, "Share The App", '',shareDialoge: true),
                        16.height,
                        _buildActionButton(privacy_logo, "Privacy Policy",'https://zapai.chat/privacy-policy'),
-                       _buildActionButton(whatsapp_logo, "Contact The Developer",'https://wa.me/918300111204'),
+                       _buildActionButton(whatsapp_logo, "Contact The Developer",'https://wa.me/916266276582'),
                       16.height,
 
                        MyText(

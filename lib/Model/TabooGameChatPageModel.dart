@@ -1,5 +1,5 @@
 class TabooGameChatPageModel {
-  Response? response;
+  Response?   response;
 
   TabooGameChatPageModel({this.response});
 

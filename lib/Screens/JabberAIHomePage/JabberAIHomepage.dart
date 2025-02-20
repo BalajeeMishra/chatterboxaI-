@@ -12,6 +12,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 
+import '../../Constants/ImageConstant.dart';
 import '../../Utils/app_colors.dart';
 import '../../Utils/app_images.dart';
 import '../../ViewModel/JabberHomeAIvm.dart';
@@ -61,8 +62,8 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Color(0xff755be8),
-                primaryColor,
+                Color(0xff9840EB),
+                Color(0xff09C8C8),
               ],
               begin: Alignment.bottomLeft,
               end: Alignment.bottomRight,
@@ -73,15 +74,14 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
         showBack: false,
         color: primaryColor,
         actions: [
-          IconButton(
-              onPressed: () {
-                AccountScreen().launch(context);
-              },
-              icon: Icon(
-                Icons.person,
-                color: Colors.white,
-                size: 30,
-              ))
+          InkWell(
+            onTap: (){  AccountScreen().launch(context);},
+            child: Container(
+              height: 24,
+              width: 24,
+              child: Image.asset(ImageConstant.person),
+            ).paddingSymmetric(horizontal: 20),
+          )
         ],
         '',
         context: context,
@@ -118,8 +118,6 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
               await Provider.of<JabberHomeAIvm>(context, listen: false)
                   .homepageAPI(context);
             },
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0,vertical: 8),
               child: Column(
                 children: [
                 Expanded(
@@ -206,6 +204,7 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
                                                 // }
                                               },
                                               child: Container(
+                                                  width:double.infinity,
                                                   decoration: BoxDecoration(
                                                       color: containerColor,
                                                       borderRadius:
@@ -215,7 +214,7 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
                                                   child: Padding(
                                                     padding: const EdgeInsets
                                                         .symmetric(
-                                                        horizontal: 15.0,
+                                                        horizontal: 16.0,
                                                         vertical: 10.0),
                                                     child: Row(
                                                       children: [
@@ -294,10 +293,12 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
                       InkWell(
                         onTap: (){
                           ShareAndReview().share();
+                          // ShareAndReview().showReviewPopup();
+                          // ShareAndReview().removeAllKeys();
                           // Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ShareAndReviewScreen()));
                         },
                         child: Container(
-                          width: MediaQuery.of(context).size.width*.9,
+                          width: double.infinity,
                           height: 84,
                           margin: EdgeInsets.only(bottom: 0),
                           decoration: BoxDecoration(
@@ -315,7 +316,7 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       MyText(text:"Sharing is Caring!" ,fontSize: 18,fontWeight: FontWeight.bold,color: Colors.white,),
-                                      MyText(text:"Share The Zao AI App" ,fontSize: 15,color: Colors.white)
+                                      MyText(text:"Share The Zap AI App" ,fontSize: 15,color: Colors.white)
                                     ],
                                   ),
                                 ),
@@ -345,8 +346,8 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
                       )
                   )
                ]
-              ),
-            ),
+              ).paddingSymmetric(horizontal: 16,vertical: 8),
+
           ),
         ),
       ),

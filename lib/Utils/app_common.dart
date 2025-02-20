@@ -452,7 +452,7 @@ class GameEventManager {
 
     while (gameEvents.length >= 4) {
       List<Map<String, dynamic>> batch = gameEvents.sublist(0, 4);
-
+     print("This is batch ${batch[0]}");
       if (batch.any((event) => event['Game_name'] != gameName)) {
         print("Invalid batch. Skipping.");
         return;
@@ -460,7 +460,7 @@ class GameEventManager {
 
       int nextCount = gameEventCounts[gameName]! + 4;
       print("this is khush next count $nextCount");
-      if(nextCount%8 == 0){
+      if(nextCount % 8 == 0){
         print("increase counter called");
         await ShareAndReview().increaseGameCounter();
         // await ShareAndReview().checkAndShowPopup();

@@ -143,12 +143,12 @@ AppBar appBarWidget(String title,
     leading: showBack ? (backWidget) : null,
     shadowColor: shadowColor,
     elevation: elevation ?? defaultAppBarElevation,
-    systemOverlayStyle: systemUiOverlayStyle ??
-        SystemUiOverlayStyle(
-          statusBarColor: appStore.isDarkMode ? scaffoldColorDark : Colors.white,
-          statusBarIconBrightness:appStore.isDarkMode ? Brightness.light: Brightness.dark,
-          statusBarBrightness:appStore.isDarkMode ? Brightness.light: Brightness.light,
-        ),
+    // systemOverlayStyle: systemUiOverlayStyle ??
+    //     SystemUiOverlayStyle(
+    //       statusBarColor: appStore.isDarkMode ? scaffoldColorDark : Colors.white,
+    //       statusBarIconBrightness:appStore.isDarkMode ? Brightness.light: Brightness.dark,
+    //       statusBarBrightness:appStore.isDarkMode ? Brightness.light: Brightness.light,
+    //     ),
     bottom: bottom,
     titleSpacing: titleSpacing,
     flexibleSpace: flexibleSpace,
