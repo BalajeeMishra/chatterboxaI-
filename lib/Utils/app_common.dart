@@ -6,8 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 // import 'package:html/parser.dart';
 import 'package:intl/intl.dart';
-import 'package:share_plus/share_plus.dart';
-import '../ShareAndReview/share_and_review.dart';
 import '../extensions/extension_util/int_extensions.dart';
 // import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -400,11 +398,11 @@ class InstallDateHelper {
   }
 }
 
-
 class GameEventManager {
   final String currentSessionId;
   List<Map<String, dynamic>> gameEvents = [];
   Map<String, int> gameEventCounts = {};
+  Map<String, Map<String, int>> contentEventCounts = {}; // Stores content count per game
   String? lastGameName;
 
   static GameEventManager? _instance;
@@ -428,11 +426,15 @@ class GameEventManager {
       print("Game name changed from $lastGameName to $gameName. Resetting event count.");
       gameEvents.clear();
       gameEventCounts[gameName] = 0;
+      contentEventCounts[gameName] = {};
       lastGameName = gameName;
       isFirstBatch = true;
     }
 
     gameEventCounts.putIfAbsent(gameName, () => 0);
+    contentEventCounts.putIfAbsent(gameName, () => {});
+    contentEventCounts[gameName]!.putIfAbsent(contentName, () => 0);
+    contentEventCounts[gameName]![contentName] = contentEventCounts[gameName]![contentName]! + 1;
 
     gameEvents.add({
       'content_name': contentName,
@@ -450,76 +452,178 @@ class GameEventManager {
       return;
     }
 
-    while (gameEvents.length >= 4) {
-      List<Map<String, dynamic>> batch = gameEvents.sublist(0, 4);
-     print("This is batch ${batch[0]}");
-      if (batch.any((event) => event['Game_name'] != gameName)) {
-        print("Invalid batch. Skipping.");
-        return;
-      }
-
+    // Check if the same content was played 4 times
+    if (contentEventCounts[gameName]![contentName]! >= 4) {
       int nextCount = gameEventCounts[gameName]! + 4;
-      print("this is khush next count $nextCount");
-      if(nextCount % 8 == 0){
-        print("increase counter called");
-        await ShareAndReview().increaseGameCounter();
-        // await ShareAndReview().checkAndShowPopup();
-      }
-      await logEvent('Game_complete_$nextCount', batch);
-      await logFacebookEvent('Game_complete_$nextCount', batch);
+      List<Map<String, dynamic>> batch = gameEvents.where((event) => event['content_name'] == contentName).toList();
+
+      await _logEvent('Game_complete_$nextCount', batch);
+      await _logFacebookEvent('Game_complete_$nextCount', batch);
 
       gameEventCounts[gameName] = nextCount;
-      gameEvents.removeRange(0, 4);
+      gameEvents.removeWhere((event) => event['content_name'] == contentName);
+      contentEventCounts[gameName]![contentName] = 0; // Reset content count
 
-      print("Logged batch: Game_complete_$nextCount");
-    }
-
-    if (gameEvents.isNotEmpty) {
-      print("Waiting for more events to form a batch for $gameName.");
+      print("Logged batch: Game_complete_$nextCount for content: $contentName");
+    } else {
+      print("Waiting for more events of the same content to form a batch for $gameName.");
     }
   }
 
-
-  Future<void> logEvent(String eventName, List<Map<String, dynamic>> events) async {
+  Future<void> _logEvent(String eventName, List<Map<String, dynamic>> events) async {
     try {
-      final combinedParameters = <String, Object>{
-        'Game_name': events.first['Game_name'],
-        'Modality': events.first['Modality'],
-        'User_id': events.first['User_id'],
-        'content_name': events.map((e) => e['content_name']).toList().toString(),
-        'days_since_install': events.first['days_since_install'],
-      };
+      final parameters = _buildEventParameters(events);
 
       await analytics.logEvent(
         name: eventName,
-        parameters: combinedParameters,
+        parameters: parameters,
       );
 
-      print('Logged event: $eventName with parameters: $combinedParameters');
+      print('Logged event: $eventName with parameters: $parameters');
     } catch (error) {
       print('Failed to log event: $error');
     }
   }
-  Future<void> logFacebookEvent(String eventName, List<Map<String, dynamic>> events) async {
+
+  Future<void> _logFacebookEvent(String eventName, List<Map<String, dynamic>> events) async {
     try {
-      final combinedParameters = <String, Object>{
-        'Game_name': events.first['Game_name'],
-        'Modality': events.first['Modality'],
-        'User_id': events.first['User_id'],
-        'content_name': events.map((e) => e['content_name']).toList().toString(),
-        'days_since_install': events.first['days_since_install'],
-      };
+      final parameters = _buildEventParameters(events);
 
       await facebookAppEvents.logEvent(
         name: eventName,
-        parameters: combinedParameters,
+        parameters: parameters,
       );
 
-      print('Logged event: $eventName with parameters: $combinedParameters');
+      print('Logged Facebook event: $eventName with parameters: $parameters');
     } catch (error) {
-      print('Failed to log event: $error');
+      print('Failed to log Facebook event: $error');
     }
   }
 
-
+  Map<String, Object> _buildEventParameters(List<Map<String, dynamic>> events) {
+    return {
+      'Game_name': events.first['Game_name'],
+      'Modality': events.first['Modality'],
+      'User_id': events.first['User_id'],
+      'content_name': events.first['content_name'], // Ensuring the correct content is logged
+      'days_since_install': events.first['days_since_install'],
+    };
+  }
 }
+
+// class GameEventManager {
+//   final String currentSessionId;
+//   List<Map<String, dynamic>> gameEvents = [];
+//   Map<String, int> gameEventCounts = {};
+//   String? lastGameName;
+//
+//   static GameEventManager? _instance;
+//
+//   GameEventManager._internal({required this.currentSessionId});
+//
+//   factory GameEventManager({required String currentSessionId}) {
+//     return _instance ??= GameEventManager._internal(currentSessionId: currentSessionId);
+//   }
+//
+//   bool isFirstBatch = true;
+//
+//   Future<void> saveGameEvent({
+//     required String contentName,
+//     required String gameName,
+//     required String userId,
+//     required String modality,
+//     required int daysSinceInstall,
+//   }) async {
+//     if (lastGameName != gameName) {
+//       print("Game name changed from $lastGameName to $gameName. Resetting event count.");
+//       gameEvents.clear();
+//       gameEventCounts[gameName] = 0;
+//       lastGameName = gameName;
+//       isFirstBatch = true;
+//     }
+//
+//     gameEventCounts.putIfAbsent(gameName, () => 0);
+//
+//     gameEvents.add({
+//       'content_name': contentName,
+//       'Game_name': gameName,
+//       'User_id': userId,
+//       'Modality': modality,
+//       'days_since_install': daysSinceInstall,
+//     });
+//
+//     print("Game events added: $gameEvents");
+//
+//     if (isFirstBatch) {
+//       isFirstBatch = false;
+//       print("Skipping batching for the first set of events.");
+//       return;
+//     }
+//
+//     while (gameEvents.length >= 4) {
+//       List<Map<String, dynamic>> batch = gameEvents.sublist(0, 4);
+//
+//       if (batch.any((event) => event['Game_name'] != gameName)) {
+//         print("Invalid batch. Skipping.");
+//         return;
+//       }
+//
+//       int nextCount = gameEventCounts[gameName]! + 4;
+//       await logEvent('Game_complete_$nextCount', batch);
+//       await logFacebookEvent('Game_complete_$nextCount', batch);
+//
+//       gameEventCounts[gameName] = nextCount;
+//       gameEvents.removeRange(0, 4);
+//
+//       print("Logged batch: Game_complete_$nextCount");
+//     }
+//
+//     if (gameEvents.isNotEmpty) {
+//       print("Waiting for more events to form a batch for $gameName.");
+//     }
+//   }
+//
+//
+//   Future<void> logEvent(String eventName, List<Map<String, dynamic>> events) async {
+//     try {
+//       final combinedParameters = <String, Object>{
+//         'Game_name': events.first['Game_name'],
+//         'Modality': events.first['Modality'],
+//         'User_id': events.first['User_id'],
+//         'content_name': events.map((e) => e['content_name']).toList().toString(),
+//         'days_since_install': events.first['days_since_install'],
+//       };
+//
+//       await analytics.logEvent(
+//         name: eventName,
+//         parameters: combinedParameters,
+//       );
+//
+//       print('Logged event: $eventName with parameters: $combinedParameters');
+//     } catch (error) {
+//       print('Failed to log event: $error');
+//     }
+//   }
+//   Future<void> logFacebookEvent(String eventName, List<Map<String, dynamic>> events) async {
+//     try {
+//       final combinedParameters = <String, Object>{
+//         'Game_name': events.first['Game_name'],
+//         'Modality': events.first['Modality'],
+//         'User_id': events.first['User_id'],
+//         'content_name': events.map((e) => e['content_name']).toList().toString(),
+//         'days_since_install': events.first['days_since_install'],
+//       };
+//
+//       await facebookAppEvents.logEvent(
+//         name: eventName,
+//         parameters: combinedParameters,
+//       );
+//
+//       print('Logged event: $eventName with parameters: $combinedParameters');
+//     } catch (error) {
+//       print('Failed to log event: $error');
+//     }
+//   }
+//
+//
+// }
