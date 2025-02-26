@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:balajiicode/extensions/app_button.dart';
+import 'package:balajiicode/extensions/decorations.dart';
 import 'package:balajiicode/extensions/extension_util/int_extensions.dart';
 import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
 import 'package:balajiicode/extensions/text_styles.dart';
@@ -10,6 +11,7 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../Constants/ImageConstant.dart';
 import '../Model/AllGameModel.dart';
+import '../Widget/text_widget.dart';
 import 'ChooseWordScreen/PlayTabooScreen.dart';
 
 class YoutubeVideoPlayerScreen extends StatefulWidget {
@@ -18,7 +20,7 @@ class YoutubeVideoPlayerScreen extends StatefulWidget {
   final String sessionId;
   final String gameName;
 
-  YoutubeVideoPlayerScreen(
+    YoutubeVideoPlayerScreen(
       this.allGameModel, this.index, this.sessionId, this.gameName);
 
   @override
@@ -165,6 +167,7 @@ class _YoutubeVideoPlayerScreenState extends State<YoutubeVideoPlayerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double height = MediaQuery.of(context).size.height;
     return Scaffold(
         backgroundColor: Colors.black,
         appBar: AppBar(
@@ -216,7 +219,7 @@ class _YoutubeVideoPlayerScreenState extends State<YoutubeVideoPlayerScreen> {
                         ),
                       )
                 : SizedBox(),
-            _controller!.value.isPlaying && !isVideoEnded
+            (_controller!.value.isPlaying && !isVideoEnded)
                 ? Align(
                     alignment: Alignment.center,
                     child: IconButton(
@@ -244,11 +247,12 @@ class _YoutubeVideoPlayerScreenState extends State<YoutubeVideoPlayerScreen> {
                       // crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        SizedBox(height: height*(200/744),),
                         IconButton(
                           icon: Icon(
                             Icons.replay_rounded,
                             color: Colors.white,
-                            size: 70,
+                            size: 60,
                           ),
                           onPressed: () {
                             setState(() {
@@ -256,42 +260,32 @@ class _YoutubeVideoPlayerScreenState extends State<YoutubeVideoPlayerScreen> {
                             });
                           },
                         ),
-                        15.height,
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            AppButton(
-                              shapeBorder: CircleBorder(),
-                              onTap: _replayVideo,
-                              color: Colors.white.withOpacity(0.1),
-                              padding: EdgeInsets.zero,
-                              height: 35,
-                              // width: 160,
-                              child: Text(
-                                'Replay',
-                                style:TextStyle(fontSize: 16,color: Colors.white,fontFamily: "inter"),
-                              ),
-                            ),
-                            10.width,
-                            AppButton(
-                              onTap: _closeVideo,
-                              shapeBorder: CircleBorder(),
-                              padding: EdgeInsets.zero,
-                              height: 35,
-                              width: 160,
-                              child: Text(
-                                'Practice Speaking',
-                                style: secondaryTextStyle(color: Colors.white),
-                              ),
-                            ),
-                          ],
+                        MyText(
+                          text: 'Replay',
+                          color: Colors.white,
                         ),
-                        18.height,
+                       SizedBox(height:  MediaQuery.of(context).size.height*(180/744),),
                         Text(
                           'Game Starts Automatically in $_countdown Seconds',
                           style:
-                              secondaryTextStyle(color: Colors.white, size: 10),
-                        )
+                          secondaryTextStyle(color: Colors.white, size: 10),
+                        ),
+                        16.height,
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                          child: AppButton(
+                            onTap: _closeVideo,
+                            shapeBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+                            height: 44,
+                            padding: EdgeInsets.zero,
+                            width: double.infinity,
+                            child: Text(
+                              'Practice Speaking',
+                              style: secondaryTextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
+
                       ],
                     ),
                   )

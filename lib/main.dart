@@ -13,6 +13,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'Screens/ChooseWordScreen/MicScreen.dart';
 import 'Screens/JabberAIHomePage/JabberAIHomepage.dart';
 import 'Screens/no_internet_screen.dart';
 import 'Screens/profile_screen.dart';
@@ -119,7 +120,7 @@ class MyAppState extends State<MyApp> {
         home: getStringAsync(TOKEN).toString().isEmpty
             ? SplashScreen()
             : JabberAIHomepage(),
-        // home: AccountScreen(),
+        // home: AnimatedMicUI(),
         localizationsDelegates: [
           CountryLocalizations.delegate,
         ],

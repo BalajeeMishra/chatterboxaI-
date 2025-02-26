@@ -65,6 +65,7 @@ dependencies:
   share_plus: ^10.1.4
   in_app_review: ^2.0.10
   flutter_launcher_icons: ^0.14.3
+  flutter_animate: ^4.5.2
 
 
 

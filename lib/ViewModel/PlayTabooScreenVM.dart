@@ -335,6 +335,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
 
   void speakText(String text) async {
     print("Into Vm Calling");
+
     // clearTextForBold();
     // text = text.replaceAll(RegExp(r'\*\*'), '');
     // List<String> res = text.split(RegExp(r'\n+'));
