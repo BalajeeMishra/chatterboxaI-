@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+import 'package:balajiicode/ShareAndReview/share_and_review.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -455,6 +456,10 @@ class GameEventManager {
     // Check if the same content was played 4 times
     if (contentEventCounts[gameName]![contentName]! >= 4) {
       int nextCount = gameEventCounts[gameName]! + 4;
+      if(nextCount%8==0){
+        print("game 8 count called");
+        await ShareAndReview().increaseGameCounter();
+      }
       List<Map<String, dynamic>> batch = gameEvents.where((event) => event['content_name'] == contentName).toList();
 
       await _logEvent('Game_complete_$nextCount', batch);
