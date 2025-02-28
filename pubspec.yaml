@@ -4,7 +4,7 @@ description: "A new Flutter project."
 publish_to: 'none'
 
 
-version: 1.0.0+7
+version: 1.0.0+10
 
 environment:
   sdk: '>=3.3.4 <4.0.0'
@@ -43,7 +43,7 @@ dependencies:
   country_code_picker: ^3.1.0
   telephony: ^0.2.0
   dropdown_search: ^6.0.1
-  permission_handler: ^11.3.1
+  permission_handler: ^11.3.1 
   emoji_regex: ^0.0.5
   dotted_border: ^2.1.0
 #  keyboard_languages: ^0.1.4
