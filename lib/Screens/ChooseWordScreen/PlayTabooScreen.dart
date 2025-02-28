@@ -1315,7 +1315,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                           },
                                           child: Container(
                                             width: width * (81 / 375),
-                                            height: height * (55 / 812),
+                                            height: height * (56 / 812),
                                             child: Column(
                                               mainAxisAlignment:
                                                   MainAxisAlignment.center,
@@ -1435,7 +1435,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                             // width:72,
                                             // height:60,
                                             width: width * (81 / 375),
-                                            height: height * (55 / 812),
+                                            height: height * (56 / 812),
                                             // color:Colors.red,
                                             child: Center(
                                               child: Column(

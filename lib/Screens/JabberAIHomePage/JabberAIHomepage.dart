@@ -293,9 +293,7 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
                       InkWell(
                         onTap: (){
                           ShareAndReview().share();
-                          // ShareAndReview().showReviewPopup();
-                          // ShareAndReview().removeAllKeys();
-                          // Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ShareAndReviewScreen()));
+
                         },
                         child: Container(
                           width: double.infinity,
