@@ -22,21 +22,28 @@ android {
         jvmTarget = JavaVersion.VERSION_1_8
     }
 
-
+    signingConfigs {
+        release {
+            storeFile file("D:/chatterboxaI-/zapai.jks")
+            storePassword "zapai1"
+            keyAlias "key0"
+            keyPassword "zapai1"
+        }
+    }
     defaultConfig {
         applicationId "com.talkyplay.zapai"
         minSdk 23
         targetSdkVersion 34
         multiDexEnabled true
-        versionCode 10
-        versionName "1.0"
+        versionCode 11
+        versionName "1.1"
     }
 
     buildTypes {
         release {
             minifyEnabled true
             shrinkResources true
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
         }
     }
 }
