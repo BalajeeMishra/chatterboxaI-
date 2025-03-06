@@ -149,6 +149,7 @@ AppBar appBarWidget(String title,
     //       statusBarIconBrightness:appStore.isDarkMode ? Brightness.light: Brightness.dark,
     //       statusBarBrightness:appStore.isDarkMode ? Brightness.light: Brightness.light,
     //     ),
+
     bottom: bottom,
     titleSpacing: titleSpacing,
     flexibleSpace: flexibleSpace,

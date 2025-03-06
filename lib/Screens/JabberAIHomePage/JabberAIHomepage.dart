@@ -73,7 +73,9 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
         center: true,
         showBack: false,
         color: primaryColor,
+
         actions: [
+
           InkWell(
             onTap: (){  AccountScreen().launch(context);},
             child: Container(
@@ -293,6 +295,7 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
                       InkWell(
                         onTap: (){
                           ShareAndReview().share();
+                          // ShareAndReview().removeAllKeys();
 
                         },
                         child: Container(
@@ -302,6 +305,7 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
                           decoration: BoxDecoration(
                             color: Color(0xFF01875F),
                             borderRadius: BorderRadius.circular(15)
+
                           ),
                           child: Center(
                             child: Row(

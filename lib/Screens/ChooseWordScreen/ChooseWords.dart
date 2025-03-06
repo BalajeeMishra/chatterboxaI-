@@ -85,6 +85,7 @@ class _ChooseWordScreen extends State<ChooseWordScreen> {
             onPressed: () {
               Navigator.pop(context,true);
             },
+
             title: widget.gameName),
         body: RefreshIndicator(
           color: primaryColor,

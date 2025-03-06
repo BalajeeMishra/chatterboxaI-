@@ -20,6 +20,7 @@ import 'package:emoji_regex/emoji_regex.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import '../../Model/AllConversationModel.dart';
@@ -1013,7 +1014,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                           width: 25,
                                         ),
                                         Container(
-                                          width: width * 0.13,
+                                          width: width * 0.125,
                                           height: height * 0.07,
                                           child: Center(
                                             child: Column(
@@ -1037,7 +1038,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
                                                     if (currentTime -
                                                             lastTapTime <
-                                                        500) {
+                                                        1000) {
                                                       return;
                                                     }
 
@@ -1066,8 +1067,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                                       else {
                                                         stopSpeaking();
                                                         Future.delayed(
-                                                            Duration(
-                                                                seconds: 1),
+                                                            Duration(seconds: 1),
                                                             () {
                                                           speakText();
                                                         });
@@ -1075,12 +1075,10 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                                     });
                                                   },
                                                   child: Center(
-                                                    child: Image.asset(
+                                                    child: SvgPicture.asset(
                                                       !isMuted
-                                                          ? ImageConstant
-                                                              .speaker
-                                                          : ImageConstant
-                                                              .speaker_close,
+                                                          ? 'assets/svg/unmute.svg'
+                                                          : 'assets/svg/mute.svg',
                                                       width: 35,
                                                       height: 35,
                                                     ),
