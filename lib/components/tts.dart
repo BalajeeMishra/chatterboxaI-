@@ -20,6 +20,7 @@ class TTSManager {
       if (startHandler != null) startHandler!();
     });
 
+
     // Completion handler
     flutterTts.setCompletionHandler(() {
       if (completionHandler != null) completionHandler!();
@@ -29,12 +30,12 @@ class TTSManager {
     flutterTts.setErrorHandler((msg) {
       if (errorHandler != null) errorHandler!(msg);
     });
-
     // Progress handler for real-time word tracking
     flutterTts.setProgressHandler((String text, int start, int end, String word) {
       if (progressHandler != null) progressHandler!(word);
     });
   }
+
 
   // Methods to set custom handlers
   Future<void> awaitSpeakCompletion(bool value) async {
@@ -83,5 +84,8 @@ class TTSManager {
 
   Future<void> setVolume(double volume) async {
     await flutterTts.setVolume(volume);
+  }
+  Future<void> setVoice() async {
+    flutterTts.setVoice({"identifier": "com.apple.voice.compact.en-AU.Karen"});
   }
 }

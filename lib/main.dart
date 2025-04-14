@@ -4,6 +4,7 @@ import 'package:balajiicode/Screens/Account/account_screen.dart';
 import 'package:balajiicode/providers/providers.dart';
 import 'package:balajiicode/store/UserStore/UserStore.dart';
 import 'package:balajiicode/store/app_store.dart';
+import 'package:balajiicode/stt/demo_speech.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -120,7 +121,7 @@ class MyAppState extends State<MyApp> {
         home: getStringAsync(TOKEN).toString().isEmpty
             ? SplashScreen()
             : JabberAIHomepage(),
-        // home: AnimatedMicUI(),
+        // home: SpeechScreen(),
         localizationsDelegates: [
           CountryLocalizations.delegate,
         ],

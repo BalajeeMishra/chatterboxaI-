@@ -159,6 +159,5 @@ abstract class UserStoreBase with Store {
 
 
 
-
   }
 }

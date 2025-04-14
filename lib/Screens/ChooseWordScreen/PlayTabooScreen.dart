@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'dart:ui';
-
-import 'package:balajiicode/Constants/ApiURLConstant.dart';
 import 'package:balajiicode/Constants/ImageConstant.dart';
 import 'package:balajiicode/Model/TabooGameChatPageModel.dart';
 import 'package:balajiicode/ShareAndReview/share_and_review.dart';
@@ -37,6 +35,7 @@ import '../../extensions/colors.dart';
 import '../../extensions/constants.dart';
 import '../../main.dart';
 import '../../network/rest_api.dart';
+import '../../stt/speech_service.dart';
 import '../TabooGameChatpage/TaboogamechatPage.dart';
 import 'package:http/http.dart' as http;
 
@@ -92,6 +91,9 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   bool isSwipingLeft = false;
   bool isSwipingUp = false;
   bool isKeyBoardOpen = false;
+
+  final SpeechToText _speech = SpeechToText();
+
 
   // int timeFordelay = 400;
 
@@ -223,7 +225,15 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   @override
   void initState() {
     super.initState();
+    _speech.onResults.listen((result) {
+      setState(() {
+        if (result.text != null) {
+          _lastWords = result.text!;
+          print(result.text!);
+        }
 
+      });
+    });
     appStore.setLoading(false);
     print("this is game name : ${widget.gameName}");
 
@@ -245,6 +255,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     // print("User NAtive Language is==>" + userStore.userNativeLanguage);
     // print("User English Proficiency is==>" + userStore.userEnglishProficiency);
     ttsManager.setSpeechRate(firstSoundLevel);
+    ttsManager.setVoice();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       var vm = Provider.of<PlayTabooScreenVM>(context, listen: false);
       vm.seInitialValue(widget.allGameModel, widget.index, widget.sessionId);
@@ -1233,243 +1244,243 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                       ),
                     ),
                     if (!isLoaderShow)
-                      // Consumer<PlayTabooScreenVM>(
-                      //     builder: (context, vm, child) {
-                      //   return vm.tabooGameChatPageModel.response == null
-                      //       ? SizedBox()
-                      //       : Center(
-                      //           child: startListening
-                      //               ? listeningWidget()
-                      //               : _showSpeakAndListen(
-                      //                   height, width, heightFactor,keyboardHeight));
-                      // }),
+                      Consumer<PlayTabooScreenVM>(
+                          builder: (context, vm, child) {
+                        return vm.tabooGameChatPageModel.response == null
+                            ? SizedBox()
+                            : Center(
+                                child: startListening
+                                    ? listeningWidget()
+                                    : _showSpeakAndListen(
+                                        height, width, heightFactor,keyboardHeight));
+                      }),
                     // _showSpeakAndListen(height,width,heightFactor)
-                    Consumer<PlayTabooScreenVM>(builder: (context, vm, child) {
-                      return vm.tabooGameChatPageModel.response == null
-                          ? SizedBox()
-                          : Center(
-                              child: startListening
-                                  ? listeningWidget()
-                                  : Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        GestureDetector(
-                                          onTap: () async {
-                                            analytics.logEvent(
-                                              name: 'write',
-                                              parameters: {
-                                                'content_name': widget
-                                                    .allGameModel
-                                                    .allGame![widget.index]
-                                                    .mainContent
-                                                    .toString(),
-                                                'Game_name': widget.gameName,
-                                                'User_id':
-                                                    getStringAsync(USER_ID),
-                                              },
-                                            ).then((_) {
-                                              print(
-                                                  'Logged event: write with parameters:');
-                                            }).catchError((error) {
-                                              print(
-                                                  'Failed to log event: $error');
-                                            });
-                                            facebookAppEvents.logEvent(
-                                              name: 'write',
-                                              parameters: {
-                                                'content_name': widget
-                                                    .allGameModel
-                                                    .allGame![widget.index]
-                                                    .mainContent
-                                                    .toString(),
-                                                'Game_name': widget.gameName,
-                                                'User_id':
-                                                    getStringAsync(USER_ID),
-                                              },
-                                            ).then((_) {
-                                              print(
-                                                  'Logged event: write with parameters:');
-                                            }).catchError((error) {
-                                              print(
-                                                  'Failed to log event: $error');
-                                            });
-                                            stopSpeaking();
-                                            final bool res =
-                                                await TaboogamechatPage(
-                                                        widget.allGameModel,
-                                                        widget.index,
-                                                        widget.sessionId,
-                                                        widget.gameName)
-                                                    .launch(context);
-                                            if (res == true) {
-                                              allConversationApiCall();
-                                              if (isMuted) {
-                                                stopSpeaking();
-                                              }
-                                            } else {}
-                                          },
-                                          child: Container(
-                                            width: width * (81 / 375),
-                                            height: height * (56 / 812),
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                Icon(
-                                                  Icons.chat,
-                                                  size: 35,
-                                                ),
-                                                MyText(
-                                                  text: "History",
-                                                  fontSize: 12,
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: 40,
-                                        ),
-                                        Container(
-                                          child: GestureDetector(
-                                            onTap: () async {
-                                              // ShareAndReview().removeAllKeys();
-                                              analytics.logEvent(
-                                                name: 'speak',
-                                                parameters: {
-                                                  'content_name': widget
-                                                      .allGameModel
-                                                      .allGame![widget.index]
-                                                      .mainContent
-                                                      .toString(),
-                                                  'Game_name': widget.gameName,
-                                                  'User_id':
-                                                      getStringAsync(USER_ID),
-                                                },
-                                              ).then((_) {
-                                                print(
-                                                    'Logged event: speak with parameters:');
-                                              }).catchError((error) {
-                                                print(
-                                                    'Failed to log event: $error');
-                                              });
-                                              facebookAppEvents.logEvent(
-                                                name: 'speak',
-                                                parameters: {
-                                                  'content_name': widget
-                                                      .allGameModel
-                                                      .allGame![widget.index]
-                                                      .mainContent
-                                                      .toString(),
-                                                  'Game_name': widget.gameName,
-                                                  'User_id':
-                                                      getStringAsync(USER_ID),
-                                                },
-                                              ).then((_) {
-                                                print(
-                                                    'Logged event: speak with parameters:');
-                                              }).catchError((error) {
-                                                print(
-                                                    'Failed to log event: $error');
-                                              });
-                                              stopSpeaking();
-                                              _lastWords = "";
-                                              String res = await Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          BuildMassageScreen()));
-                                              vm.setIsPlayScreen(true);
-                                              _lastWords = res;
-                                              isMuted = false;
-                                              print("Mute state $isMuted");
-                                              speechRate = 0.3;
-                                              ques = _lastWords;
-                                              _lastWords = "";
-
-                                              setState(() {});
-                                              if (ques.isNotEmpty) {
-                                                save2(ques, widget.sessionId);
-                                              }
-                                            },
-                                            child: Column(
-                                              children: [
-                                                Container(
-                                                  padding: EdgeInsets.all(14),
-                                                  decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              50),
-                                                      color: Color(0XFFe0ddf5)),
-                                                  child: Icon(
-                                                    Icons.keyboard_voice,
-                                                    size: 50,
-                                                    color: primaryColor,
-                                                  ),
-                                                ),
-                                                MyText(
-                                                  text: "Speak",
-                                                  fontSize: 12,
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: 40,
-                                        ),
-                                        GestureDetector(
-                                          onTap: () async {
-                                            setState(() {
-                                              showSubtitle = !showSubtitle;
-                                            });
-                                          },
-                                          child: Container(
-                                            // width:72,
-                                            // height:60,
-                                            width: width * (81 / 375),
-                                            height: height * (56 / 812),
-                                            // color:Colors.red,
-                                            child: Center(
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  Icon(
-                                                    showSubtitle
-                                                        ? Icons.subtitles_off
-                                                        : Icons.subtitles,
-                                                    size: 35,
-                                                    color: showSubtitle
-                                                        ? Colors.black
-                                                        : Colors.blue,
-                                                  ),
-                                                  MyText(
-                                                    text: showSubtitle
-                                                        ? "Show Subtitle"
-                                                        : "Hide Subtitle",
-                                                    fontSize: 12,
-                                                    color: showSubtitle
-                                                        ? Colors.black
-                                                        : Colors.blue,
-                                                  )
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ).paddingOnly(
-                                      left: 16, right: 16, bottom: 20),
-                            );
-                    })
+                    // Consumer<PlayTabooScreenVM>(builder: (context, vm, child) {
+                    //   return vm.tabooGameChatPageModel.response == null
+                    //       ? SizedBox()
+                    //       : Center(
+                    //           child: startListening
+                    //               ? listeningWidget()
+                    //               : Row(
+                    //                   mainAxisAlignment:
+                    //                       MainAxisAlignment.center,
+                    //                   crossAxisAlignment:
+                    //                       CrossAxisAlignment.center,
+                    //                   children: [
+                    //                     GestureDetector(
+                    //                       onTap: () async {
+                    //                         analytics.logEvent(
+                    //                           name: 'write',
+                    //                           parameters: {
+                    //                             'content_name': widget
+                    //                                 .allGameModel
+                    //                                 .allGame![widget.index]
+                    //                                 .mainContent
+                    //                                 .toString(),
+                    //                             'Game_name': widget.gameName,
+                    //                             'User_id':
+                    //                                 getStringAsync(USER_ID),
+                    //                           },
+                    //                         ).then((_) {
+                    //                           print(
+                    //                               'Logged event: write with parameters:');
+                    //                         }).catchError((error) {
+                    //                           print(
+                    //                               'Failed to log event: $error');
+                    //                         });
+                    //                         facebookAppEvents.logEvent(
+                    //                           name: 'write',
+                    //                           parameters: {
+                    //                             'content_name': widget
+                    //                                 .allGameModel
+                    //                                 .allGame![widget.index]
+                    //                                 .mainContent
+                    //                                 .toString(),
+                    //                             'Game_name': widget.gameName,
+                    //                             'User_id':
+                    //                                 getStringAsync(USER_ID),
+                    //                           },
+                    //                         ).then((_) {
+                    //                           print(
+                    //                               'Logged event: write with parameters:');
+                    //                         }).catchError((error) {
+                    //                           print(
+                    //                               'Failed to log event: $error');
+                    //                         });
+                    //                         stopSpeaking();
+                    //                         final bool res =
+                    //                             await TaboogamechatPage(
+                    //                                     widget.allGameModel,
+                    //                                     widget.index,
+                    //                                     widget.sessionId,
+                    //                                     widget.gameName)
+                    //                                 .launch(context);
+                    //                         if (res == true) {
+                    //                           allConversationApiCall();
+                    //                           if (isMuted) {
+                    //                             stopSpeaking();
+                    //                           }
+                    //                         } else {}
+                    //                       },
+                    //                       child: Container(
+                    //                         width: width * (81 / 375),
+                    //                         height: height * (56 / 812),
+                    //                         child: Column(
+                    //                           mainAxisAlignment:
+                    //                               MainAxisAlignment.center,
+                    //                           crossAxisAlignment:
+                    //                               CrossAxisAlignment.center,
+                    //                           children: [
+                    //                             Icon(
+                    //                               Icons.chat,
+                    //                               size: 35,
+                    //                             ),
+                    //                             MyText(
+                    //                               text: "History",
+                    //                               fontSize: 12,
+                    //                             )
+                    //                           ],
+                    //                         ),
+                    //                       ),
+                    //                     ),
+                    //                     SizedBox(
+                    //                       width: 40,
+                    //                     ),
+                    //                     Container(
+                    //                       child: GestureDetector(
+                    //                         onTap: () async {
+                    //                           // ShareAndReview().removeAllKeys();
+                    //                           analytics.logEvent(
+                    //                             name: 'speak',
+                    //                             parameters: {
+                    //                               'content_name': widget
+                    //                                   .allGameModel
+                    //                                   .allGame![widget.index]
+                    //                                   .mainContent
+                    //                                   .toString(),
+                    //                               'Game_name': widget.gameName,
+                    //                               'User_id':
+                    //                                   getStringAsync(USER_ID),
+                    //                             },
+                    //                           ).then((_) {
+                    //                             print(
+                    //                                 'Logged event: speak with parameters:');
+                    //                           }).catchError((error) {
+                    //                             print(
+                    //                                 'Failed to log event: $error');
+                    //                           });
+                    //                           facebookAppEvents.logEvent(
+                    //                             name: 'speak',
+                    //                             parameters: {
+                    //                               'content_name': widget
+                    //                                   .allGameModel
+                    //                                   .allGame![widget.index]
+                    //                                   .mainContent
+                    //                                   .toString(),
+                    //                               'Game_name': widget.gameName,
+                    //                               'User_id':
+                    //                                   getStringAsync(USER_ID),
+                    //                             },
+                    //                           ).then((_) {
+                    //                             print(
+                    //                                 'Logged event: speak with parameters:');
+                    //                           }).catchError((error) {
+                    //                             print(
+                    //                                 'Failed to log event: $error');
+                    //                           });
+                    //                           stopSpeaking();
+                    //                           _lastWords = "";
+                    //                           String res = await Navigator.push(
+                    //                               context,
+                    //                               MaterialPageRoute(
+                    //                                   builder: (context) =>
+                    //                                       BuildMassageScreen()));
+                    //                           vm.setIsPlayScreen(true);
+                    //                           _lastWords = res;
+                    //                           isMuted = false;
+                    //                           print("Mute state $isMuted");
+                    //                           speechRate = 0.3;
+                    //                           ques = _lastWords;
+                    //                           _lastWords = "";
+                    //
+                    //                           setState(() {});
+                    //                           if (ques.isNotEmpty) {
+                    //                             save2(ques, widget.sessionId);
+                    //                           }
+                    //                         },
+                    //                         child: Column(
+                    //                           children: [
+                    //                             Container(
+                    //                               padding: EdgeInsets.all(14),
+                    //                               decoration: BoxDecoration(
+                    //                                   borderRadius:
+                    //                                       BorderRadius.circular(
+                    //                                           50),
+                    //                                   color: Color(0XFFe0ddf5)),
+                    //                               child: Icon(
+                    //                                 Icons.keyboard_voice,
+                    //                                 size: 50,
+                    //                                 color: primaryColor,
+                    //                               ),
+                    //                             ),
+                    //                             MyText(
+                    //                               text: "Speak",
+                    //                               fontSize: 12,
+                    //                             )
+                    //                           ],
+                    //                         ),
+                    //                       ),
+                    //                     ),
+                    //                     SizedBox(
+                    //                       width: 40,
+                    //                     ),
+                    //                     GestureDetector(
+                    //                       onTap: () async {
+                    //                         setState(() {
+                    //                           showSubtitle = !showSubtitle;
+                    //                         });
+                    //                       },
+                    //                       child: Container(
+                    //                         // width:72,
+                    //                         // height:60,
+                    //                         width: width * (81 / 375),
+                    //                         height: height * (56 / 812),
+                    //                         // color:Colors.red,
+                    //                         child: Center(
+                    //                           child: Column(
+                    //                             mainAxisAlignment:
+                    //                                 MainAxisAlignment.center,
+                    //                             crossAxisAlignment:
+                    //                                 CrossAxisAlignment.center,
+                    //                             children: [
+                    //                               Icon(
+                    //                                 showSubtitle
+                    //                                     ? Icons.subtitles_off
+                    //                                     : Icons.subtitles,
+                    //                                 size: 35,
+                    //                                 color: showSubtitle
+                    //                                     ? Colors.black
+                    //                                     : Colors.blue,
+                    //                               ),
+                    //                               MyText(
+                    //                                 text: showSubtitle
+                    //                                     ? "Show Subtitle"
+                    //                                     : "Hide Subtitle",
+                    //                                 fontSize: 12,
+                    //                                 color: showSubtitle
+                    //                                     ? Colors.black
+                    //                                     : Colors.blue,
+                    //                               )
+                    //                             ],
+                    //                           ),
+                    //                         ),
+                    //                       ),
+                    //                     ),
+                    //                   ],
+                    //                 ).paddingOnly(
+                    //                   left: 16, right: 16, bottom: 20),
+                    //         );
+                    // })
                   ],
                 ),
               )),
@@ -1625,6 +1636,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                   onLongPress: () => setState(() {
                     isExpanded = true;
                     isshowHistoryAndSubtitle = false;
+                    _startListening();
                   }),
                   onLongPressEnd: (details) {
                     if (details.localPosition.dy < -50) {
@@ -1898,6 +1910,20 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
         ),
       ],
     );
+  }
+  void _startListening() async {
+    print("called");
+    final hasPermission = await _speech.startListening();
+    if (!hasPermission) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Microphone permission not granted')),
+      );
+    }
+
+  }
+
+  void _stopListening() {
+   _speech.stopListening();
   }
 
   listeningWidget() {
@@ -2295,21 +2321,34 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   //
   //   return paragraphs;
   // }
-
+  // String removeEmojisAfterPeriodBeforeNewline(String text) {
+  //   return text.replaceAllMapped(
+  //       RegExp(r'\.([\s\S]*?)\n+', multiLine: true),
+  //           (match) {
+  //         String segment = match.group(1) ?? "";
+  //
+  //         // Always remove emojis from the segment
+  //         String cleanedSegment = segment.replaceAll(emojiRegex(), "").trim();
+  //
+  //         return ".$cleanedSegment\n";
+  //       }
+  //   );
+  // }
   String removeEmojisAfterPeriodBeforeNewline(String text) {
     return text.replaceAllMapped(RegExp(r'\.([\s\S]*?)\n+', multiLine: true),
-        (match) {
-      String segment = match.group(1) ?? "";
+            (match) {
+          String segment = match.group(1) ?? "";
 
-      // Check if segment contains only emojis/spaces
-      if (segment.trim().isNotEmpty &&
-          segment.trim().replaceAll(emojiRegex(), "").isEmpty) {
-        segment = segment.replaceAll(emojiRegex(), ""); // Remove emojis
-      }
+          // Check if segment contains only emojis/spaces
+          if (segment.trim().isNotEmpty &&
+              segment.trim().replaceAll(emojiRegex(), "").isEmpty) {
+            segment = segment.replaceAll(emojiRegex(), ""); // Remove emojis
+          }
 
-      return ".${segment}\n";
-    });
+          return ".${segment}\n";
+        });
   }
+
 
   List<String> splitAndPreserveDelimiters(String res) {
     List<String> paragraphs = [];

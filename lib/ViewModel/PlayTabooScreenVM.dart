@@ -156,7 +156,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
     dynamicDta.add(dataAdd);
     notifyListeners();
     appStore.setLoading(true);
-
+ print("this is game id ${allGameModel.allGame![index].gameId}");
     try {
       var data = {
         "question": dataToAdd,

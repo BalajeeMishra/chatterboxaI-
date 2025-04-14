@@ -4,6 +4,7 @@ import 'package:balajiicode/extensions/extension_util/int_extensions.dart';
 import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
 import 'package:balajiicode/extensions/text_styles.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../Utils/app_colors.dart';
 import '../extensions/app_button.dart';
@@ -16,6 +17,8 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  final MethodChannel _channel = const MethodChannel('com.example.speech_to_text');
+
   @override
   void initState() {
     super.initState();
@@ -58,11 +61,7 @@ class _SplashScreenState extends State<SplashScreen> {
                               color: Colors.white,
                               fontFamily: 'roboto')),
                       10.height,
-                      Text("Your AI English Tutor",
-                          style: boldTextStyle(
-                              size: 32,
-                              color: Colors.white,
-                              fontFamily: 'roboto')),
+                  
                     ],
                   ),
                 ),
@@ -83,5 +82,23 @@ class _SplashScreenState extends State<SplashScreen> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
+  }
+
+  void startListening() async {
+    try {
+      await _channel.invokeMethod('startListening');
+      print('Started listening');
+    } on PlatformException catch (e) {
+      print('Error: ${e.message}');
+    }
+  }
+
+  void stopListening() async {
+    try {
+      await _channel.invokeMethod('stopListening');
+      print('Stopped listening');
+    } on PlatformException catch (e) {
+      print('Error: ${e.message}');
+    }
   }
 }

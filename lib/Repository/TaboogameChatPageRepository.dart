@@ -15,6 +15,7 @@ class TabooGameChatPageRepository {
       // Log the URL and data
       print("API URL: $tabooGameChatPage");
       print("Payload: $data");
+      print(JsonEncoder.withIndent('  ').convert(data));
 
       final response = await ApiClass.post(tabooGameChatPage, data, isHeader: true);
       final ApiResponseStatus status = mapStatusCode(response.statusCode);
