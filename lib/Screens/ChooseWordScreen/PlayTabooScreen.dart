@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:balajiicode/Constants/ImageConstant.dart';
 import 'package:balajiicode/Model/TabooGameChatPageModel.dart';
 import 'package:balajiicode/ShareAndReview/share_and_review.dart';
+import 'package:balajiicode/ViewModel/TabooGameChatPageVM.dart';
 import 'package:balajiicode/Widget/text_gradient.dart';
 import 'package:balajiicode/Widget/text_widget.dart';
 import 'package:balajiicode/extensions/common.dart';
@@ -93,6 +94,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   bool isKeyBoardOpen = false;
 
   final SpeechToText _speech = SpeechToText();
+  final TextEditingController  wordController = TextEditingController();
 
 
   // int timeFordelay = 400;
@@ -229,6 +231,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
       setState(() {
         if (result.text != null) {
           _lastWords = result.text!;
+          wordController.text = result.text!;
           print(result.text!);
         }
 
@@ -1251,8 +1254,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                             : Center(
                                 child: startListening
                                     ? listeningWidget()
-                                    : _showSpeakAndListen(
-                                        height, width, heightFactor,keyboardHeight));
+                                    : _showSpeakAndListen(vm,height, width, heightFactor,keyboardHeight));
                       }),
                     // _showSpeakAndListen(height,width,heightFactor)
                     // Consumer<PlayTabooScreenVM>(builder: (context, vm, child) {
@@ -1493,7 +1495,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   bool isKeyboardOpen(BuildContext context) {
     return MediaQuery.of(context).viewInsets.bottom > 0;
   }
-  _showSpeakAndListen(double height, double width, double heightFactor,double keyboardHeight) {
+  _showSpeakAndListen(PlayTabooScreenVM vm, double height, double width, double heightFactor,double keyboardHeight) {
     return Column(
       children: [
         if (isLocked)
@@ -1507,6 +1509,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                 borderRadius: BorderRadius.circular(20), // Rounded corners
               ),
               child: TextField(
+                controller: wordController,
                 maxLines: null,
                 style: TextStyle(fontFamily: "inter", fontSize: 16),
                 decoration: InputDecoration(
@@ -1547,19 +1550,29 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                         child: Container(
                           // width: width * (81 / 375),
                           // height: height * (55 / 812),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.delete_outline,
-                                size: 36,
-                              ),
-                              MyText(
-                                text: "Delete",
-                                fontSize: 12,
-                              )
-                            ],
+                          child: GestureDetector(
+                            onTap: (){
+                              wordController.clear();
+                              setState(() {
+                                isExpanded = false;
+                                isLocked = false;
+                                isshowHistoryAndSubtitle = true;
+                              });
+                            },
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.delete_outline,
+                                  size: 36,
+                                ),
+                                MyText(
+                                  text: "Delete",
+                                  fontSize: 12,
+                                )
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -1593,6 +1606,8 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                   child: Center(
                                     child: IconButton(
                                       onPressed: () {
+                                        _sendAnalytics();
+                                        _stopAndSendResponse(vm);
                                         setState(() {
                                           isExpanded = false;
                                           isLocked = false;
@@ -1636,6 +1651,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                   onLongPress: () => setState(() {
                     isExpanded = true;
                     isshowHistoryAndSubtitle = false;
+                    stopSpeaking();
                     _startListening();
                   }),
                   onLongPressEnd: (details) {
@@ -1652,6 +1668,8 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                         isSwipingUp = false;
                       });
                     } else {
+                      _sendAnalytics();
+                      _stopAndSendResponse(vm);
                       setState(() {
                         isExpanded = false;
                         isshowHistoryAndSubtitle = true;
@@ -1911,6 +1929,62 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
       ],
     );
   }
+  void _sendAnalytics(){
+    analytics.logEvent(
+      name: 'speak',
+      parameters: {
+        'content_name': widget
+            .allGameModel
+            .allGame![widget.index]
+            .mainContent
+            .toString(),
+        'Game_name': widget.gameName,
+        'User_id':
+        getStringAsync(USER_ID),
+      },
+    ).then((_) {
+      print(
+          'Logged event: speak with parameters:');
+    }).catchError((error) {
+      print(
+          'Failed to log event: $error');
+    });
+    facebookAppEvents.logEvent(
+      name: 'speak',
+      parameters: {
+        'content_name': widget
+            .allGameModel
+            .allGame![widget.index]
+            .mainContent
+            .toString(),
+        'Game_name': widget.gameName,
+        'User_id':
+        getStringAsync(USER_ID),
+      },
+    ).then((_) {
+      print(
+          'Logged event: speak with parameters:');
+    }).catchError((error) {
+      print(
+          'Failed to log event: $error');
+    });
+  }
+  void _stopAndSendResponse(PlayTabooScreenVM vm){
+    wordController.clear();
+    _stopListening();
+    vm.setIsPlayScreen(true);
+    isMuted = false;
+    print("Mute state $isMuted");
+    speechRate = 0.3;
+    ques = _lastWords;
+    _lastWords = "";
+
+    setState(() {});
+    if (ques.isNotEmpty) {
+      save2(ques, widget.sessionId);
+    }
+  }
+
   void _startListening() async {
     print("called");
     final hasPermission = await _speech.startListening();
