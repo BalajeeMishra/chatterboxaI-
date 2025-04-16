@@ -1553,6 +1553,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                           child: GestureDetector(
                             onTap: (){
                               wordController.clear();
+                              _stopListening();
                               setState(() {
                                 isExpanded = false;
                                 isLocked = false;
@@ -1653,8 +1654,9 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                     isshowHistoryAndSubtitle = false;
                     stopSpeaking();
                     _startListening();
+                    _sendAnalytics();
                   }),
-                  onLongPressEnd: (details) {
+                  onLongPressEnd: (details) async{
                     if (details.localPosition.dy < -50) {
                       setState(() {
                         isSwipingUp = true;
@@ -1668,12 +1670,17 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                         isSwipingUp = false;
                       });
                     } else {
-                      _sendAnalytics();
-                      _stopAndSendResponse(vm);
+
+                      await Future.delayed(Duration(milliseconds: 1000));
                       setState(() {
                         isExpanded = false;
                         isshowHistoryAndSubtitle = true;
                       });
+                      await Future.delayed(Duration(milliseconds: 1000)).then((onValue){
+                        _stopAndSendResponse(vm);
+                      });
+
+
                     }
                   },
                   child: (isExpanded || isLocked)
@@ -1750,8 +1757,8 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                               isSwipingUp ? Colors.blue : Colors.grey.shade300,
                         ),
                         child: CircleAvatar(
-                          child: Icon(Icons.lock,
-                              color: isSwipingUp ? Colors.white : Colors.black),
+                          backgroundColor: Colors.grey.shade300,
+                          child: Icon(Icons.lock, color: isSwipingUp ? Colors.white : Colors.black),
                           radius: 15,
                         ),
                       ),

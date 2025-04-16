@@ -26,12 +26,12 @@ class ShareAndReview{
 
     if (lastPopupTime > lastGameTime) return;
 
-    if (gameCounter == 2 || (!showReview && gameCounter >=2)) {
+    if (gameCounter == 3 || (!showReview && gameCounter >=3)) {
       setValue(show_review, true);
       print("Calledd review dialogeu");
       await showReviewPopup();
     }
-    if (gameCounter > 0 && gameCounter % 3 == 0) {
+    if ( (gameCounter-1) % 3 == 0) {
       await showSharePopup(context);
     }
   }
