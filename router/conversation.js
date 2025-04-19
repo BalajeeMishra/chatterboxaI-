@@ -65,13 +65,14 @@ router.post("/play", jwtHelper.verifyToken,lastActivity,async (req, res,next) =>
   // nativelanguage, listofword, firstword
   // let { question, userId, session,firstword } = req.body;
   let { sessionId, mainContent, question, gameId,modality } = req.body;
+ 
   const userId = req.userId;
   let history = "";
 
   let responseforuser = {};
 
   const user = await User.findById(userId);
-
+  
   const promptTemplate = await Prompt.findOne({
     gameId,
     engprolevel: user.engprolevel,
@@ -81,6 +82,8 @@ router.post("/play", jwtHelper.verifyToken,lastActivity,async (req, res,next) =>
 
   const template = `User native language is {nativeLanguage}. user is from this ${user.country}. user name is ${user.name}. maincontent is {maincontent}. detailofcontent is {detailOfContent}. User english proficiency is ${user.engprolevel}. ${promptTemplateContent} Previous conversation:
 {chat_history} current question is {question} `;
+ 
+
 
   const prompt = new PromptTemplate({
     inputVariables: [
@@ -110,6 +113,7 @@ router.post("/play", jwtHelper.verifyToken,lastActivity,async (req, res,next) =>
     }
     
     const userSession = getUserSession(sessionId, prompt);
+
     const gamecontent = await GameContent.findOne({ mainContent });
 
     const maincontent = gamecontent.mainContent;
@@ -170,6 +174,7 @@ router.post("/play", jwtHelper.verifyToken,lastActivity,async (req, res,next) =>
     await userdatalog.save();
     return res.status(200).json({ response: responseforuser });
   } catch (error) {
+    console.log(error,"inside catch")
     res.status(500).json({ error: "Something went wrong" });
   }
 });

@@ -6,7 +6,7 @@ export default {
       const payload = {};
       const secret = process.env.ACCESS_TOKEN_SECRET;
       const options = {
-        expiresIn: "24d",
+        expiresIn: 200,
         issuer: "ChatterboxAI",
         audience: userId,
       };
