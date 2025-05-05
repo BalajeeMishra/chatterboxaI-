@@ -1,6 +1,7 @@
 
 import 'package:provider/provider.dart';
 
+import '../Screens/ChooseWordScreen/PlayTabooScreenProvider.dart';
 import '../ViewModel/AllGameVm.dart';
 import '../ViewModel/JabberHomeAIvm.dart';
 import '../ViewModel/PlayTabooScreenVM.dart';
@@ -14,4 +15,6 @@ final appProvider = [
   ChangeNotifierProvider<AllGameVm>(create: (context) => AllGameVm(context)),
   ChangeNotifierProvider<TabooGameChatPageVM>(create: (context) => TabooGameChatPageVM(context)),
   ChangeNotifierProvider<PlayTabooScreenVM>(create: (context) => PlayTabooScreenVM(context)),
+  ChangeNotifierProvider<PlayTabooScreenProvider>(create: (context) => PlayTabooScreenProvider()),
+  // ChangeNotifierProvider<CloudTtsProvider>(create: (context) => CloudTtsProvider()),
 ];

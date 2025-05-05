@@ -1,18 +1,21 @@
+
+
 import 'package:http/http.dart'as http;
 import 'package:balajiicode/main.dart';
 import 'package:emoji_regex/emoji_regex.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:provider/provider.dart';
 import '../Model/AllConversationModel.dart';
 import '../Model/AllGameModel.dart';
 import '../Model/TabooGameChatPageModel.dart';
 import '../Repository/TaboogameChatPageRepository.dart';
 import '../Screens/ChooseWordScreen/PlayTabooScreen.dart';
+import '../Screens/ChooseWordScreen/PlayTabooScreenProvider.dart';
 import '../Services/ApiResponseStatus.dart';
 import '../Utils/ShowSnackBar.dart';
 import '../Utils/app_common.dart';
 import '../Utils/app_constants.dart';
-import '../components/tts.dart';
 import '../extensions/shared_pref.dart';
 import 'package:flutter/services.dart';
 class PlayTabooScreenVM extends ChangeNotifier {
@@ -40,15 +43,13 @@ class PlayTabooScreenVM extends ChangeNotifier {
   bool isListening = true;
   bool isBreakLoop = false;
   bool ifDelayOfASecond = false;
-  // List<Map<String,dynamic>> textForBold=[];
-  // int textForBoldIndex = 0;
-
-  // String currentWord='';
-  int currentIndex = 0;
-  int currentParaIndex = 0;
+  List<String> textsForTts=[];
+  int currentParaIndex = -1;
 
 
   bool isPlayScreen = true;
+
+  BuildContext globalContext = navigatorKey.currentContext!;
 
   void setIsPlayScreen(bool val){
     isPlayScreen = val;
@@ -64,10 +65,6 @@ class PlayTabooScreenVM extends ChangeNotifier {
   //   currentWord = word;
   //   notifyListeners();
   // }
-  void setCurrentIndex(int index){
-    currentIndex = index;
-    notifyListeners();
-  }
   void setCurrentParaIndex(int index){
     currentParaIndex = index;
     notifyListeners();
@@ -155,7 +152,6 @@ class PlayTabooScreenVM extends ChangeNotifier {
 
     dynamicDta.add(dataAdd);
     notifyListeners();
-    appStore.setLoading(true);
  print("this is game id ${allGameModel.allGame![index].gameId}");
     try {
       var data = {
@@ -250,88 +246,87 @@ class PlayTabooScreenVM extends ChangeNotifier {
       }
     } catch (e) {
       appStore.setLoading(false);
-
       // EasyLoading.dismiss();
       // MySnackBar.showSnackBar(context, e.toString());
     }
-    appStore.setLoading(false);
+
   }
 
 
-  Future<void> setTtsLanguage(String language) async {
-    String ttsLanguage;
+  // Future<void> setTtsLanguage(String language) async {
+  //   String ttsLanguage;
+  //
+  //   switch (language) {
+  //     case 'Hindi':
+  //       ttsLanguage = 'hi-IN';
+  //       break;
+  //     case 'English':
+  //       ttsLanguage = 'en-US';
+  //       break;
+  //     case 'Bengali':
+  //       ttsLanguage = 'bn-IN';
+  //       break;
+  //     case 'Kannada':
+  //       ttsLanguage = 'kn-IN';
+  //       break;
+  //     case 'Malayalam':
+  //       ttsLanguage = 'ml-IN';
+  //       break;
+  //     case 'Marathi':
+  //       ttsLanguage = 'mr-IN';
+  //       break;
+  //     case 'Nepali':
+  //       ttsLanguage = 'ne-NP';
+  //       break;
+  //     case 'Punjabi':
+  //       ttsLanguage = 'pa-IN';
+  //       break;
+  //     case 'Tamil':
+  //       ttsLanguage = 'ta-IN';
+  //       break;
+  //     case 'Telugu':
+  //       ttsLanguage = 'te-IN';
+  //       break;
+  //     case 'Urdu':
+  //       ttsLanguage = 'ur-IN';
+  //       break;
+  //     case 'Gujarati':
+  //       ttsLanguage = 'gu-IN';
+  //       break;
+  //     default:
+  //       ttsLanguage = 'en-US';
+  //       break;
+  //   }
+  //
+  //   await ttsManager.setLanguage(ttsLanguage);
+  //   //edited by khush
+  //   // await flutterTts.setLanguage(ttsLanguage);
+  // }
 
-    switch (language) {
-      case 'Hindi':
-        ttsLanguage = 'hi-IN';
-        break;
-      case 'English':
-        ttsLanguage = 'en-US';
-        break;
-      case 'Bengali':
-        ttsLanguage = 'bn-IN';
-        break;
-      case 'Kannada':
-        ttsLanguage = 'kn-IN';
-        break;
-      case 'Malayalam':
-        ttsLanguage = 'ml-IN';
-        break;
-      case 'Marathi':
-        ttsLanguage = 'mr-IN';
-        break;
-      case 'Nepali':
-        ttsLanguage = 'ne-NP';
-        break;
-      case 'Punjabi':
-        ttsLanguage = 'pa-IN';
-        break;
-      case 'Tamil':
-        ttsLanguage = 'ta-IN';
-        break;
-      case 'Telugu':
-        ttsLanguage = 'te-IN';
-        break;
-      case 'Urdu':
-        ttsLanguage = 'ur-IN';
-        break;
-      case 'Gujarati':
-        ttsLanguage = 'gu-IN';
-        break;
-      default:
-        ttsLanguage = 'en-US';
-        break;
-    }
-
-    await ttsManager.setLanguage(ttsLanguage);
-    //edited by khush
-    // await flutterTts.setLanguage(ttsLanguage);
-  }
-
-  Future<void> configureTts() async {
-    print("Configuration time ==>" + userStore.userNativeLanguage.toString());
-    // if (userStore.userNativeLanguage.isNotEmpty && userStore.userEnglishProficiency =="Beginner") {
-    //   selectedLanguage = userStore.userNativeLanguage;
-    //   setTtsLanguage(selectedLanguage);
-    // }else{
-    //   print("Amrican");
-    //   await ttsManager.setLanguage('en-US');
-    //   // await flutterTts.se;
-    //
-    //
-    // }
-    await ttsManager.setLanguage('en-US');
-
-    // print("Selectd Language is ==>"+selectedLanguage.toString());
-
-    await ttsManager.setSpeechRate(0.3);
-    await ttsManager.setVolume(1.0);
-    ttsManager.awaitSpeakCompletion(true);
-    //edited by khush
-    // await flutterTts.setLanguage('en-US');
-    // await flutterTts.setSpeechRate(0.3);
-    // await flutterTts.setVolume(1.0);
-  }
+  // Future<void> configureTts() async {
+  //   print("Configuration time ==>" + userStore.userNativeLanguage.toString());
+  //   // if (userStore.userNativeLanguage.isNotEmpty && userStore.userEnglishProficiency =="Beginner") {
+  //   //   selectedLanguage = userStore.userNativeLanguage;
+  //   //   setTtsLanguage(selectedLanguage);
+  //   // }else{
+  //   //   print("Amrican");
+  //   //   await ttsManager.setLanguage('en-US');
+  //   //   // await flutterTts.se;
+  //   //
+  //   //
+  //   // }
+  //   await ttsManager.setLanguage('en-US');
+  //
+  //   // print("Selectd Language is ==>"+selectedLanguage.toString());
+  //
+  //   await ttsManager.setSpeechRate(0.3);
+  //   await ttsManager.setVolume(1.0);
+  //   ttsManager.awaitSpeakCompletion(true);
+  //   //edited by khush
+  //   // await flutterTts.setLanguage('en-US');
+  //   // await flutterTts.setSpeechRate(0.3);
+  //   // await flutterTts.setVolume(1.0);
+  // }
 
   void speakText(String text) async {
     print("Into Vm Calling");
@@ -345,23 +340,21 @@ class PlayTabooScreenVM extends ChangeNotifier {
     // }
     // notifyListeners();
 
-    configureTts();
-    String updatedText = cleanTextForTTS(text);
+    // configureTts();
+    var pro = Provider.of<PlayTabooScreenProvider>(globalContext, listen: false);
+    pro.setIsLoaderShow(true);
+    // String updatedText = cleanTextForTTS(text);
     appStore.setLastWords(text);
     print("text of speaking $text" );
     // estimateTTSDuration(updatedText, 0.3);
-    speakParagraphs(updatedText, ttsManager,0);
-    // setIsListening(false);
-    // increseIndexForBoldText(updatedText,400);
-    // await ttsManager.speak(updatedText);
-    // ttsManager.setCompletionHandler(() {
-    //   print("text completed$isListening");
-    //   setIsListening(true);
-    //   stopSpeaking();
-    //       });
+    splitTextIntoList(text);
 
+    await cloudTtsService.speakTexts(textsForTts);
+    // setIsListening(true);
+    // speakParagraphs(updatedText,0);
 
   }
+
 
   // Future<void> stopSpeaking() async {
   //   setIsListening(true);
@@ -369,63 +362,46 @@ class PlayTabooScreenVM extends ChangeNotifier {
   //   await ttsManager.stop();
   // }
 
-
-  Future<void> speakParagraphs(String text,TTSManager flutterTts,int currentIndex) async {
-    // List<String> paragraphs = text.split(RegExp(r'\n+'));
-     text = cleanTextForTTS(text);
-    List<String> paragraphs = text.split(RegExp(r'(?:\n+|\.)'));
-    paragraphs = paragraphs.where((p) => p.trim().isNotEmpty).toList();
-    print("this is paragraph$paragraphs");
-
-    flutterTts.setCompletionHandler(() {
-      print("Paragraph completed");
-      setIsListening(true);
-    });
-
-    flutterTts.setProgressHandler((word) {
-      setCurrentIndex(currentIndex++);
-    });
-
-    setIsBreakLoop(false);
-    for (int i = 0; i < paragraphs.length; i++) {
-      print("this is break loop bool $isBreakLoop");
-
-      // if (paragraphs[i].trim().isEmpty) continue;
-      if(isBreakLoop) break;
-      setIsListening(false);
-      setCurrentParaIndex(i);
-      if (i == 0) {
-        await Future.delayed(const Duration(milliseconds: 500));
-      }
-
-      await flutterTts.speak(paragraphs[i]);
-      await flutterTts.awaitSpeakCompletion(true);
-      //
-      // ttsManager.setCompletionHandler(() {
-      //   print("text completed$isListening");
-      //   setIsListening(true);
-      // });
-      //
-      // flutterTts.setProgressHandler((word){
-      //   // print("CurrentWord : $word");
-      //   // setCurrentWord(word);
-      //   setCurrentIndex(currentIndex++);
-      // });
-
-      // if(textForBoldIndex<textForBold.length){
-      //   textForBold[textForBoldIndex] = {'text':textForBold[textForBoldIndex++]['text'],'isActive':true};
-      //   notifyListeners();
-      // }
-      // setIsListening(true);
-      if (i < paragraphs.length - 1) {
-        setIsListening(true);
-        setIfDelayOfASecond(true);
-        await Future.delayed(Duration(milliseconds: 750));
-        setIfDelayOfASecond(false);
-      }
-    }
-    setIsListening(true);
+  void splitTextIntoList(String text){
+    text = cleanTextForTTS(text);
+    textsForTts = text.split(RegExp(r'(?:\n+|\.)'));
+    textsForTts = textsForTts.where((p) => p.trim().isNotEmpty).toList();
+    print("this is paragraph$textsForTts");
+    notifyListeners();
   }
+  // Future<void> speakParagraphs(String text,int currentIndex) async {
+  //   // List<String> paragraphs = text.split(RegExp(r'\n+'));
+  //
+  //
+  //   // flutterTts.setCompletionHandler(() {
+  //   //   print("Paragraph completed");
+  //   //   setIsListening(true);
+  //   // });
+  //   //
+  //   // flutterTts.setProgressHandler((word) {
+  //   //   setCurrentIndex(currentIndex++);
+  //   // });
+  //
+  //   setIsBreakLoop(false);
+  //   for (int i = 0; i < text.length; i++) {
+  //     print("this is break loop bool $isBreakLoop");
+  //
+  //     // if (paragraphs[i].trim().isEmpty) continue;
+  //     if(isBreakLoop) break;
+  //     setIsListening(false);
+  //     setCurrentParaIndex(i);
+  //
+  //     // await flutterTts.speak(paragraphs[i]);
+  //     // await flutterTts.awaitSpeakCompletion(true);
+  //     if (i < text.length - 1) {
+  //       setIsListening(true);
+  //       setIfDelayOfASecond(true);
+  //       await Future.delayed(Duration(milliseconds: 750));
+  //       setIfDelayOfASecond(false);
+  //     }
+  //   }
+  //   setIsListening(true);
+  // }
 
   Uint8List? listeningGif;
   Uint8List? talkingGif;

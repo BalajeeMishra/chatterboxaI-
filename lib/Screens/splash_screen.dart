@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 
 import '../Utils/app_colors.dart';
 import '../extensions/app_button.dart';
+import '../main.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -22,6 +23,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+
   }
 
   @override

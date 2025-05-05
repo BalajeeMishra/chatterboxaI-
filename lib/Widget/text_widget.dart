@@ -17,6 +17,7 @@ class MyText extends StatelessWidget {
   final double? minFontSize;
   final double? lineHeight;
   final TextDecoration? textDecoration;
+  final bool? softwrap;
 
   const MyText({
     super.key,
@@ -35,6 +36,7 @@ class MyText extends StatelessWidget {
     this.minFontSize,
     this.lineHeight,
     this.textDecoration,
+    this.softwrap,
   });
 
   @override
@@ -45,6 +47,7 @@ class MyText extends StatelessWidget {
       overflow: overflow,
       maxLines: maxLines ?? defaultTextStyle.maxLines,
       textAlign: textAlign,
+      softWrap: softwrap,
       style: TextStyle(
         decoration: textDecoration,
         height: lineHeight,

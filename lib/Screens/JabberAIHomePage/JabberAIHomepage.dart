@@ -156,27 +156,15 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
                                                 //   ExpiredScreen()
                                                 //       .launch(context);
                                                 // } else {
-
-                                               print("Data: ${data.sId}  ${data.gameName}");
-                                          bool ispop   = await  Navigator.of(context).push(
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            ChooseWordScreen(
-                                                                data.sId!,
-                                                                data.gameName!)));
-                                             if(ispop){
-                                               checkAndShowPopup();
-                                             }
-
                                                 analytics.logEvent(
                                                   name: 'game_selection',
                                                   parameters: {
                                                     'Game_name': data.gameName!,
                                                     'User_id':
-                                                        getStringAsync(USER_ID),
+                                                    getStringAsync(USER_ID),
                                                     'days_since_install':
-                                                        await InstallDateHelper
-                                                            .getDaysSinceInstall()
+                                                    await InstallDateHelper
+                                                        .getDaysSinceInstall()
                                                   },
                                                 ).then((_) {
                                                   print(
@@ -190,10 +178,10 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
                                                   parameters: {
                                                     'Game_name': data.gameName!,
                                                     'User_id':
-                                                        getStringAsync(USER_ID),
+                                                    getStringAsync(USER_ID),
                                                     'days_since_install':
-                                                        await InstallDateHelper
-                                                            .getDaysSinceInstall()
+                                                    await InstallDateHelper
+                                                        .getDaysSinceInstall()
                                                   },
                                                 ).then((_) {
                                                   print(
@@ -203,7 +191,17 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
                                                       'Failed to log event: $error');
                                                 });
 
-                                                // }
+                                               print("Data: ${data.sId}  ${data.gameName}");
+                                          bool ispop   = await  Navigator.of(context).push(
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            ChooseWordScreen(
+                                                                data.sId!,
+                                                                data.gameName!)));
+                                             if(ispop){
+                                               checkAndShowPopup();
+                                             }
+
                                               },
                                               child: Container(
                                                   width:double.infinity,

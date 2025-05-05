@@ -90,7 +90,9 @@ class MainActivity: FlutterActivity() {
 
             override fun onBufferReceived(buffer: ByteArray?) {}
 
-            override fun onEndOfSpeech() {}
+            override fun onEndOfSpeech() {
+
+            }
 
             override fun onError(error: Int) {
                 if (error != SpeechRecognizer.ERROR_CLIENT) { // Ignore client errors (from stop)

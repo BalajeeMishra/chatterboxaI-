@@ -44,6 +44,7 @@ class ShareAndReview{
   }
 
   Future<void> showReviewPopup() async {
+    print("this is review called ");
     if (await inAppReview.isAvailable()) {
       inAppReview.requestReview().then((e){
 

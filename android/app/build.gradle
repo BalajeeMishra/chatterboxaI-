@@ -29,6 +29,12 @@ android {
             keyAlias "key0"
             keyPassword "zapai1"
         }
+        customDebug {
+            storeFile file("D:/chatterboxaI-/zapai.jks")
+            storePassword "zapai1"
+            keyAlias "key0"
+            keyPassword "zapai1"
+        }
     }
     defaultConfig {
         applicationId "com.talkyplay.zapai"
@@ -44,6 +50,9 @@ android {
             minifyEnabled true
             shrinkResources true
             signingConfig signingConfigs.release
+        }
+        debug {
+            signingConfig signingConfigs.customDebug // 👈 use your custom one
         }
     }
 }

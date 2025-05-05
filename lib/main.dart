@@ -12,8 +12,10 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'Cloud tts/cloud_tts.dart';
 import 'Screens/ChooseWordScreen/MicScreen.dart';
 import 'Screens/JabberAIHomePage/JabberAIHomepage.dart';
 import 'Screens/no_internet_screen.dart';
@@ -37,6 +39,7 @@ final facebookAppEvents = FacebookAppEvents();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(
           name: 'jabber-ai',
           options: FirebaseOptions(
@@ -67,6 +70,14 @@ Future<void> main() async {
   runApp(MyApp());
 }
 
+Future<void> requestMicrophonePermission() async {
+  var status = await Permission.microphone.status;
+  if (!status.isGranted) {
+    // Ask for permission
+    await Permission.microphone.request();
+  }
+}
+
 class MyApp extends StatefulWidget {
   static String tag = '/MyApp';
 
@@ -87,6 +98,7 @@ class MyAppState extends State<MyApp> {
   }
 
   void init() async {
+
     _connectivitySubscription =
         Connectivity().onConnectivityChanged.listen((e) {
       if (e.contains(ConnectivityResult.none)) {
@@ -121,7 +133,7 @@ class MyAppState extends State<MyApp> {
         home: getStringAsync(TOKEN).toString().isEmpty
             ? SplashScreen()
             : JabberAIHomepage(),
-        // home: SpeechScreen(),
+        // home: TTSExample(),
         localizationsDelegates: [
           CountryLocalizations.delegate,
         ],

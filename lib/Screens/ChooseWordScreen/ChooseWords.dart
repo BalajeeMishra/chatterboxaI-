@@ -16,7 +16,6 @@ import '../../Utils/app_colors.dart';
 import '../../Utils/app_common.dart';
 import '../../Utils/app_constants.dart';
 import '../../ViewModel/AllGameVm.dart';
-import '../../components/tts.dart';
 import '../../extensions/loader_widget.dart';
 import '../../extensions/shared_pref.dart';
 import '../../main.dart';
@@ -39,12 +38,15 @@ class _ChooseWordScreen extends State<ChooseWordScreen> {
   @override
   void initState() {
     super.initState();
+    initCloudTTS();
     Provider.of<AllGameVm>(context, listen: false).seInitialValue();
     Provider.of<AllGameVm>(context, listen: false)
         .allGamePageAPI(context, widget.dataId);
 
   }
-
+  initCloudTTS()async{
+    await cloudTtsService.initialize();
+  }
   timerFunction() {
     print("Timer function calling");
     int elapsedSeconds = 0;
@@ -58,8 +60,7 @@ class _ChooseWordScreen extends State<ChooseWordScreen> {
         print("Into iF");
         userStore.setTTSPlaying("NO");
         vm.setIsBreakLoop(true);
-        await ttsManager.stop();
-        await ttsManager.stopAndReset();
+        // cloudTtsService.stop();
         print("Condition met. Stopping TTS and timer.");
         timer.cancel();
       }
@@ -164,7 +165,8 @@ class _ChooseWordScreen extends State<ChooseWordScreen> {
                                                               )));
 
                                               if (res == true) {
-                                                await ttsManager.stopAndReset();
+                                                // await ttsManager.stopAndReset();
+                                                // cloudTtsService.stop();
                                                 timerFunction();
                                               }
                                               analytics.logEvent(
