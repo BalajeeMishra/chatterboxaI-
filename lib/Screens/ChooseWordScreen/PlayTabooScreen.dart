@@ -1314,7 +1314,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                   ),
                 ).animate().fadeIn(duration: 300.ms),
               Positioned(
-                bottom: 15,
+                bottom: 25,
                 child: GestureDetector(
                   onTap: provider.isLocked
                       ? (){

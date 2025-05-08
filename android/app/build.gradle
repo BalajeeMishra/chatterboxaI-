@@ -41,8 +41,8 @@ android {
         minSdk 23
         targetSdkVersion 34
         multiDexEnabled true
-        versionCode 11
-        versionName "1.1"
+        versionCode 15
+        versionName "1.2"
     }
 
     buildTypes {
@@ -52,7 +52,7 @@ android {
             signingConfig signingConfigs.release
         }
         debug {
-            signingConfig signingConfigs.customDebug // 👈 use your custom one
+            signingConfig signingConfigs.customDebug
         }
     }
 }
