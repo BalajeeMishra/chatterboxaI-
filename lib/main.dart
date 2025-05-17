@@ -132,7 +132,7 @@ class MyAppState extends State<MyApp> {
         debugShowCheckedModeBanner: false,
         home: getStringAsync(TOKEN).toString().isEmpty
             ? SplashScreen()
-            : JabberAIHomepage(),
+            :JabberAIHomepage(),
         // home: TTSExample(),
         localizationsDelegates: [
           CountryLocalizations.delegate,

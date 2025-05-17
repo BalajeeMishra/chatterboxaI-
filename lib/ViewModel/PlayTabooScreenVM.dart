@@ -477,11 +477,12 @@ class PlayTabooScreenVM extends ChangeNotifier {
   //
   String cleanTextForTTS(String text) {
     String textWithoutEmojis = text.replaceAll(emojiRegex(), "");
-    String textWithoutdoubleQuat = textWithoutEmojis.replaceAll("\"", "");
-    String textWithoutSingleQuat = textWithoutdoubleQuat.replaceAll(RegExp(r"[‘’']"), "");
+    // String textWithoutSpecialQuotes = textWithoutEmojis.replaceAll(RegExp(r"[‘’]"), ""); // only fancy quotes
+    String textWithoutDoubleQuotes = textWithoutEmojis.replaceAll("\"", "");
+    String cleanedText = textWithoutDoubleQuotes.replaceAll(RegExp(r'\*+'), "");
+    print("this is cleaned text $cleanedText");
+    return cleanedText;
 
-
-    return textWithoutSingleQuat.replaceAll(RegExp(r'\*+'), '');
   }
 
 }
