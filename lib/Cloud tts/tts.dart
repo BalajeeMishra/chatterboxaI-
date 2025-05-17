@@ -131,6 +131,8 @@ class GoogleCloudTTSService {
     if (!_isInitialized) {
       await initialize();
     }
+    await deleteFiles(ttsFilePaths);
+    print("length of filepath ${ttsFilePaths.length}");
     ttsFilePaths.clear();
     _audioFileQueue.clear();
 
@@ -221,6 +223,21 @@ class GoogleCloudTTSService {
       throw Exception('Failed to get TTS: ${response.body}');
     }
   }
+
+
+  Future<void> deleteFiles(List<String> filePaths) async {
+    for (String path in filePaths) {
+      final file = File(path);
+
+      if (await file.exists()) {
+        await file.delete();
+        print("Deleted: $path");
+      } else {
+        print("File not found: $path");
+      }
+    }
+  }
+
 
   void dispose() {
     audioPlayer.dispose();
