@@ -6,6 +6,7 @@ class MyText extends StatelessWidget {
   final double? fontSize;
   final FontWeight? fontWeight;
   final Color? color;
+  final Color? decorationcolor;
   final TextOverflow? overflow;
   final TextOverflow? textOverflow;
   final int? maxLines;
@@ -37,6 +38,7 @@ class MyText extends StatelessWidget {
     this.lineHeight,
     this.textDecoration,
     this.softwrap,
+    this.decorationcolor
   });
 
   @override
@@ -50,6 +52,7 @@ class MyText extends StatelessWidget {
       softWrap: softwrap,
       style: TextStyle(
         decoration: textDecoration,
+        decorationColor: decorationcolor,
         height: lineHeight,
         overflow: textOverflow,
         fontSize: fontSize ?? 16,

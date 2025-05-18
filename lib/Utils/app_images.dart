@@ -13,4 +13,8 @@ const share_logo = "assets/images/share_logo.png";
 const sharePopupImage = "assets/images/sharePopupImage.png";
 const share_backgorund_dialogue = "assets/images/share_backgorund_dialogue.png";
 const home_share_logo = "assets/images/home_share_logo.png";
+const google_logo = "assets/images/google.png";
+const zapAIAvtar = "assets/images/zapAIAvtar.png";
+const zapai2 = "assets/images/zapai2.png";
+
 

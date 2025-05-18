@@ -203,40 +203,40 @@ class _AccountScreenState extends State<AccountScreen> {
                       ],
                     ).paddingSymmetric(horizontal: 0, vertical: 4),
                     4.height,
-                    DropdownSearch<String>(
-                      key: dropDownKey,
-                      items: (String filter, LoadProps? loadProps) async {
-                        if (filter.isEmpty) {
-                          return languageList;
-                        } else {
-                          return languageList
-                              .where((language) => language
-                              .toLowerCase()
-                              .contains(filter.toLowerCase()))
-                              .toList();
-                        }
-                      },
-                      selectedItem: selectedLanguage,
-                      popupProps: PopupProps.menu(
-                        showSearchBox: true,
-                        searchFieldProps: TextFieldProps(
-                          decoration:
-                          InputDecoration(hintText: 'Search Language'),
-                        ),
-                        emptyBuilder: (context, searchEntry) {
-                          return Text('No Language available').center();
-                        },
-                      ),
-                      onChanged: (String? value) {
-                        setState(() {
-                          selectedLanguage = value!;
-                        });
-                      },
-                      decoratorProps: DropDownDecoratorProps(
-                        decoration: defaultInputDecoration(
-                            context), // Applying the decoration here
-                      ),
-                    ).paddingSymmetric(horizontal: 0, vertical: 4),
+                    // DropdownSearch<String>(
+                    //   key: dropDownKey,
+                    //   items: (String filter, LoadProps? loadProps) async {
+                    //     if (filter.isEmpty) {
+                    //       return languageList;
+                    //     } else {
+                    //       return languageList
+                    //           .where((language) => language
+                    //           .toLowerCase()
+                    //           .contains(filter.toLowerCase()))
+                    //           .toList();
+                    //     }
+                    //   },
+                    //   selectedItem: selectedLanguage,
+                    //   popupProps: PopupProps.menu(
+                    //     showSearchBox: true,
+                    //     searchFieldProps: TextFieldProps(
+                    //       decoration:
+                    //       InputDecoration(hintText: 'Search Language'),
+                    //     ),
+                    //     emptyBuilder: (context, searchEntry) {
+                    //       return Text('No Language available').center();
+                    //     },
+                    //   ),
+                    //   onChanged: (String? value) {
+                    //     setState(() {
+                    //       selectedLanguage = value!;
+                    //     });
+                    //   },
+                    //   decoratorProps: DropDownDecoratorProps(
+                    //     decoration: defaultInputDecoration(
+                    //         context), // Applying the decoration here
+                    //   ),
+                    // ).paddingSymmetric(horizontal: 0, vertical: 4),
                     16.height,
                     Row(
                       children: [

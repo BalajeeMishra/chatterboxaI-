@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../extensions/extension_util/widget_extensions.dart';
 import '../Screens/otp_screen.dart';
+import '../authentication/otp_verification_screen.dart';
 import '../extensions/shared_pref.dart';
 import '../extensions/system_utils.dart';
 import '../main.dart';
@@ -36,12 +38,12 @@ String country,
     timeout: Duration(minutes: 1),
     codeSent: (String verificationId, int? resendToken) async {
       finish(context);
-      OtpScreen(
+      OTPVerification(
         country: country,
         verificationId: verificationId,
         mobileNumber: phoneNumber,
-
       ).launch(context);
+
     },
     codeAutoRetrievalTimeout: (String verificationId) {
       //
@@ -70,4 +72,26 @@ Future<void> logout(BuildContext context, {Function? onLogout}) async {
   userStore.clearUserData();
   userStore.setLogin(false);
   onLogout?.call();
+}
+
+
+
+Future<UserCredential?> signInWithGoogle() async {
+  try {
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+    if (googleUser == null) return null;
+
+    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    return await FirebaseAuth.instance.signInWithCredential(credential);
+  } catch (e) {
+    print("Google sign-in error: $e");
+    return null;
+  }
 }

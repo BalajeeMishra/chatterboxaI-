@@ -1,10 +1,9 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:balajiicode/Screens/Account/account_screen.dart';
+import 'package:balajiicode/authentication/profile_details_screen.dart';
 import 'package:balajiicode/providers/providers.dart';
 import 'package:balajiicode/store/UserStore/UserStore.dart';
 import 'package:balajiicode/store/app_store.dart';
-import 'package:balajiicode/stt/demo_speech.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -15,15 +14,14 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'Cloud tts/cloud_tts.dart';
-import 'Screens/ChooseWordScreen/MicScreen.dart';
 import 'Screens/JabberAIHomePage/JabberAIHomepage.dart';
 import 'Screens/no_internet_screen.dart';
-import 'Screens/profile_screen.dart';
 import 'Screens/splash_screen.dart';
 import 'Utils/app_common.dart';
 import 'Utils/app_config.dart';
 import 'Utils/app_constants.dart';
+import 'authentication/login_screen.dart';
+import 'authentication/add_phone.dart';
 import 'extensions/common.dart';
 import 'extensions/shared_pref.dart';
 import 'extensions/system_utils.dart';
@@ -130,10 +128,10 @@ class MyAppState extends State<MyApp> {
         navigatorKey: navigatorKey,
         title: APP_NAME,
         debugShowCheckedModeBanner: false,
-        home: getStringAsync(TOKEN).toString().isEmpty
-            ? SplashScreen()
-            :JabberAIHomepage(),
-        // home: TTSExample(),
+        // home: getStringAsync(TOKEN).toString().isEmpty
+        //     ? SplashScreen()
+        //     :JabberAIHomepage(),
+        home:LoginScreen(),
         localizationsDelegates: [
           CountryLocalizations.delegate,
         ],
