@@ -2,12 +2,16 @@ import { Router } from "express";
 import User from "../model/User.js";
 import jwtHelper from "../helper/jwt_helper.js";
 import UserLog from "../model/logs.js";
+import { OAuth2Client } from 'google-auth-library';
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
 
 const router = Router();
 
 router.post("/register", async (req, res, next) => {
   try {
-    const { name,nativeLanguage, country, mobileNo, engprolevel } =
+    const { name,nativeLanguage, country, mobileNo, engprolevel,email } =
       req.body;
     const newUser = new User({
       name,
@@ -15,6 +19,7 @@ router.post("/register", async (req, res, next) => {
       country,
       mobileNo,
       engprolevel,
+      email
     });
     const accessToken = await jwtHelper.signAccessToken(newUser.id);
     await newUser.save();
@@ -183,5 +188,46 @@ router.get("/currentuser",jwtHelper.verifyToken,async(req,res)=>{
       throw err;
     }
 })
+
+// router.get('/google',
+//   passport.authenticate('google', { scope: ['profile'] }));
+
+// router.get('/google/callback', 
+//   passport.authenticate('google', { failureRedirect: '/login' }),
+//   function(req, res) {
+//     // Successful authentication, redirect home.
+//     res.redirect('/');
+//   });
+
+// Route to handle token
+
+
+router.post('/auth/google', async (req, res) => {
+  const { idToken } = req.body;
+
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const {  email, name } = payload;
+
+    // Check or create user
+    let user = await User.findOne({ email });
+    
+    if(user){
+      const accessToken = await jwtHelper.signAccessToken(user.id);
+      return res.status(200).json({message: "Login successful", accessToken, user });
+    }
+   return res.status(200).json({message:"Token verified", user: { name, email } });
+  } catch (err) {
+    res.status(401).json({ message: "Invalid ID token" });
+  }
+});
+
+
+
 
 export default router;
