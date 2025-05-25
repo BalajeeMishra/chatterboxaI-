@@ -64,8 +64,9 @@ function getUserSession(session, prompt) {
 router.post("/play", jwtHelper.verifyToken,lastActivity,async (req, res,next) => {
   // nativelanguage, listofword, firstword
   // let { question, userId, session,firstword } = req.body;
-  let { sessionId, mainContent, question, gameId,modality,completetheanswer } = req.body;
- 
+  let { sessionId, mainContent, question, gameId,modality } = req.body;
+
+
   const userId = req.userId;
   let history = "";
 
@@ -133,9 +134,7 @@ router.post("/play", jwtHelper.verifyToken,lastActivity,async (req, res,next) =>
       human_input: "",
     });
    
-    if (completetheanswer) {
-       return res.status(200).json({ response: { text: response.text } });
-    }
+    
 
     await userSession.memory.saveContext(
       { input: question },
@@ -181,6 +180,71 @@ router.post("/play", jwtHelper.verifyToken,lastActivity,async (req, res,next) =>
     res.status(500).json({ error: "Something went wrong" });
   }
 });
+
+
+
+router.post("/completetheanswer", jwtHelper.verifyToken,lastActivity,async (req, res,next) => {
+
+  let { sessionId, mainContent, question, gameId } = req.body;
+
+
+  const userId = req.userId;
+
+
+  const user = await User.findById(userId);
+  
+  const promptTemplate = await Prompt.findOne({
+    gameId,
+    engprolevel: user.engprolevel,
+  });
+
+  const promptTemplateContent = promptTemplate.content;
+
+  const template = `User native language is {nativeLanguage}. user is from this ${user.country}. user name is ${user.name}. maincontent is {maincontent}. detailofcontent is {detailOfContent}. User english proficiency is ${user.engprolevel}. ${promptTemplateContent} Previous conversation:
+{chat_history} On the basis of Previous AI response user wants to give the answer but finding diificult to give answer. They have written something as answer to previous AI response: {question} You need to complete the answer.  `;
+ 
+
+
+  const prompt = new PromptTemplate({
+    inputVariables: [
+      "question",
+      "nativeLanguage",
+      "maincontent",
+      "detailOfContent",
+      "chat_history",
+    ],
+    template: template,
+  });
+
+  
+  try {
+    const userSession = getUserSession(sessionId, prompt);
+
+    const gamecontent = await GameContent.findOne({ mainContent });
+
+    const maincontent = gamecontent.mainContent;
+    const detailOfContent = gamecontent.detailOfContent;
+
+    const nativeLanguage = user.nativeLanguage;
+
+   
+
+    const response = await userSession.chain.invoke({
+      question: question,
+      maincontent: maincontent,
+      detailOfContent: detailOfContent,
+      nativeLanguage: nativeLanguage,
+      chat_history: userSession.history ?? "",
+      human_input: "",
+    });
+   
+    return res.status(200).json({text:response.text} );
+  } catch (error) {
+    res.status(500).json({ error: "Something went wrong" });
+  }
+});
+
+
 
 
 router.post("/correctsentance", jwtHelper.verifyToken, async (req, res) => {
