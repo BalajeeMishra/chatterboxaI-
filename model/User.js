@@ -3,8 +3,6 @@ import mongoose from "mongoose";
 const userSchema = new mongoose.Schema({
     mobileNo:{
         type:String, 
-        unique:true,
-        required: true
     },
     name: {
         type: String,
