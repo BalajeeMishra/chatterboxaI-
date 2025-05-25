@@ -64,7 +64,7 @@ function getUserSession(session, prompt) {
 router.post("/play", jwtHelper.verifyToken,lastActivity,async (req, res,next) => {
   // nativelanguage, listofword, firstword
   // let { question, userId, session,firstword } = req.body;
-  let { sessionId, mainContent, question, gameId,modality } = req.body;
+  let { sessionId, mainContent, question, gameId,modality,completetheanswer } = req.body;
  
   const userId = req.userId;
   let history = "";
@@ -132,6 +132,10 @@ router.post("/play", jwtHelper.verifyToken,lastActivity,async (req, res,next) =>
       chat_history: userSession.history ?? "",
       human_input: "",
     });
+   
+    if (completetheanswer) {
+       return res.status(200).json({ response: { text: response.text } });
+    }
 
     await userSession.memory.saveContext(
       { input: question },
@@ -174,7 +178,6 @@ router.post("/play", jwtHelper.verifyToken,lastActivity,async (req, res,next) =>
     await userdatalog.save();
     return res.status(200).json({ response: responseforuser });
   } catch (error) {
-    console.log(error,"inside catch")
     res.status(500).json({ error: "Something went wrong" });
   }
 });
