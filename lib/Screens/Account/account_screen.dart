@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:balajiicode/Screens/Account/delete_account_screen.dart';
+import 'package:balajiicode/Services/auth_service.dart';
 import 'package:balajiicode/Services/network/http_client.dart';
 import 'package:balajiicode/ShareAndReview/share_and_review.dart';
 import 'package:balajiicode/Utils/app_images.dart';
@@ -22,6 +23,7 @@ import '../../Widget/appbar.dart';
 import '../../Widget/text_gradient.dart';
 import '../../extensions/loader_widget.dart';
 import '../../main.dart';
+import '../authentication/login_screen.dart';
 
 
 class AccountScreen extends StatefulWidget {
@@ -52,16 +54,17 @@ class _AccountScreenState extends State<AccountScreen> {
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
         backgroundColor: Colors.grey.shade100,
-        title: GradientText(
-          "Account",
-          style: TextStyle(fontWeight: FontWeight.bold),
-          softWrap: false,
-          ),
+        title: MyText(
+         text:  "Account",
+          fontWeight: FontWeight.bold,
+          softwrap: false,
+          ).withGradient(),
         centerTitle: true,
-        leading:  GradientIcon(ontap: (){
-          pop();
-        }, icon: Icons.close),
-
+        leading:  InkWell(onTap:()=>pop(),child: Icon(Icons.close).withGradient()),
+        actions: [IconButton(onPressed: (){
+          logout(context);
+          LoginScreen().launch(context);
+        }, icon: Icon(Icons.logout))],
       ),
 
       body: Stack(
@@ -168,7 +171,7 @@ class _AccountScreenState extends State<AccountScreen> {
                            Expanded(
                              child: MyText(
                               text:  "Important: Deleting Your Account Is Permanent. All Your Progress And Data Will Be Erased And Cannot Be Recovered.",
-                              color: Colors.grey, fontSize: 12,
+                              fontSize: 12,
                              ),
                            ),
                          ],
@@ -249,6 +252,7 @@ class _AccountScreenState extends State<AccountScreen> {
       final Map<String, dynamic> responseData = jsonDecode(response.body);
       if (status == ApiResponseStatus.success) {
         final data = responseData["user"]["name"];
+        // print(responseData['user'])
          name = data;
         setState(() {
 

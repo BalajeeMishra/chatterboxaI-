@@ -25,6 +25,7 @@ class Response {
   String? engProLevel;
   String? modality;
   int? count;
+  String?text;
   // String? sId;
   // int? iV;
 
@@ -35,7 +36,8 @@ class Response {
       this.sessionId,
       this.engProLevel,
       this.modality,
-      this.count
+      this.count,
+        this.text,
       // this.sId,
       // this.iV
       });
@@ -48,6 +50,7 @@ class Response {
     engProLevel = json['engprolevel'];
     modality = json['modality'];
     count = json['count'];
+    text = json['text'];
     // sId = json['_id'];
     // iV = json['__v'];
   }
@@ -61,6 +64,7 @@ class Response {
     data['engprolevel'] = engProLevel;
     data['modality'] = modality;
     data['count'] = count;
+    data['text'] = text;
     // data['_id'] = sId;
     // data['__v'] = iV;
     return data;

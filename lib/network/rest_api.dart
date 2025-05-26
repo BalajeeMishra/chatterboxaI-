@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import '../Model/AllConversationModel.dart';
 import '../Model/CheckMobileNumberResponse.dart';
 import '../Model/CheckStatusModel.dart';
@@ -33,6 +35,11 @@ Future<CheckPhoneNumberResponse> mobileNumberCheckApi(
       await buildHttpResponse('user/checkphoneno',
           request: req, method: HttpMethod.POST)));
 }
+Future <CheckPhoneNumberResponse>emailCheckApi(Map req)async{
+  return CheckPhoneNumberResponse.fromJson(await handleResponse(
+      await buildHttpResponse('user/auth/google',
+      request: req, method: HttpMethod.POST)));
+}
 
 Future<UpdateProficiencyModel> updateProficiencyApi(
   Map req,
@@ -42,10 +49,24 @@ Future<UpdateProficiencyModel> updateProficiencyApi(
           request: req, method: HttpMethod.PUT)));
 }
 
-Future<CorrectSentenceModel> correctSentenceApi(
-  Map req,
-) async {
-  return CorrectSentenceModel.fromJson(await handleResponse(
-      await buildHttpResponse('correctsentance',
-          request: req, method: HttpMethod.POST)));
+Future<CorrectSentenceModel?> correctSentenceApi(Map req) async {
+  CorrectSentenceModel model = CorrectSentenceModel(
+    response: Response(text: req['sentence'])
+  );
+  try {
+    final response = await handleResponse(
+      await buildHttpResponse('correctsentance', request: req, method: HttpMethod.POST),
+    ).timeout(Duration(seconds: 3));
+
+    print("return corrected sentence");
+    final model1 =  CorrectSentenceModel.fromJson(response);
+    print(model1.response!.text);
+    return model1;
+  } on TimeoutException {
+    print("⏱️ Request timed out after 3 seconds.");
+    return model;
+  } catch (e) {
+    print("❌ Other error: $e");
+    return model;
+  }
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:balajiicode/extensions/app_button.dart';
+import 'package:balajiicode/extensions/colors.dart';
 import 'package:balajiicode/extensions/decorations.dart';
 import 'package:balajiicode/extensions/extension_util/int_extensions.dart';
 import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
@@ -262,7 +263,7 @@ class _YoutubeVideoPlayerScreenState extends State<YoutubeVideoPlayerScreen> {
                         ),
                         MyText(
                           text: 'Replay',
-                          color: Colors.white,
+                          color: whiteColor,
                         ),
                        SizedBox(height:  MediaQuery.of(context).size.height*(180/744),),
                         Text(

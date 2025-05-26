@@ -23,6 +23,7 @@ class User {
   String? sId;
   String? mobileNo;
   String? name;
+  String ?email;
   int? age;
   String? nativeLanguage;
   bool? verified;
@@ -49,12 +50,15 @@ class User {
         this.iV,
         this.lastActive,
         // this.createdAt,
-        this.updatedAt,});
+        this.updatedAt,
+        this.email
+      });
 
   User.fromJson(Map<String, dynamic> json) {
     sId = json['_id'];
     mobileNo = json['mobileNo'];
     name = json['name'];
+    email = json['email'];
     age = json['age'];
     nativeLanguage = json['nativeLanguage'];
     verified = json['verified'];
@@ -73,6 +77,7 @@ class User {
     data['_id'] = sId;
     data['mobileNo'] = mobileNo;
     data['name'] = name;
+    data['email']= email;
     data['age'] = age;
     data['nativeLanguage'] = nativeLanguage;
     data['verified'] = verified;

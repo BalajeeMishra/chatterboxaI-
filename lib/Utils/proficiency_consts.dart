@@ -1,6 +1,6 @@
 
 
-import '../authentication/profile_details_screen.dart';
+import '../Screens/authentication/profile_details_screen.dart';
 
 final List<Language> languages = [
   Language(englishName: 'Mandarin Chinese', nativeName: '中文'),

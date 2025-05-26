@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
 
+import 'package:balajiicode/Screens/authentication/login_screen.dart';
 import 'package:balajiicode/Screens/splash_screen.dart';
 import 'package:balajiicode/Services/auth_service.dart';
 import 'package:balajiicode/Utils/app_colors.dart';
@@ -167,7 +168,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
               16.height,
               OutlinedButton(
                 onPressed: () {
-                 !isDeleted? pop(): Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>SplashScreen()),(route)=>false );
+                 !isDeleted? pop(): Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>LoginScreen()),(route)=>false );
                 },
                 style: OutlinedButton.styleFrom(
                   minimumSize: Size(double.infinity, 50),
@@ -193,14 +194,14 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                        valueColor: AlwaysStoppedAnimation<Color>(redColor),
                         strokeWidth: 4,
                       ),
                       SizedBox(height: 16),
                       MyText(
                        text:  "Account Deletion In Progress",
 
-                          color: Colors.red,
+                          color: redColor,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),

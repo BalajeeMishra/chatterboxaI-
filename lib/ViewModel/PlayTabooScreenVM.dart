@@ -11,7 +11,7 @@ import '../Model/AllGameModel.dart';
 import '../Model/TabooGameChatPageModel.dart';
 import '../Repository/TaboogameChatPageRepository.dart';
 import '../Screens/ChooseWordScreen/PlayTabooScreen.dart';
-import '../Screens/ChooseWordScreen/PlayTabooScreenProvider.dart';
+import '../Screens/ChooseWordScreen/Providers/PlayTabooScreenProvider.dart';
 import '../Services/ApiResponseStatus.dart';
 import '../Utils/ShowSnackBar.dart';
 import '../Utils/app_common.dart';
@@ -44,8 +44,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
   bool isBreakLoop = false;
   bool ifDelayOfASecond = false;
   List<String> textsForTts=[];
-  int currentParaIndex = -1;
-
+    ValueNotifier<int> currentParaIndex = ValueNotifier<int>(-1);
 
   bool isPlayScreen = true;
 
@@ -60,13 +59,8 @@ class PlayTabooScreenVM extends ChangeNotifier {
 
 
 
-
-  // void setCurrentWord(String word){
-  //   currentWord = word;
-  //   notifyListeners();
-  // }
   void setCurrentParaIndex(int index){
-    currentParaIndex = index;
+    currentParaIndex.value = index;
     notifyListeners();
   }
 
@@ -83,11 +77,6 @@ class PlayTabooScreenVM extends ChangeNotifier {
     isBreakLoop = val;
     notifyListeners();
   }
-  // void clearTextForBold(){
-  //   textForBold = [];
-  //   textForBoldIndex= 0;
-  //   notifyListeners();
-  // }
 
 
   seInitialValue(AllGameModel allGameModel, int index, String sessionId) {
@@ -164,7 +153,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
 
       ApiResponse<TabooGameChatPageModel> response =
           await _tabooGameChatPageRepository
-              .tabooGameChatPageApiCallFunction(data);
+              .tabooGameChatPageApiCallFunction(data:data);
 
 
       switch (response.status) {
@@ -188,17 +177,6 @@ class PlayTabooScreenVM extends ChangeNotifier {
           userStore.setTTSPlaying("YES");
           print("is yes" + userStore.isTTSPlaying.toString());
 
-          // if (!isFirstCall) {
-          //   speakText(response.data!.response!.aiResponse!.last);
-          // } else {
-          //   isFirstCall = false;
-          // }
-          // print("Is First call$isFirstCall");
-          // print("Is Mute ??/$isMuted");
-          //
-          // if (isMuted) {
-          //   stopSpeaking();
-          // }
           gameEventManager = GameEventManager(currentSessionId: sessionId);
           if (isFirst == false) {
             await gameEventManager.saveGameEvent(
@@ -216,14 +194,11 @@ class PlayTabooScreenVM extends ChangeNotifier {
         case ApiResponseStatus.badRequest:
           appStore.setLoading(false);
 
-          // EasyLoading.dismiss();
-          // MySnackBar.showSnackBar(context, response.error!.responseMsg!);
           break;
         case ApiResponseStatus.unauthorized:
-          // EasyLoading.dismiss();
+
           appStore.setLoading(false);
 
-          // MySnackBar.showSnackBar(context, response.error!.responseMsg!);
           break;
         case ApiResponseStatus.notFound:
           // EasyLoading.dismiss();
@@ -253,94 +228,11 @@ class PlayTabooScreenVM extends ChangeNotifier {
   }
 
 
-  // Future<void> setTtsLanguage(String language) async {
-  //   String ttsLanguage;
-  //
-  //   switch (language) {
-  //     case 'Hindi':
-  //       ttsLanguage = 'hi-IN';
-  //       break;
-  //     case 'English':
-  //       ttsLanguage = 'en-US';
-  //       break;
-  //     case 'Bengali':
-  //       ttsLanguage = 'bn-IN';
-  //       break;
-  //     case 'Kannada':
-  //       ttsLanguage = 'kn-IN';
-  //       break;
-  //     case 'Malayalam':
-  //       ttsLanguage = 'ml-IN';
-  //       break;
-  //     case 'Marathi':
-  //       ttsLanguage = 'mr-IN';
-  //       break;
-  //     case 'Nepali':
-  //       ttsLanguage = 'ne-NP';
-  //       break;
-  //     case 'Punjabi':
-  //       ttsLanguage = 'pa-IN';
-  //       break;
-  //     case 'Tamil':
-  //       ttsLanguage = 'ta-IN';
-  //       break;
-  //     case 'Telugu':
-  //       ttsLanguage = 'te-IN';
-  //       break;
-  //     case 'Urdu':
-  //       ttsLanguage = 'ur-IN';
-  //       break;
-  //     case 'Gujarati':
-  //       ttsLanguage = 'gu-IN';
-  //       break;
-  //     default:
-  //       ttsLanguage = 'en-US';
-  //       break;
-  //   }
-  //
-  //   await ttsManager.setLanguage(ttsLanguage);
-  //   //edited by khush
-  //   // await flutterTts.setLanguage(ttsLanguage);
-  // }
 
-  // Future<void> configureTts() async {
-  //   print("Configuration time ==>" + userStore.userNativeLanguage.toString());
-  //   // if (userStore.userNativeLanguage.isNotEmpty && userStore.userEnglishProficiency =="Beginner") {
-  //   //   selectedLanguage = userStore.userNativeLanguage;
-  //   //   setTtsLanguage(selectedLanguage);
-  //   // }else{
-  //   //   print("Amrican");
-  //   //   await ttsManager.setLanguage('en-US');
-  //   //   // await flutterTts.se;
-  //   //
-  //   //
-  //   // }
-  //   await ttsManager.setLanguage('en-US');
-  //
-  //   // print("Selectd Language is ==>"+selectedLanguage.toString());
-  //
-  //   await ttsManager.setSpeechRate(0.3);
-  //   await ttsManager.setVolume(1.0);
-  //   ttsManager.awaitSpeakCompletion(true);
-  //   //edited by khush
-  //   // await flutterTts.setLanguage('en-US');
-  //   // await flutterTts.setSpeechRate(0.3);
-  //   // await flutterTts.setVolume(1.0);
-  // }
 
   void speakText(String text) async {
     print("Into Vm Calling");
 
-    // clearTextForBold();
-    // text = text.replaceAll(RegExp(r'\*\*'), '');
-    // List<String> res = text.split(RegExp(r'\n+'));
-    // for(String i in res){
-    //   print("this is I $i");
-    //   textForBold.add({'text':i,'isActive':false});
-    // }
-    // notifyListeners();
-
-    // configureTts();
     var pro = Provider.of<PlayTabooScreenProvider>(globalContext, listen: false);
     pro.setIsLoaderShow(true);
     // String updatedText = cleanTextForTTS(text);
@@ -350,17 +242,11 @@ class PlayTabooScreenVM extends ChangeNotifier {
     splitTextIntoList(text);
 
     await cloudTtsService.speakTexts(textsForTts);
-    // setIsListening(true);
-    // speakParagraphs(updatedText,0);
+
 
   }
 
 
-  // Future<void> stopSpeaking() async {
-  //   setIsListening(true);
-  //   // setIsBreakLoop(true);
-  //   await ttsManager.stop();
-  // }
 
   void splitTextIntoList(String text){
     text = cleanTextForTTS(text);
@@ -369,39 +255,7 @@ class PlayTabooScreenVM extends ChangeNotifier {
     print("this is paragraph$textsForTts");
     notifyListeners();
   }
-  // Future<void> speakParagraphs(String text,int currentIndex) async {
-  //   // List<String> paragraphs = text.split(RegExp(r'\n+'));
-  //
-  //
-  //   // flutterTts.setCompletionHandler(() {
-  //   //   print("Paragraph completed");
-  //   //   setIsListening(true);
-  //   // });
-  //   //
-  //   // flutterTts.setProgressHandler((word) {
-  //   //   setCurrentIndex(currentIndex++);
-  //   // });
-  //
-  //   setIsBreakLoop(false);
-  //   for (int i = 0; i < text.length; i++) {
-  //     print("this is break loop bool $isBreakLoop");
-  //
-  //     // if (paragraphs[i].trim().isEmpty) continue;
-  //     if(isBreakLoop) break;
-  //     setIsListening(false);
-  //     setCurrentParaIndex(i);
-  //
-  //     // await flutterTts.speak(paragraphs[i]);
-  //     // await flutterTts.awaitSpeakCompletion(true);
-  //     if (i < text.length - 1) {
-  //       setIsListening(true);
-  //       setIfDelayOfASecond(true);
-  //       await Future.delayed(Duration(milliseconds: 750));
-  //       setIfDelayOfASecond(false);
-  //     }
-  //   }
-  //   setIsListening(true);
-  // }
+
 
   Uint8List? listeningGif;
   Uint8List? talkingGif;
@@ -445,39 +299,9 @@ class PlayTabooScreenVM extends ChangeNotifier {
     }
     return null;
   }
-  //Track index for bold text
-  // int currentIndex = 0;
 
-  // Future<void> increseIndexForBoldText(String text,int timeForDelay) async {
-  //   List<String> words = text.split(' ');
-  //
-  //     currentIndex = 0;
-  //
-  //     notifyListeners();
-  //
-  //   for (int i = 0; i < words.length; i++) {
-  //     await Future.delayed(Duration(milliseconds: timeForDelay));
-  //     if(ifDelayOfASecond){
-  //       await Future.delayed(Duration(milliseconds: 1500));
-  //     }
-  //
-  //       currentIndex++;
-  //       notifyListeners();
-  //   }
-  // }
-  // int estimateTTSDuration(String text, double speechRate) {
-  //   int wordCount = text.trim().split(RegExp(r'\s+')).length;
-  //   double baseWPM = 180;
-  //   double wpm = baseWPM * (2 * speechRate);
-  //
-  //   int duration = ((wordCount * 60000) / wpm).round();
-  //   print("This Is Duration $duration");
-  //   return duration;
-  // }
-  //
   String cleanTextForTTS(String text) {
     String textWithoutEmojis = text.replaceAll(emojiRegex(), "");
-    // String textWithoutSpecialQuotes = textWithoutEmojis.replaceAll(RegExp(r"[‘’]"), ""); // only fancy quotes
     String textWithoutDoubleQuotes = textWithoutEmojis.replaceAll("\"", "");
     String cleanedText = textWithoutDoubleQuotes.replaceAll(RegExp(r'\*+'), "");
     print("this is cleaned text $cleanedText");

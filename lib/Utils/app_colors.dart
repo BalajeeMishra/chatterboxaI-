@@ -35,6 +35,8 @@ const textColor = Color(0xff8A8A8A);
 
 const RedColor = Color(0xffF4462C);
 
+
+
 const YellowColor = Color(0xffEBBB14);
 const BlueColor = Color(0xff3998DD);
 const GreenColor = Color(0xff3FC27B);
@@ -45,3 +47,4 @@ const darkRedColor = Color(0xFFF54E4E);
 const stepBackground = Color(0xffEEF4FF);
 const favDietBackground = Color(0xffC2D5D9);
 const favBackground = Color(0xffA4A29B);
+const lightGreyBackground =Color(0xffF1F1F1);

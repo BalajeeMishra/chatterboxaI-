@@ -1,4 +1,5 @@
 
+import 'package:balajiicode/extensions/colors.dart';
 import 'package:flutter/material.dart';
 
 import '../Widget/text_widget.dart';
@@ -12,7 +13,7 @@ class MySnackBar{
       content: Center(
         child: MyText(
           text: text,
-          color: Colors.white,
+          color: whiteColor,
           fontWeight: FontWeight.bold,
           textAlign: TextAlign.center,
         ),

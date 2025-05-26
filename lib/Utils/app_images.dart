@@ -16,5 +16,7 @@ const home_share_logo = "assets/images/home_share_logo.png";
 const google_logo = "assets/images/google.png";
 const zapAIAvtar = "assets/images/zapAIAvtar.png";
 const zapai2 = "assets/images/zapai2.png";
+const chatTyping = "assets/images/chat_typing.png";
+const tilt = "assets/images/tilt.png";
 
 

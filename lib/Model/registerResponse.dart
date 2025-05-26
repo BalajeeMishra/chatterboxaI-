@@ -22,6 +22,7 @@ class RegisterResponse {
 
 class NewUser {
   String? mobileNo;
+  String ? email;
   String? name;
   int? age;
   String? nativeLanguage;
@@ -48,11 +49,12 @@ class NewUser {
         this.iV,
         this.lastActive,
         this.createdAt,
-        this.updatedAt,});
+        this.updatedAt,this.email});
 
   NewUser.fromJson(Map<String, dynamic> json) {
     mobileNo = json['mobileNo'];
     name = json['name'];
+    email = json['email'];
     age = json['age'];
     nativeLanguage = json['nativeLanguage'];
     verified = json['verified'];
@@ -71,6 +73,7 @@ class NewUser {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['mobileNo'] = mobileNo;
     data['name'] = name;
+    data['email']= email;
     data['age'] = age;
     data['nativeLanguage'] = nativeLanguage;
     data['verified'] = verified;
@@ -83,6 +86,7 @@ class NewUser {
     data['lastActive'] = lastActive;
     data['createdAt'] = createdAt;
     data['updatedAt'] = updatedAt;
+
     return data;
   }
 }

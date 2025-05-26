@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:balajiicode/authentication/profile_details_screen.dart';
 import 'package:balajiicode/providers/providers.dart';
 import 'package:balajiicode/store/UserStore/UserStore.dart';
 import 'package:balajiicode/store/app_store.dart';
@@ -15,13 +14,13 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Screens/JabberAIHomePage/JabberAIHomepage.dart';
+import 'Screens/authentication/login_screen.dart';
 import 'Screens/no_internet_screen.dart';
 import 'Screens/splash_screen.dart';
 import 'Utils/app_common.dart';
 import 'Utils/app_config.dart';
 import 'Utils/app_constants.dart';
-import 'authentication/login_screen.dart';
-import 'authentication/add_phone.dart';
+
 import 'extensions/common.dart';
 import 'extensions/shared_pref.dart';
 import 'extensions/system_utils.dart';
@@ -128,10 +127,10 @@ class MyAppState extends State<MyApp> {
         navigatorKey: navigatorKey,
         title: APP_NAME,
         debugShowCheckedModeBanner: false,
-        // home: getStringAsync(TOKEN).toString().isEmpty
-        //     ? SplashScreen()
-        //     :JabberAIHomepage(),
-        home:LoginScreen(),
+        home: getStringAsync(TOKEN).toString().isEmpty
+            ? LoginScreen()
+            :JabberAIHomepage(),
+        // home:LoginScreen(),
         localizationsDelegates: [
           CountryLocalizations.delegate,
         ],

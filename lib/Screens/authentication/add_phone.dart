@@ -1,21 +1,24 @@
-import 'package:balajiicode/Services/auth_service.dart';
+import 'package:balajiicode/Screens/authentication/profile_details_screen.dart';
 import 'package:balajiicode/Utils/app_colors.dart';
-import 'package:balajiicode/authentication/profile_details_screen.dart';
+import 'package:balajiicode/extensions/colors.dart';
 import 'package:balajiicode/extensions/extension_util/int_extensions.dart';
 import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart'as user;
 import 'package:flutter/material.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import '../Constants/ImageConstant.dart';
-import '../Widget/text_widget.dart';
-import '../Utils/app_images.dart';
-import '../extensions/app_text_field.dart';
+
+import '../../Constants/ImageConstant.dart';
+import '../../Model/CheckMobileNumberResponse.dart';
+import '../../Utils/app_images.dart';
+import '../../Widget/text_widget.dart';
+import '../../extensions/app_text_field.dart';
+
 
 class AddPhoneDetails extends StatefulWidget {
-  final name ;
+  final User user;
 
-  const AddPhoneDetails({super.key, this.name,});
+  const AddPhoneDetails({super.key, required this.user,});
 
   @override
   State<AddPhoneDetails> createState() => _AddPhoneDetailsState();
@@ -91,9 +94,9 @@ class _AddPhoneDetailsState extends State<AddPhoneDetails> {
                         children: [
                           SizedBox(height: screenHeight * 0.02),
                           MyText(
-                            text: 'Hey\n${widget.name ?? "User"} 👋',
+                            text: 'Hey\n${widget.user.name ?? "User"} 👋',
                             textAlign: TextAlign.center,
-                            color: Colors.white,
+                            color: whiteColor,
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                           ),
@@ -103,7 +106,7 @@ class _AddPhoneDetailsState extends State<AddPhoneDetails> {
                             children: [
                               MyText(
                                 text: 'Not You? ',
-                                color: Colors.white.withOpacity(0.8),
+                                color: whiteColor.withOpacity(0.8),
                                 fontSize: 14,
                               ),
                               Image.asset(google_logo, height: 15, width: 15),
@@ -112,12 +115,12 @@ class _AddPhoneDetailsState extends State<AddPhoneDetails> {
                                 onTap: () async{
                                   final GoogleSignIn googleSignIn = GoogleSignIn();
                                   await googleSignIn.signOut();
-                                  await FirebaseAuth.instance.signOut();
+                                  await user.FirebaseAuth.instance.signOut();
                                   Navigator.pop(context);
                                 },
                                 child: MyText(
                                   text: 'Change Account',
-                                  color: Colors.white,
+                                  color: whiteColor,
                                   fontSize: 14,
                                   textDecoration: TextDecoration.underline,
                                   decorationcolor: Colors.white,
@@ -208,10 +211,16 @@ class _AddPhoneDetailsState extends State<AddPhoneDetails> {
                                   width: double.infinity,
                                   child: ElevatedButton(
                                     onPressed: () {
+                                      String number = '$selectedCode${phoneController.text}';
+                                      print(number);
+                                      // if (!number.startsWith('+')) {
+                                      //   number = '$selectedCode ${phoneController.text.trim()}';
+                                      // }
                                       ProfileDetailsScreen(
                                           country: selectedCountry,
-                                          mobileNumber: phoneController.text,
-                                          name: widget.name,// Replace null with actual phone number when available
+                                          email: widget.user.email,
+                                          mobileNumber: number,
+                                          name: widget.user.name,
                                         ).launch(context);
                                     },
                                     style: ElevatedButton.styleFrom(
@@ -227,7 +236,7 @@ class _AddPhoneDetailsState extends State<AddPhoneDetails> {
                                 15.height,
                                 GestureDetector(
                                   onTap: (){
-                                    ProfileDetailsScreen(name: widget.name,).launch(context);
+                                    ProfileDetailsScreen(name: widget.user.name, country: selectedCountry,).launch(context);
                                   },
                                   child: Row(
                                     children: [

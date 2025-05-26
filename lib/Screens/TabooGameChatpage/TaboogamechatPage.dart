@@ -157,18 +157,14 @@ class _TaboogamechatPage extends State<TaboogamechatPage>
         preferredSize: const Size.fromHeight(40.0),
         child: AppBar(
           centerTitle: true,
-          leading: GradientIcon(
-              ontap: () {
-               Navigator.pop(context,true);
-              }, icon: Icons.arrow_back
-          ),
+          leading:  InkWell(onTap:()=>pop(),child: Icon(Icons.arrow_back).withGradient()),
 
-          title: GradientText(
+          title: Text(
             softWrap: true,
             "Chat History",
             style: const TextStyle(),
 
-          ),
+          ).withGradient(),
 
         ),
       ),

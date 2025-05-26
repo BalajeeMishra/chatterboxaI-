@@ -1,22 +1,19 @@
 import 'package:balajiicode/Utils/app_colors.dart';
-import 'package:balajiicode/authentication/add_phone.dart';
+import 'package:balajiicode/extensions/colors.dart';
 import 'package:balajiicode/extensions/extension_util/int_extensions.dart';
 import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-
-import '../Constants/ImageConstant.dart';
-import '../Services/auth_service.dart';
-import '../Utils/app_common.dart';
-import '../Utils/app_images.dart';
-import '../Widget/text_widget.dart';
-import '../extensions/app_text_field.dart';
-import '../extensions/common.dart';
-import '../extensions/loader_widget.dart';
-import '../main.dart';
-import 'otp_verification_screen.dart';
+import '../../Services/auth_service.dart';
+import '../../Utils/app_common.dart';
+import '../../Utils/app_images.dart';
+import '../../Widget/text_widget.dart';
+import '../../extensions/app_text_field.dart';
+import '../../extensions/common.dart';
+import '../../extensions/loader_widget.dart';
+import '../../main.dart';
 
 class PhoneLogin extends StatefulWidget {
   const PhoneLogin({Key? key}) : super(key: key);
@@ -42,7 +39,7 @@ class _PhoneLoginState extends State<PhoneLogin> {
     if (!number.startsWith('+')) {
       number = '$mMobileCont ${mMobileCont.text.trim()}';
     }
-
+       print("selected country $selectedCountry");
     await loginWithOTP(
       context,
       number,
@@ -125,7 +122,7 @@ class _PhoneLoginState extends State<PhoneLogin> {
                             MyText(
                               text: 'Register Your\nAccount',
                               textAlign: TextAlign.center,
-                              color: Colors.white,
+                              color: whiteColor,
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
                             ),

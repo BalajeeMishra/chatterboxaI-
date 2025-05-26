@@ -1,28 +1,28 @@
 import 'dart:async';
 
+import 'package:balajiicode/Screens/authentication/profile_details_screen.dart';
 import 'package:balajiicode/Utils/app_colors.dart';
-import 'package:balajiicode/authentication/add_phone.dart';
-import 'package:balajiicode/authentication/phone_login.dart';
-import 'package:balajiicode/authentication/profile_details_screen.dart';
+import 'package:balajiicode/extensions/colors.dart';
 import 'package:balajiicode/extensions/extension_util/context_extensions.dart';
 import 'package:balajiicode/extensions/extension_util/int_extensions.dart';
 import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:telephony/telephony.dart';
 
-import '../Screens/JabberAIHomePage/JabberAIHomepage.dart';
-import '../Screens/profile_screen.dart';
-import '../Utils/app_common.dart';
-import '../Utils/app_constants.dart';
-import '../Utils/app_images.dart';
-import '../Widget/text_widget.dart';
-import '../extensions/common.dart';
-import '../extensions/otp_text_field.dart';
-import '../extensions/shared_pref.dart';
-import '../extensions/text_styles.dart';
-import '../main.dart';
-import '../network/rest_api.dart';
+import '../../Utils/app_common.dart';
+import '../../Utils/app_constants.dart';
+import '../../Utils/app_images.dart';
+import '../../Widget/text_widget.dart';
+import '../../extensions/common.dart';
+import '../../extensions/otp_text_field.dart';
+import '../../extensions/shared_pref.dart';
+import '../../extensions/text_styles.dart';
+import '../../main.dart';
+import '../../network/rest_api.dart';
+import '../JabberAIHomePage/JabberAIHomepage.dart';
+
 
 class OTPVerification extends StatefulWidget {
   final String country;
@@ -33,7 +33,8 @@ class OTPVerification extends StatefulWidget {
       {Key? key,
       required this.country,
       required this.mobileNumber,
-      required this.verificationId})
+      required this.verificationId,
+      })
       : super(key: key);
 
   @override
@@ -55,6 +56,7 @@ class _OTPVerificationState extends State<OTPVerification> {
   @override
   void initState() {
     super.initState();
+    print(widget.country);
     init();
   }
 
@@ -266,7 +268,7 @@ class _OTPVerificationState extends State<OTPVerification> {
                           MyText(
                             text: 'Enter Verification\nCode',
                             textAlign: TextAlign.center,
-                            color: Colors.white,
+                            color: whiteColor,
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                           ),
@@ -275,7 +277,7 @@ class _OTPVerificationState extends State<OTPVerification> {
                             text:
                                 'An OTP(One Time Password) Has Been\n Sent To Your Phone Number.',
                             textAlign: TextAlign.center,
-                            color: Colors.white.withOpacity(0.8),
+                            color: whiteColor.withOpacity(0.8),
                             fontSize: 14,
                           ),
                         ],
@@ -325,11 +327,7 @@ class _OTPVerificationState extends State<OTPVerification> {
                                   width: double.infinity,
                                   child: ElevatedButton(
                                     onPressed: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  ProfileDetailsScreen()));
+                                     submit();
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: primaryColor,

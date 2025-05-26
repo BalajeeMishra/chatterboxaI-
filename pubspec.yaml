@@ -75,6 +75,7 @@ dependencies:
   googleapis_auth: ^2.0.0
   country_picker: ^2.0.27
   google_sign_in: ^6.3.0
+  libphonenumber_plugin: ^0.3.3
 
 
 

@@ -135,7 +135,7 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
                                         text: 'No Game Found',
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.black,
+                                        color: blackColor,
                                       ),
                                     )
                                   : ListView.builder(
@@ -231,8 +231,7 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
                                                                     fontWeight:
                                                                         FontWeight
                                                                             .w800,
-                                                                    color: Colors
-                                                                        .black,
+                                                                    color: blackColor,
                                                                     fontSize:
                                                                         20
                                                               ),
@@ -315,8 +314,8 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      MyText(text:"Sharing is Caring!" ,fontSize: 18,fontWeight: FontWeight.bold,color: Colors.white,),
-                                      MyText(text:"Share The Zap AI App" ,fontSize: 15,color: Colors.white)
+                                      MyText(text:"Sharing is Caring!" ,fontSize: 18,fontWeight: FontWeight.bold,color: whiteColor,),
+                                      MyText(text:"Share The Zap AI App" ,fontSize: 15,color: whiteColor)
                                     ],
                                   ),
                                 ),

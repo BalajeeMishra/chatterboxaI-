@@ -1,3 +1,4 @@
+import 'package:balajiicode/Utils/app_colors.dart';
 import 'package:flutter/material.dart';
 
 
@@ -56,7 +57,7 @@ class MyText extends StatelessWidget {
         height: lineHeight,
         overflow: textOverflow,
         fontSize: fontSize ?? 16,
-        color: color ?? Colors.black,
+        color: color ?? textColor,
         fontWeight: fontWeight ?? FontWeight.w400,
         letterSpacing: letterSpacing ?? 0.2,
         fontFamily: "inter",

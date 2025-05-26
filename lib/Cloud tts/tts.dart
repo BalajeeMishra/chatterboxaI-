@@ -1,7 +1,7 @@
 import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
-import 'package:balajiicode/Screens/ChooseWordScreen/PlayTabooScreenProvider.dart';
+import 'package:balajiicode/Screens/ChooseWordScreen/Providers/PlayTabooScreenProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -76,117 +76,114 @@ class GoogleCloudTTSService {
     }
   }
 
-  // Future<void> _playNextInQueue() async {
-  //   var pro = Provider.of<PlayTabooScreenVM>(globalContext, listen: false);
-  //
-  //   if (_audioFileQueue.isEmpty) {
-  //     pro.setIsListening(true);
-  //     _isPlayingQueue = false;
-  //     return;
-  //   }
-  //
-  //   final nextFilePath = _audioFileQueue.removeFirst();
-  //   await _audioPlayer.setFilePath(nextFilePath);
-  //   pro.setIsListening(false);
-  //   print("this is speedh${_audioPlayer.speed}");
-  //   await _audioPlayer.setSpeed(audioSpeed);
-  //   pro.setCurrentParaIndex(pro.currentParaIndex++);
-  //   print("this is current index ${pro.currentParaIndex++}");
-  //   await _audioPlayer.play();
-  //
-  // }
   Future<void> _playNextInQueue() async {
     var pro = Provider.of<PlayTabooScreenVM>(globalContext, listen: false);
+    try {
+      // If queue is empty, wait briefly (e.g., up to 2 seconds), checking every 200ms
+      int retries = 50; // 10 * 200ms = 2 seconds
+      while (_audioFileQueue.isEmpty && retries > 0 && _isPlayingQueue) {
+        await Future.delayed(Duration(milliseconds: 200));
+        retries--;
+      }
 
-    // If queue is empty, wait briefly (e.g., up to 2 seconds), checking every 200ms
-    int retries = 50; // 10 * 200ms = 2 seconds
-    while (_audioFileQueue.isEmpty && retries > 0 && _isPlayingQueue) {
-      await Future.delayed(Duration(milliseconds: 200));
-      retries--;
-    }
+      if (_audioFileQueue.isEmpty) {
+        // Still empty after retries: stop
+        pro.setIsListening(true);
+        _isPlayingQueue = false;
+        return;
+      }
 
-    if (_audioFileQueue.isEmpty) {
-      // Still empty after retries: stop
+      final nextFilePath = _audioFileQueue.removeFirst();
+      await audioPlayer.setSpeed(audioSpeed);
+      await audioPlayer.setFilePath(nextFilePath);
+      pro.setIsListening(false);
+
+      pro.setCurrentParaIndex(pro.currentParaIndex.value + 1);
+      await audioPlayer.play();
+    } catch (e, stack) {
+      print('Error in _playNextInQueue: $e\n$stack');
       pro.setIsListening(true);
       _isPlayingQueue = false;
-      return;
     }
-
-    final nextFilePath = _audioFileQueue.removeFirst();
-    await audioPlayer.setSpeed(audioSpeed);
-    await audioPlayer.setFilePath(nextFilePath);
-    pro.setIsListening(false);
-
-    pro.setCurrentParaIndex(pro.currentParaIndex + 1);
-    await audioPlayer.play();
   }
 
   Future<void> speakTexts(List<String> texts, {
     String languageCode = 'en-US',
-    String voiceName = 'en-US-Chirp3-HD-Achernar',
+    String voiceName = 'en-GB-Standard-F',
     String gender = 'FEMALE',
     double speakingRate = 0.8,
     double pitch = 0.0,
   }) async {
-    if (!_isInitialized) {
-      await initialize();
-    }
-    await deleteFiles(ttsFilePaths);
-    print("length of filepath ${ttsFilePaths.length}");
-    ttsFilePaths.clear();
-    _audioFileQueue.clear();
-
-    final directory = await getTemporaryDirectory();
-    for (int i=0;i<texts.length;i++) {
-      final filePath = '${directory.path}/tts_output_${DateTime.now().millisecondsSinceEpoch}.mp3';
-      if(i==1){
-        if (!_isPlayingQueue) {
-          _isPlayingQueue = true;
-          var pro = Provider.of<PlayTabooScreenProvider>(globalContext, listen: false);
-          pro.setIsLoaderShow(false);
-          await _playNextInQueue();
+    try {
+      if (!_isInitialized) {
+        await initialize();
+      }
+      await deleteFiles(ttsFilePaths);
+      print("length of filepath ${ttsFilePaths.length}");
+      ttsFilePaths.clear();
+      _audioFileQueue.clear();
+      print("hii this is running");
+      final directory = await getTemporaryDirectory();
+      for (int i = 0; i < texts.length; i++) {
+        final filePath = '${directory.path}/tts_output_${DateTime.now().millisecondsSinceEpoch}.mp3';
+        if (i == 1) {
+          if (!_isPlayingQueue) {
+            _isPlayingQueue = true;
+            var pro = Provider.of<PlayTabooScreenProvider>(globalContext, listen: false);
+            pro.setIsLoaderShow(false);
+            await _playNextInQueue();
+          }
+        }
+        try {
+          final audioData = await _getAudioFromAPI(
+            texts[i],
+            languageCode: languageCode,
+            voiceName: voiceName,
+            gender: gender,
+            speakingRate: speakingRate,
+            pitch: pitch,
+          );
+          final file = File(filePath);
+          await file.writeAsBytes(audioData);
+          _audioFileQueue.add(filePath);
+          ttsFilePaths.add(filePath);
+        } catch (e, stack) {
+          print('Error generating or writing audio for "$filePath": $e\n$stack');
         }
       }
-      final audioData = await _getAudioFromAPI(
-        texts[i],
-        languageCode: languageCode,
-        voiceName: voiceName,
-        gender: gender,
-        speakingRate: speakingRate,
-        pitch: pitch,
-      );
-      final file = File(filePath);
-      await file.writeAsBytes(audioData);
-      _audioFileQueue.add(filePath);
-      ttsFilePaths.add(filePath);
-
+    } catch (e, stack) {
+      print('Error in speakTexts: $e\n$stack');
     }
-
-
   }
-  void speekSaved()async{
-    _audioFileQueue.clear();
-    for(int i=0;i<ttsFilePaths.length;i++){
-      _audioFileQueue.add(ttsFilePaths[i]);
-      if(i==1){
-        if (!_isPlayingQueue) {
-          _isPlayingQueue = true;
 
-          await _playNextInQueue();
+  void speekSaved() async {
+    try {
+      _audioFileQueue.clear();
+      for (int i = 0; i < ttsFilePaths.length; i++) {
+        _audioFileQueue.add(ttsFilePaths[i]);
+        if (i == 1) {
+          if (!_isPlayingQueue) {
+            _isPlayingQueue = true;
+            await _playNextInQueue();
+          }
         }
       }
+    } catch (e, stack) {
+      print('Error in speekSaved: $e\n$stack');
     }
   }
 
   void stop() {
-    audioPlayer.stop();
-    var pro = Provider.of<PlayTabooScreenVM>(globalContext, listen: false);
-    pro.setCurrentParaIndex(-1);
-    _audioFileQueue.clear();
-    _isPlayingQueue = false;
-
+    try {
+      audioPlayer.stop();
+      var pro = Provider.of<PlayTabooScreenVM>(globalContext, listen: false);
+      pro.setCurrentParaIndex(-1);
+      _audioFileQueue.clear();
+      _isPlayingQueue = false;
+    } catch (e, stack) {
+      print('Error in stop: $e\n$stack');
+    }
   }
-
 
   Future<List<int>> _getAudioFromAPI(String text, {
     required String languageCode,
@@ -195,49 +192,69 @@ class GoogleCloudTTSService {
     required double speakingRate,
     required double pitch,
   }) async {
-    final url = 'https://texttospeech.googleapis.com/v1/text:synthesize';
+    try {
+      final url = 'https://texttospeech.googleapis.com/v1/text:synthesize';
 
-    final payload = {
-      'input': {'text': text},
-      'voice': {'languageCode': languageCode, 'name': voiceName},
-      'audioConfig': {
-        'audioEncoding': 'LINEAR16',
-        "sampleRateHertz": 24000,
-        'effectsProfileId': ['small-bluetooth-speaker-class-device'],
-        'speakingRate': speakingRate,
-        'pitch': pitch,
+      final payload = {
+        'input': {'text': text},
+        'voice': {'languageCode': languageCode, 'name': voiceName},
+        'audioConfig': {
+          'audioEncoding': 'LINEAR16',
+          "sampleRateHertz": 24000,
+          'effectsProfileId': ['small-bluetooth-speaker-class-device'],
+          'speakingRate': speakingRate,
+          'pitch': pitch,
+        }
+      };
+
+      final response = await _client.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(payload),
+      );
+
+      if (response.statusCode == 200) {
+        final responseJson = jsonDecode(response.body);
+        final audioContent = responseJson['audioContent'];
+        return base64Decode(audioContent);
+      } else {
+        print('Failed to get TTS: ${response.body}');
+        throw Exception('Failed to get TTS: ${response.body}');
       }
-    };
-
-    final response = await _client.post(
-      Uri.parse(url),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(payload),
-    );
-
-    if (response.statusCode == 200) {
-      final responseJson = jsonDecode(response.body);
-      final audioContent = responseJson['audioContent'];
-      return base64Decode(audioContent);
-    } else {
-      throw Exception('Failed to get TTS: ${response.body}');
+    } catch (e, stack) {
+      print('Error in _getAudioFromAPI: $e\n$stack');
+      rethrow;
     }
   }
-
 
   Future<void> deleteFiles(List<String> filePaths) async {
-    for (String path in filePaths) {
-      final file = File(path);
-
-      if (await file.exists()) {
-        await file.delete();
-        print("Deleted: $path");
-      } else {
-        print("File not found: $path");
+    // Make a copy to avoid concurrent modification
+    final List<String> pathsToDelete = List<String>.from(filePaths);
+    for (String path in pathsToDelete) {
+      int retries = 3;
+      bool deleted = false;
+      while (retries > 0 && !deleted) {
+        try {
+          final file = File(path);
+          if (await file.exists()) {
+            await file.delete();
+            print("Deleted: $path");
+          } else {
+            print("File not found: $path");
+          }
+          deleted = true;
+        } catch (e) {
+          retries--;
+          print("Error deleting $path: $e. Retries left: $retries");
+          if (retries == 0) {
+            print("Failed to delete $path after retries.");
+          } else {
+            await Future.delayed(Duration(milliseconds: 200));
+          }
+        }
       }
     }
   }
-
 
   void dispose() {
     audioPlayer.dispose();
