@@ -6,6 +6,7 @@ import User from "./router/user.js";
 import ConverSation from "./router/conversation.js"
 import Admin from "./router/admin.js";
 import cors from "cors";
+import AI from './model/ai.js';
 
 const app = express();
 connectDB();
@@ -23,6 +24,37 @@ app.use("/api/user", User);
 app.use("/api", ConverSation);
 app.use("/api/auth", Admin);
 app.get("/", async (_, res) => res.send("Server is running"));
+
+app.post("/api/ai", async (req, res) => {
+  try {
+    const {aitouse}= req.body;
+    const ai = await AI.findOne({});
+    if (!ai) {
+      await new AI({aitouse}).save();
+      return res.status(200).json({ ai });
+    }
+    ai.aitouse = aitouse;
+    await ai.save();
+    return res.status(200).json({ ai });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error." });
+  }
+});
+
+app.get("/api/ai", async (req, res) => {
+  try {
+    const ai = await AI.findOne({});
+    if (!ai) {
+      return res.status(404).json({ message: "AI configuration not found." });
+    }
+    return res.status(200).json({ ai });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error." });
+  }
+});
+
+
+
 
 app.use(async (err, req, res, next) => {
   if (!err?.status) {

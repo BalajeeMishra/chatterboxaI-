@@ -11,6 +11,7 @@ import jwtHelper from "../helper/jwt_helper.js";
 import getSecret from "../helper/secret.js";
 import Pronounciation from "../model/PronounciationTemplate.js";
 import lastActivity from "../helper/lastactivity.js";
+
 const router = Router();
 
 // const apiKey = fs.readFileSync("OpenAiKey.txt", "utf-8").trim();
@@ -25,240 +26,232 @@ const llm = new ChatOpenAI({
 });
 
 const userSessions = {};
-const userSessionsfor ={};
+const userSessionsfor = {};
 
 function getUserSessionfor(session, prompt) {
   if (!userSessionsfor[session]) {
-      userSessionsfor[session] = {
-        chain: new LLMChain({
-          llm,
-          prompt,
-          verbose: true,
-        }),
-      };
+    userSessionsfor[session] = {
+      chain: new LLMChain({
+        llm,
+        prompt,
+        verbose: true,
+      }),
+    };
   }
 
   return userSessionsfor[session];
 }
 
-
 function getUserSession(session, prompt) {
   if (!userSessions[session]) {
-      // Initialize a new session for the user with persistent memory
-      const memory = new BufferMemory({ memory_key: "chat_history" });
-      //
-      userSessions[session] = {
+    // Initialize a new session for the user with persistent memory
+    const memory = new BufferMemory({ memory_key: "chat_history" });
+    //
+    userSessions[session] = {
+      memory,
+      chain: new LLMChain({
+        llm,
+        prompt,
+        verbose: true,
         memory,
-        chain: new LLMChain({
-          llm,
-          prompt,
-          verbose: true,
-          memory,
-        }),
-      };
-    }
+      }),
+    };
+  }
 
   return userSessions[session];
 }
 
-router.post("/play", jwtHelper.verifyToken,lastActivity,async (req, res,next) => {
-  // nativelanguage, listofword, firstword
-  // let { question, userId, session,firstword } = req.body;
-  let { sessionId, mainContent, question, gameId,modality } = req.body;
+router.post(
+  "/play",
+  jwtHelper.verifyToken,
+  lastActivity,
+  async (req, res, next) => {
+    // nativelanguage, listofword, firstword
+    // let { question, userId, session,firstword } = req.body;
+    let { sessionId, mainContent, question, gameId, modality } = req.body;
 
+    const userId = req.userId;
+    let history = "";
 
-  const userId = req.userId;
-  let history = "";
+    let responseforuser = {};
 
-  let responseforuser = {};
+    const user = await User.findById(userId);
 
-  const user = await User.findById(userId);
-  
-  const promptTemplate = await Prompt.findOne({
-    gameId,
-    engprolevel: user.engprolevel,
-  });
+    const promptTemplate = await Prompt.findOne({
+      gameId,
+      engprolevel: user.engprolevel,
+    });
 
-  const promptTemplateContent = promptTemplate.content;
+    const promptTemplateContent = promptTemplate.content;
 
-  const template = `User native language is {nativeLanguage}. user is from this ${user.country}. user name is ${user.name}. maincontent is {maincontent}. detailofcontent is {detailOfContent}. User english proficiency is ${user.engprolevel}. ${promptTemplateContent} Previous conversation:
+    const template = `User native language is {nativeLanguage}. user is from this ${user.country}. user name is ${user.name}. maincontent is {maincontent}. detailofcontent is {detailOfContent}. User english proficiency is ${user.engprolevel}. ${promptTemplateContent} Previous conversation:
 {chat_history} current question is {question} `;
- 
 
+    const prompt = new PromptTemplate({
+      inputVariables: [
+        "question",
+        "nativeLanguage",
+        "maincontent",
+        "detailOfContent",
+        "chat_history",
+      ],
+      template: template,
+    });
 
-  const prompt = new PromptTemplate({
-    inputVariables: [
-      "question",
-      "nativeLanguage",
-      "maincontent",
-      "detailOfContent",
-      "chat_history",
-    ],
-    template: template,
-  });
-
-  let userdatalog = await UserLog.findOne({ userId, sessionId: sessionId });
-  if (!userdatalog) {
-    delete userSessions[sessionId];
-  }
-  // const usedTabooWord = tabooWords.find((word) => question.includes(word));
-  // if (usedTabooWord) {
-  //   return res.json({ message: `You used a taboo word: ${usedTabooWord}` });
-  // }
-  try {
-    if(userdatalog && userdatalog?.engprolevel != user.engprolevel){
-      // userSession.history = "";
+    let userdatalog = await UserLog.findOne({ userId, sessionId: sessionId });
+    if (!userdatalog) {
       delete userSessions[sessionId];
-      userdatalog.engprolevel = user.engprolevel;
+    }
+    // const usedTabooWord = tabooWords.find((word) => question.includes(word));
+    // if (usedTabooWord) {
+    //   return res.json({ message: `You used a taboo word: ${usedTabooWord}` });
+    // }
+    try {
+      if (userdatalog && userdatalog?.engprolevel != user.engprolevel) {
+        // userSession.history = "";
+        delete userSessions[sessionId];
+        userdatalog.engprolevel = user.engprolevel;
+        await userdatalog.save();
+      }
+
+      const userSession = getUserSession(sessionId, prompt);
+
+      const gamecontent = await GameContent.findOne({ mainContent });
+
+      const maincontent = gamecontent.mainContent;
+      const detailOfContent = gamecontent.detailOfContent;
+      // const detailOfContent = "";
+
+      const nativeLanguage = user.nativeLanguage;
+
+      const response = await userSession.chain.invoke({
+        question: question,
+        maincontent: maincontent,
+        detailOfContent: detailOfContent,
+        nativeLanguage: nativeLanguage,
+        chat_history: userSession.history ?? "",
+        human_input: "",
+      });
+
+      await userSession.memory.saveContext(
+        { input: question },
+        { output: response.text }
+      );
+      history = await userSession.memory.loadMemoryVariables({});
+      userSession.history = history.history;
+      if (userdatalog) {
+        userdatalog.userResponse = [
+          ...userdatalog.userResponse,
+          { text: question },
+        ];
+        userdatalog.aiResponse = [
+          ...userdatalog.aiResponse,
+          { text: response.text },
+        ];
+        userdatalog.count = userdatalog.count + 1;
+        const allUsertext = userdatalog.userResponse.map((item) => item.text);
+        const allAiText = userdatalog.aiResponse.map((item) => item.text);
+
+        responseforuser.userResponse = [...allUsertext];
+        responseforuser.aiResponse = [...allAiText];
+        responseforuser.userId = userId;
+        responseforuser.sessionId = sessionId;
+        responseforuser.engprolevel = user.engprolevel;
+        responseforuser.modality = modality;
+        responseforuser.count = userdatalog.count;
+      } else {
+        userdatalog = new UserLog({
+          userResponse: [{ text: question, modality }],
+          aiResponse: [{ text: response.text }],
+          userId,
+          sessionId: sessionId,
+          engprolevel: user.engprolevel,
+          gameId,
+        });
+        responseforuser.userResponse = [question];
+        responseforuser.aiResponse = [response.text];
+        responseforuser.userId = userId;
+        responseforuser.sessionId = sessionId;
+        responseforuser.engprolevel = user.engprolevel;
+        responseforuser.modality = modality;
+        responseforuser.count = 0;
+      }
       await userdatalog.save();
+      return res.status(200).json({ response: responseforuser });
+    } catch (error) {
+      res.status(500).json({ error: "Something went wrong" });
     }
-    
-    const userSession = getUserSession(sessionId, prompt);
-
-    const gamecontent = await GameContent.findOne({ mainContent });
-
-    const maincontent = gamecontent.mainContent;
-    const detailOfContent = gamecontent.detailOfContent;
-    // const detailOfContent = "";
-
-    const nativeLanguage = user.nativeLanguage;
-
-   
-
-    const response = await userSession.chain.invoke({
-      question: question,
-      maincontent: maincontent,
-      detailOfContent: detailOfContent,
-      nativeLanguage: nativeLanguage,
-      chat_history: userSession.history ?? "",
-      human_input: "",
-    });
-   
-    
-
-    await userSession.memory.saveContext(
-      { input: question },
-      { output: response.text }
-    );
-    history = await userSession.memory.loadMemoryVariables({});
-    userSession.history = history.history;
-    if (userdatalog) {
-      userdatalog.userResponse = [...userdatalog.userResponse, {text:question}];
-      userdatalog.aiResponse = [...userdatalog.aiResponse,{text:response.text}];
-      userdatalog.count = userdatalog.count + 1 ;
-      const allUsertext = userdatalog.userResponse.map((item) => item.text);
-      const allAiText = userdatalog.aiResponse.map((item) => item.text);
-
-      responseforuser.userResponse = [...allUsertext];
-      responseforuser.aiResponse = [...allAiText];
-      responseforuser.userId = userId;
-      responseforuser.sessionId = sessionId;
-      responseforuser.engprolevel = user.engprolevel;
-      responseforuser.modality = modality; 
-      responseforuser.count = userdatalog.count
-     
-    } else {
-      userdatalog = new UserLog({
-        userResponse: [{text:question,modality}],
-        aiResponse: [{text:response.text}],
-        userId,
-        sessionId: sessionId,
-        engprolevel:user.engprolevel,
-        gameId
-      }); 
-      responseforuser.userResponse = [question];
-      responseforuser.aiResponse = [response.text];
-      responseforuser.userId = userId;
-      responseforuser.sessionId = sessionId;
-      responseforuser.engprolevel = user.engprolevel;
-      responseforuser.modality = modality;
-      responseforuser.count = 0;
-    }
-    await userdatalog.save();
-    return res.status(200).json({ response: responseforuser });
-  } catch (error) {
-    res.status(500).json({ error: "Something went wrong" });
   }
-});
+);
 
+router.post(
+  "/completetheanswer",
+  jwtHelper.verifyToken,
+  lastActivity,
+  async (req, res, next) => {
+    let { sessionId, mainContent, question, gameId } = req.body;
 
+    const userId = req.userId;
 
-router.post("/completetheanswer", jwtHelper.verifyToken,lastActivity,async (req, res,next) => {
+    const user = await User.findById(userId);
 
-  let { sessionId, mainContent, question, gameId } = req.body;
+    const promptTemplate = await Prompt.findOne({
+      gameId,
+      engprolevel: user.engprolevel,
+    });
 
+    const promptTemplateContent = promptTemplate.content;
 
-  const userId = req.userId;
-
-
-  const user = await User.findById(userId);
-  
-  const promptTemplate = await Prompt.findOne({
-    gameId,
-    engprolevel: user.engprolevel,
-  });
-
-  const promptTemplateContent = promptTemplate.content;
-
-  const template = `User native language is {nativeLanguage}. user is from this ${user.country}. user name is ${user.name}. maincontent is {maincontent}. detailofcontent is {detailOfContent}. User english proficiency is ${user.engprolevel}. ${promptTemplateContent} Previous conversation:
+    const template = `User native language is {nativeLanguage}. user is from this ${user.country}. user name is ${user.name}. maincontent is {maincontent}. detailofcontent is {detailOfContent}. User english proficiency is ${user.engprolevel}. ${promptTemplateContent} Previous conversation:
 {chat_history} On the basis of Previous AI response user wants to give the answer but finding diificult to give answer. They have written something as answer to previous AI response: {question} You need to complete the answer.  `;
- 
 
-
-  const prompt = new PromptTemplate({
-    inputVariables: [
-      "question",
-      "nativeLanguage",
-      "maincontent",
-      "detailOfContent",
-      "chat_history",
-    ],
-    template: template,
-  });
-
-  
-  try {
-    const userSession = getUserSession(sessionId, prompt);
-
-    const gamecontent = await GameContent.findOne({ mainContent });
-
-    const maincontent = gamecontent.mainContent;
-    const detailOfContent = gamecontent.detailOfContent;
-
-    const nativeLanguage = user.nativeLanguage;
-
-   
-
-    const response = await userSession.chain.invoke({
-      question: question,
-      maincontent: maincontent,
-      detailOfContent: detailOfContent,
-      nativeLanguage: nativeLanguage,
-      chat_history: userSession.history ?? "",
-      human_input: "",
+    const prompt = new PromptTemplate({
+      inputVariables: [
+        "question",
+        "nativeLanguage",
+        "maincontent",
+        "detailOfContent",
+        "chat_history",
+      ],
+      template: template,
     });
-   
-    return res.status(200).json({text:response.text} );
-  } catch (error) {
-    res.status(500).json({ error: "Something went wrong" });
+
+    try {
+      const userSession = getUserSession(sessionId, prompt);
+
+      const gamecontent = await GameContent.findOne({ mainContent });
+
+      const maincontent = gamecontent.mainContent;
+      const detailOfContent = gamecontent.detailOfContent;
+
+      const nativeLanguage = user.nativeLanguage;
+
+      const response = await userSession.chain.invoke({
+        question: question,
+        maincontent: maincontent,
+        detailOfContent: detailOfContent,
+        nativeLanguage: nativeLanguage,
+        chat_history: userSession.history ?? "",
+        human_input: "",
+      });
+
+      return res.status(200).json({ text: response.text });
+    } catch (error) {
+      res.status(500).json({ error: "Something went wrong" });
+    }
   }
-});
-
-
-
+);
 
 router.post("/correctsentance", jwtHelper.verifyToken, async (req, res) => {
   try {
-    
-    const { sentence, sessionId,previousSentence } = req.body;
+    const { sentence, sessionId, previousSentence } = req.body;
     const words = sentence.trim().split(/\s+/);
     if (words.length < 5) {
-      return res.status(200).json({ response:{text:sentence} });
+      return res.status(200).json({ response: { text: sentence } });
     } else {
-      const pronounciation = await Pronounciation.find({
-      });
-      const {content} = pronounciation[0];
-     
+      const pronounciation = await Pronounciation.find({});
+      const { content } = pronounciation[0];
+
       const template = `previous sentence was ${previousSentence},Follow the rule:${content} You need to correct the current sentence based on previous sentence and rule. You dont need to suggest anything from your side. You only need to check on given sentence. If you found nothing wrong with sentence just return the original sentence. Following is the current sentence: {sentence}`;
       const prompt = new PromptTemplate({
         inputVariables: ["sentence"],
@@ -269,7 +262,6 @@ router.post("/correctsentance", jwtHelper.verifyToken, async (req, res) => {
       return res.status(200).json({ response });
     }
   } catch (err) {
-    
     throw err;
   }
 });
@@ -305,22 +297,24 @@ router.get("/allconversation", async (req, res) => {
           preserveNullAndEmptyArrays: true, // Include documents with no matching Game
         },
       },
-    ]).sort({createdAt:-1});
+    ]).sort({ createdAt: -1 });
     // console.log(completeConversation,"completeConversation");
-    userCompeleteConversation.userResponse = completeConversation[0].userResponse.map((e)=>e.text);
-    userCompeleteConversation.aiResponse = completeConversation[0].aiResponse.map((e)=>e.text);
+    userCompeleteConversation.userResponse =
+      completeConversation[0].userResponse.map((e) => e.text);
+    userCompeleteConversation.aiResponse =
+      completeConversation[0].aiResponse.map((e) => e.text);
     userCompeleteConversation.userId = completeConversation[0].userId;
     userCompeleteConversation.sessionId = completeConversation[0].sessionId;
     userCompeleteConversation.engprolevel = completeConversation[0].engprolevel;
     userCompeleteConversation.gameDetails = completeConversation[0].gameDetails;
     userCompeleteConversation.createdAt = completeConversation[0].createdAt;
     // console.log(userCompeleteConversation,"responseforuserresponseforuser");
-    return res.status(200).json({ completeConversation:userCompeleteConversation });
+    return res
+      .status(200)
+      .json({ completeConversation: userCompeleteConversation });
   } catch (err) {
     throw err;
   }
 });
-
-
 
 export default router;
