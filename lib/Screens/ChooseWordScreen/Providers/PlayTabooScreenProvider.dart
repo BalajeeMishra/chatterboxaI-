@@ -33,7 +33,7 @@ class PlayTabooScreenProvider extends ChangeNotifier {
   bool _isSwipingLeft = false;
   bool _isSwipingUp = false;
   bool _isKeyBoardOpen = false;
-  bool _isOnPressedEnd = true;
+  bool _isOnPressedEnd = false;
   String _previousSpokenTextWhenStateIsLocked ='' ;
 
   //controller

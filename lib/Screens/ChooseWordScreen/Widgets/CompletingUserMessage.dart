@@ -74,6 +74,7 @@ class _CompletingUserMessageState extends State<CompletingUserMessage> {
                       ]),
                       10.height,
                       TextField(
+                        readOnly: true,
                         controller: provider.correctedUserMessageController,
                         onChanged: (val) {
                           // _stopListening();
@@ -113,11 +114,14 @@ class _CompletingUserMessageState extends State<CompletingUserMessage> {
 
           }
           else if(pro.state == AnswerAssistState.active){
+            pro.clearCorrectedUserMessageController();
+            pro.setCompleting();
           bool res =  await  pro.completeUserMessage(context,widget.userMessage,widget.sessionId,widget.gameModel,widget.index,widget.modality);
           if(res){
-            var provider = Provider.of<PlayTabooScreenProvider>(context,listen: false);
-            provider.setIsOnLockedAndRestartListening(false);
-            provider.setpreviousSpokenTextWhenStateIsLocked('');          }
+            // var provider = Provider.of<PlayTabooScreenProvider>(context,listen: false);
+            // provider.setIsOnLockedAndRestartListening(false);
+            // provider.setpreviousSpokenTextWhenStateIsLocked('');
+            }
           }
           else if(pro.state == AnswerAssistState.encouraging){
 

@@ -17,10 +17,16 @@ class AnswerAssistProvider extends ChangeNotifier {
   AnswerAssistState _state = AnswerAssistState.idle;
   TextEditingController correctedUserMessageController = TextEditingController();
   TextEditingController wordController = TextEditingController();
+  bool canDoActiveOrNot = false;
 
 
   AnswerAssistState get state => _state;
 
+
+  void setCanActiveOrNot(bool val){
+    canDoActiveOrNot = val;
+    notifyListeners();
+  }
   void setIdle() {
     _state = AnswerAssistState.idle;
     notifyListeners();
@@ -50,7 +56,6 @@ class AnswerAssistProvider extends ChangeNotifier {
     String? res =  await completingUserMessage(context, userMessage, sessionId, allGameModel, index, modality);
     if (res !='' && res != null){
       correctedUserMessageController.text = res;
-      wordController.clear();
       setEncouraging();
       notifyListeners();
       return true;
