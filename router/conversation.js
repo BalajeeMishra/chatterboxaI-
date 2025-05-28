@@ -189,6 +189,8 @@ router.post(
   jwtHelper.verifyToken,
   lastActivity,
   async (req, res, next) => {
+
+    print("api called for completetheanswer");
     let { sessionId, mainContent, question, gameId } = req.body;
 
     const userId = req.userId;
@@ -234,6 +236,13 @@ router.post(
         chat_history: userSession.history ?? "",
         human_input: "",
       });
+
+      print("response", response.text);
+      print("userSession.history");
+      // await userSession.memory.saveContext(
+      //   { input: question },
+      //   { output: response.text }
+      // );
 
       return res.status(200).json({ text: response.text });
     } catch (error) {
