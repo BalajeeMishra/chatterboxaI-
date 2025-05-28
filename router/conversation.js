@@ -190,7 +190,7 @@ router.post(
   lastActivity,
   async (req, res, next) => {
 
-    print("api called for completetheanswer");
+    console.log("api called for completetheanswer");
     let { sessionId, mainContent, question, gameId } = req.body;
 
     const userId = req.userId;
@@ -237,8 +237,8 @@ router.post(
         human_input: "",
       });
 
-      print("response", response.text);
-      print("userSession.history");
+      comnsole.log("response", response.text);
+      console.log("userSession.history");
       // await userSession.memory.saveContext(
       //   { input: question },
       //   { output: response.text }
