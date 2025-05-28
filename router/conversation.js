@@ -203,7 +203,7 @@ router.post(
     const promptTemplateContent = promptTemplate.content;
 
     const template = `User native language is {nativeLanguage}. user is from this ${user.country}. user name is ${user.name}. maincontent is {maincontent}. detailofcontent is {detailOfContent}. User english proficiency is ${user.engprolevel}. ${promptTemplateContent} Previous conversation:
-{chat_history} On the basis of Previous AI response user wants to give the answer but finding diificult to give answer. They have written something as answer to previous AI response: {question} You need to complete the answer.  `;
+{chat_history} On the basis of Previous AI response user wants to give the answer but they may find diificulty to give answer. They have written something as answer to previous AI response. Now see user written text {question} carefully and complete it so that this would be the answer of last one AI response.  `;
 
     const prompt = new PromptTemplate({
       inputVariables: [
