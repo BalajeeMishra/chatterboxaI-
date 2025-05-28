@@ -237,7 +237,7 @@ router.post(
         human_input: "",
       });
 
-      comnsole.log("response", response.text);
+      console.log("response", response.text);
       console.log("userSession.history");
       // await userSession.memory.saveContext(
       //   { input: question },
