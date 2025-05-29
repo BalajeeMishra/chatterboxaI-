@@ -1170,9 +1170,10 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                                                   ? height *
                                                                       0.1
                                                                   : height *
-                                                                      .205
+                                                                      .28
                                                               : height *
                                                                   0.28,
+                                                      // height: height* 0.30,
                                                       child: Scrollbar(
                                                         child:
                                                             SingleChildScrollView(
@@ -1209,46 +1210,48 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                         if (!provider.isLoaderShow)
                           vm.tabooGameChatPageModel.response == null
                               ? SizedBox()
-                              : SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: Row(
-                       
-                                    children: [
-                                      Suggetionswidget(
-                                          text: "Skip Question",
-                                          onTap: () {
-                                            stopSpeaking();
-                                            _sendAnalytics();
-                                           completProvider.wordController.text =
-                                                "Skip Question";
-                                            _stopAndSendResponse(vm);
-                                          },
-                                          isIcon: true),
-                                      10.width,
-                                      Suggetionswidget(
-                                          text: "Yes, I'm ready",
-                                          onTap: () {
-                                            stopSpeaking();
-                                            _sendAnalytics();
-                                            completProvider.wordController.text =
-                                                "Yes, I'm ready";
-                                            _stopAndSendResponse(vm);
-                                          }),
-                                      10.width,
-                                      Suggetionswidget(
-                                          text:
-                                              "No, help me understand the game",
-                                          onTap: () {
-                                            stopSpeaking();
-                                            _sendAnalytics();
-                                            completProvider.wordController.text =
-                                                "No, help me understand the game";
-                                            _stopAndSendResponse(vm);
-                                          }),
-                                    ],
-                                  ).paddingSymmetric(
-                                      vertical: 4, horizontal: 12),
-                                ),
+                              : Container(
+                                child: SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+
+                                      children: [
+                                        Suggetionswidget(
+                                            text: "Skip Question",
+                                            onTap: () {
+                                              stopSpeaking();
+                                              _sendAnalytics();
+                                             completProvider.wordController.text =
+                                                  "Skip Question";
+                                              _stopAndSendResponse(vm);
+                                            },
+                                            isIcon: true),
+                                        10.width,
+                                        Suggetionswidget(
+                                            text: "Yes, I'm ready",
+                                            onTap: () {
+                                              stopSpeaking();
+                                              _sendAnalytics();
+                                              completProvider.wordController.text =
+                                                  "Yes, I'm ready";
+                                              _stopAndSendResponse(vm);
+                                            }),
+                                        10.width,
+                                        Suggetionswidget(
+                                            text:
+                                                "No, help me understand the game",
+                                            onTap: () {
+                                              stopSpeaking();
+                                              _sendAnalytics();
+                                              completProvider.wordController.text =
+                                                  "No, help me understand the game";
+                                              _stopAndSendResponse(vm);
+                                            }),
+                                      ],
+                                    ).paddingSymmetric(
+                                        vertical: 4,),
+                                  ),
+                              ).paddingSymmetric(horizontal: 12),
                         if (!provider.isLoaderShow)
                           vm.tabooGameChatPageModel.response == null
                               ? SizedBox()
@@ -1275,8 +1278,23 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
   Widget _showSpeakAndListen(PlayTabooScreenVM vm, double height, double width,
       double heightFactor, double keyboardHeight) {
-    var provider = Provider.of<PlayTabooScreenProvider>(context, listen: false);
+    var provider = Provider.of<PlayTabooScreenProvider>(context, listen: true);
     var completeProvider = Provider.of<AnswerAssistProvider>(context,listen: false);
+
+    // if( provider.isTtsCompleted){
+    //   provider.setIsTtsCompleted(false);
+    //   stopSpeaking();
+    //   provider.setIsOnPressedEnd(true);
+    //   provider.setIsLocked(true);
+    //   provider.setIsOnLockedAndRestartListening(true);
+    //   provider.setIsshowHistoryAndSubtitle(false);
+    //   print("setIsOnLockedAndRestartListening ${provider.isOnLockedAndRestartListening}");
+    //   provider.setpreviousSpokenTextWhenStateIsLocked(completeProvider.wordController.text.trim());
+    //   print("last reconginzed $_lastRecognizedText");
+    //   _startListening();
+    // }
+
+
     _speech.onResults.listen((result) {
       currentText = result.text ?? '';
       // Update text in controller

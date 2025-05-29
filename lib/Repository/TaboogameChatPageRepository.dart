@@ -39,7 +39,7 @@ class TabooGameChatPageRepository {
 
     try {
       // Log the URL and data
-      print("API URL: $tabooGameChatPage");
+      print("API URL: $completUserMessage");
       print("Payload: $data");
       print(JsonEncoder.withIndent('  ').convert(data));
 
@@ -51,6 +51,7 @@ class TabooGameChatPageRepository {
         final data = responseData.isNotEmpty?responseData['text']:'';
         return data;
       } else {
+        print(status);
         return '';
       }
     } catch (e) {

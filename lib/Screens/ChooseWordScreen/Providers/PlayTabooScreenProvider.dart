@@ -35,6 +35,7 @@ class PlayTabooScreenProvider extends ChangeNotifier {
   bool _isKeyBoardOpen = false;
   bool _isOnPressedEnd = false;
   String _previousSpokenTextWhenStateIsLocked ='' ;
+  bool _isTtsComplete = false;
 
   //controller
 
@@ -68,6 +69,7 @@ class PlayTabooScreenProvider extends ChangeNotifier {
   bool get isOnLockedAndRestartListening => _isOnLockedAndRestartListening;
   bool get isRecognizingText => _isRecongningText;
   String get previousSpokenTextWhenStateIsLocked => _previousSpokenTextWhenStateIsLocked;
+  bool get isTtsCompleted => _isTtsComplete;
 
   // Setters
   void setpreviousSpokenTextWhenStateIsLocked(String val){
@@ -206,6 +208,9 @@ class PlayTabooScreenProvider extends ChangeNotifier {
     _isOnLockedAndRestartListening = value;
     notifyListeners();
   }
+  void setIsTtsCompleted(bool val){
+    _isTtsComplete = val;
+  }
 
   // Reset all states
   void resetAllStates() {
@@ -237,6 +242,7 @@ class PlayTabooScreenProvider extends ChangeNotifier {
     _isOnLockedAndRestartListening = false;
     _isRecongningText = false;
     _previousSpokenTextWhenStateIsLocked = '';
+    _isTtsComplete = false;
     notifyListeners();
   }
 } 

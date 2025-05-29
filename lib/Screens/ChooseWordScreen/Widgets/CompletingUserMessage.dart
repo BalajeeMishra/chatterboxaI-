@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 
+import '../../../Widget/text_gradient.dart';
 import '../../../Widget/text_widget.dart';
 import '../Providers/completeMessageProvider.dart';
 
@@ -44,7 +45,14 @@ class _CompletingUserMessageState extends State<CompletingUserMessage> {
                   ));
                 }
                 if(provider.state == AnswerAssistState.active) {
-                  return textGradient('Complete My Answer');
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      AnimatedActivationMask(child: textGradient('Complete My Answer')),
+                      8.width,
+                      Image.asset(chatTyping, width: 20, height: 20)
+                    ],
+                  );
                 }
                 else {
                   return Column(
@@ -129,13 +137,13 @@ class _CompletingUserMessageState extends State<CompletingUserMessage> {
             // AnswerAssistState.encouraging
           }
         },
-        child: MyText(
-          text: text,
-          textAlign: TextAlign.left,
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
+          child: MyText(
+            text: text,
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
         ).withGradient(),
-      ),
+
     );
   }
 }

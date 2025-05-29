@@ -178,16 +178,24 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                         final language = languages[index];
                         return Column(
                           children: [
-                            ListTile(
-                              title: Text(language.englishName),
-                              trailing: Text(language.nativeName),
-                              selected: selectedLanguage == language.englishName,
-                              selectedTileColor: Colors.blue.withOpacity(0.1),
-                              contentPadding: EdgeInsets.zero,
-                              onTap: () =>
-                                  Navigator.of(context).pop(language.englishName),
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color:selectedLanguage == language.englishName? Colors.grey.shade100:Colors.transparent,
+                              ),
+                              child: ListTile(
+                                title: Text(language.englishName),
+                                trailing: Text(language.nativeName),
+                                selected: selectedLanguage == language.englishName,
+                                selectedTileColor: Colors.blue.withOpacity(0.1),
+                                selectedColor: primaryColor,
+                                contentPadding: EdgeInsets.zero,
+                                onTap: () =>
+                                    Navigator.of(context).pop(language.englishName),
+                              ).paddingSymmetric(horizontal: 12),
                             ),
-                            Divider(color: Colors.black54,)
+                            Divider(thickness: 0.2,height: 10,)
+
                           ],
                         ).paddingSymmetric(horizontal: 12);
                       },

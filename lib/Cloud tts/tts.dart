@@ -3,8 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:balajiicode/Screens/ChooseWordScreen/Providers/PlayTabooScreenProvider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
 import 'package:just_audio/just_audio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:googleapis_auth/auth_io.dart';
@@ -66,6 +64,7 @@ class GoogleCloudTTSService {
           print("Delay for a second called");
           pro.setIfDelayOfASecond(false);
           await _playNextInQueue();
+
         }
       });
 
@@ -90,6 +89,8 @@ class GoogleCloudTTSService {
         // Still empty after retries: stop
         pro.setIsListening(true);
         _isPlayingQueue = false;
+        var provider = Provider.of<PlayTabooScreenProvider>(globalContext, listen: false);
+        provider.setIsTtsCompleted(true);
         return;
       }
 
