@@ -5,6 +5,7 @@ import { ProfileDropdownMenu } from "@/components/ui/profiledropdown";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Toaster } from "react-hot-toast";
 import Link from "next/link";
+import Image from "next/image";
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -72,12 +73,21 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     <div className="min-h-screen h-full flex flex-col">
       {/* Header */}
       <header className="bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow h-16 flex items-center justify-between px-4 fixed top-0 left-0 right-0 z-10">
-        <h1 className="text-xl font-semibold">Chatterbox Admin Dashboard</h1>
+        <div className="flex justify-start items-center gap-2">
+          <Image
+            src="/appicon.jpeg"
+            alt="logo"
+            height="200"
+            width="200"
+            className="h-10 w-10"
+          />
+          <h1 className="text-xl font-semibold">Chatterbox Admin Dashboard</h1>
+        </div>
         <ProfileDropdownMenu />
       </header>
-      <div className="flex flex-1 pt-16">
+      <div className="flex flex-1 ">
         {/* Sidebar */}
-        <aside className="bg-gradient-to-r from-violet-600 text-white to-indigo-600 w-64 h-screen overflow-y-auto p-4">
+        <aside className="bg-gradient-to-r from-violet-600 text-white to-indigo-600 w-64 h-screen overflow-y-auto p-4 pt-20">
           <nav className="space-y-2">
             <ul>
               <li>
@@ -122,11 +132,11 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                   href="/admin/pronunciation"
                   className="flex gap-2 py-2 px-4 rounded hover:bg-gray-100 hover:text-black"
                 >
-                  <Icon icon="cil:description" width="20" />
+                  <Icon icon="tabler:template" width="20" />
                   <span>Pronunciation Template</span>
                 </Link>
               </li>
-              
+
               <li>
                 <Link
                   href="/admin/admindetails"
@@ -134,6 +144,15 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                 >
                   <Icon icon="mdi:user-add-outline" width="20" />
                   <span> Add Admin</span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/admin/aitouse"
+                  className="flex gap-2 py-2 px-4 rounded hover:bg-gray-100 hover:text-black"
+                >
+                  <Icon icon="hugeicons:ai-idea" width="20" />
+                  <span>Ai To Use</span>
                 </Link>
               </li>
             </ul>
