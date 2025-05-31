@@ -26,7 +26,7 @@ router.post("/register", async (req, res, next) => {
     return res.status(200).json({ accessToken, newUser });
   } catch (err) {
     if (err.name == "MongoServerError") {
-      throw Error("Mobileno already exist.");
+      throw Error("Email Id already exist.");
     }
     throw err;
   }

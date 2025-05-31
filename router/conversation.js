@@ -189,7 +189,6 @@ router.post(
   jwtHelper.verifyToken,
   lastActivity,
   async (req, res, next) => {
-
     console.log("api called for completetheanswer");
     let { sessionId, mainContent, question, gameId } = req.body;
 
@@ -205,7 +204,8 @@ router.post(
     const promptTemplateContent = promptTemplate.content;
 
     const template = `User native language is {nativeLanguage}. user is from this ${user.country}. user name is ${user.name}. maincontent is {maincontent}. detailofcontent is {detailOfContent}. User english proficiency is ${user.engprolevel}. ${promptTemplateContent}
-  user wants to give the answer on the basis of Previous AI response. You can refer previous ai response in {chat_history}. User may find difficulty to give answer. They have written something as answer to previous AI response.  see user written text {question} carefully and complete it so that this would be the answer of last one AI response in order to continue playing the game.  `;
+  user wants to give the answer on the basis of Previous AI response. You can refer previous ai response in {chat_history}. You know the answer that would be correct for the last AI response for this game . User also trying to give the answer but this is incomplete or not upto the mark.
+  You need to assist user.See user written text {question} carefully and complete it so that this would be the answer of last one AI response in order to continue playing the game.  `;
 
     const prompt = new PromptTemplate({
       inputVariables: [
@@ -236,9 +236,6 @@ router.post(
         chat_history: userSession.history ?? "",
         human_input: "",
       });
-
-      console.log("response", response.text);
-      console.log("userSession.history");
       // await userSession.memory.saveContext(
       //   { input: question },
       //   { output: response.text }
