@@ -27,13 +27,13 @@ app.get("/", async (_, res) => res.send("Server is running"));
 
 app.post("/api/ai", async (req, res) => {
   try {
-    const {aitouse}= req.body;
+    const {selectedAi}= req.body;
     const ai = await AI.findOne({});
     if (!ai) {
-      await new AI({aitouse}).save();
+      await new AI({aitouse:selectedAi}).save();
       return res.status(200).json({ ai });
     }
-    ai.aitouse = aitouse;
+    ai.aitouse = selectedAi;
     await ai.save();
     return res.status(200).json({ ai });
   } catch (error) {
