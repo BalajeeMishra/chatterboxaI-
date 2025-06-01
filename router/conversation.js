@@ -189,53 +189,70 @@ router.post(
   jwtHelper.verifyToken,
   lastActivity,
   async (req, res, next) => {
-    console.log("api called for completetheanswer");
     let { sessionId, mainContent, question, gameId } = req.body;
 
     const userId = req.userId;
 
     const user = await User.findById(userId);
 
-    const promptTemplate = await Prompt.findOne({
-      gameId,
-      engprolevel: user.engprolevel,
-    });
+    // const promptTemplate = await Prompt.findOne({
+    //   gameId,
+    //   engprolevel: user.engprolevel,
+    // });
 
-    const promptTemplateContent = promptTemplate.content;
+    // const promptTemplateContent = promptTemplate.content;
 
-    const template = `User native language is {nativeLanguage}. user is from this ${user.country}. user name is ${user.name}. maincontent is {maincontent}. detailofcontent is {detailOfContent}. User english proficiency is ${user.engprolevel}. ${promptTemplateContent}
-  user wants to give the answer on the basis of Previous AI response. You can refer previous ai response in {chat_history}. You know the answer that would be correct for the last AI response for this game . User also trying to give the answer but this is incomplete or not upto the mark.
-  You need to assist user.See user written text {question} carefully and complete it so that this would be the answer of last one AI response in order to continue playing the game.  `;
+    let userdatalog = await UserLog.findOne({ userId, sessionId: sessionId });
 
-    const prompt = new PromptTemplate({
-      inputVariables: [
-        "question",
-        "nativeLanguage",
-        "maincontent",
-        "detailOfContent",
-        "chat_history",
-      ],
-      template: template,
-    });
+    const aiReply =
+      userdatalog?.aiResponse[userdatalog?.aiResponse.length - 1]?.text;
+
+    const template = `User native language is {nativeLanguage}. user is from this ${user.country}. user name is ${user.name}. User english proficiency is ${user.engprolevel}.
+  user wants to give the answer on the basis of Previous AI response. Previous ai response is  ${aiReply}. User has tried to give the answer but this is incomplete or not upto the mark.
+  See user written answer {question} carefully and complete it so that this would be the answer of last one AI response.. Also don't write other text only answer. If you found nothing wrong with answer just return the original answer.`;
+
+    // const prompt = new PromptTemplate({
+    //   inputVariables: [
+    //     "question",
+    //     "nativeLanguage",
+    //   ],
+    //   template: template,
+    // });
 
     try {
-      const userSession = getUserSession(sessionId, prompt);
+      // const userSession = getUserSession(sessionId, prompt);
 
-      const gamecontent = await GameContent.findOne({ mainContent });
+      // const gamecontent = await GameContent.findOne({ mainContent });
 
-      const maincontent = gamecontent.mainContent;
-      const detailOfContent = gamecontent.detailOfContent;
+      // const maincontent = gamecontent.mainContent;
+      // const detailOfContent = gamecontent.detailOfContent;
 
       const nativeLanguage = user.nativeLanguage;
 
-      const response = await userSession.chain.invoke({
+      //  question: question,
+      //  maincontent: maincontent,
+      //   detailOfContent: detailOfContent,
+      //   nativeLanguage: nativeLanguage,
+      //   chat_history: userSession.history ?? "",
+      //   human_input: "",
+
+      // const response = await userSession.chain.invoke({
+      //   question: question,
+      //   nativeLanguage: nativeLanguage,
+      //   human_input: "",
+      // });
+
+      const prompt = PromptTemplate.fromTemplate(template);
+      const chain = prompt.pipe(llm);
+
+      // Invoke the chain
+      const response = await chain.invoke({
         question: question,
-        maincontent: maincontent,
-        detailOfContent: detailOfContent,
         nativeLanguage: nativeLanguage,
-        chat_history: userSession.history ?? "",
-        human_input: "",
       });
+
+      console.log(response, "response for complete answer");
+
       // await userSession.memory.saveContext(
       //   { input: question },
       //   { output: response.text }
