@@ -886,389 +886,382 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                 }
                 return false;
               },
-              child: LayoutBuilder(
-                builder: (context,constraints)=>
-                 SingleChildScrollView(
-                   padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-                   child: ConstrainedBox(
-                     constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                     child: Column(
-                      children: [
-                        Column(
+              child: Column(
+                  children: [
+                    5.height,
+                    if (showSubtitle && !isLandscape)
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height *
+                            0.175,
+                      ),
+                    Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        child: Column(
+                          crossAxisAlignment:
+                          CrossAxisAlignment.center,
+                          mainAxisAlignment: !provider.apiCalled
+                              ? MainAxisAlignment.center
+                              : MainAxisAlignment.spaceBetween,
                           children: [
-                            5.height,
-                            if (showSubtitle && !isLandscape)
-                              SizedBox(
-                                height: MediaQuery.of(context).size.height *
-                                    0.175,
-                              ),
-                            Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 16),
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.center,
-                                  mainAxisAlignment: !provider.apiCalled
-                                      ? MainAxisAlignment.center
-                                      : MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Stack(
-                                      children: [
-                                        ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
+                            Stack(
+                              children: [
+                                ClipRRect(
+                                  borderRadius:
+                                  BorderRadius.circular(8),
+                                  child: Image.asset(
+                                      fit: BoxFit.cover,
+                                      height: height * (205 / 812),
+                                      ImageConstant.listening_female),
+                                ),
+                                if (!vm.isGifDownloaded &&
+                                    vm.isListening)
+                                  ClipRRect(
+                                    borderRadius:
+                                    BorderRadius.circular(8),
+                                    child: Image.asset(
+                                        fit: BoxFit.cover,
+                                        height: height * (205 / 812),
+                                        ImageConstant
+                                            .listening_female),
+                                  ),
+                                if (!vm.isGifDownloaded &&
+                                    !vm.isListening)
+                                  ClipRRect(
+                                    borderRadius:
+                                    BorderRadius.circular(8),
+                                    child: Image.asset(
+                                        fit: BoxFit.cover,
+                                        height: height * (205 / 812),
+                                        ImageConstant
+                                            .speaking_female),
+                                  ),
+                                if (vm.isListening &&
+                                    vm.listeningGif != null)
+                                  ClipRRect(
+                                    borderRadius:
+                                    BorderRadius.circular(8),
+                                    child: Image.memory(
+                                        fit: BoxFit.cover,
+                                        height: height * (205 / 812),
+                                        vm.listeningGif!),
+                                  ),
+                                if (!vm.isListening &&
+                                    vm.talkingGif != null)
+                                  ClipRRect(
+                                    borderRadius:
+                                    BorderRadius.circular(8),
+                                    child: Image.memory(
+                                        fit: BoxFit.cover,
+                                        height: height * (205 / 812),
+                                        vm.talkingGif!),
+                                  ),
+                              ],
+                            ),
+                            8.height,
+                            if (provider.apiCalled)
+                              Row(
+                                mainAxisAlignment:
+                                MainAxisAlignment.center,
+                                crossAxisAlignment:
+                                CrossAxisAlignment.center,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.center,
+                                    children: [
+                                      InkWell(
+                                          onTap: () =>
+                                              _onDecreaseRatePressed(),
                                           child: Image.asset(
-                                              fit: BoxFit.cover,
-                                              height: height * (205 / 812),
-                                              ImageConstant.listening_female),
-                                        ),
-                                        if (!vm.isGifDownloaded &&
-                                            vm.isListening)
-                                          ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                            child: Image.asset(
-                                                fit: BoxFit.cover,
-                                                height: height * (205 / 812),
-                                                ImageConstant
-                                                    .listening_female),
-                                          ),
-                                        if (!vm.isGifDownloaded &&
-                                            !vm.isListening)
-                                          ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                            child: Image.asset(
-                                                fit: BoxFit.cover,
-                                                height: height * (205 / 812),
-                                                ImageConstant
-                                                    .speaking_female),
-                                          ),
-                                        if (vm.isListening &&
-                                            vm.listeningGif != null)
-                                          ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                            child: Image.memory(
-                                                fit: BoxFit.cover,
-                                                height: height * (205 / 812),
-                                                vm.listeningGif!),
-                                          ),
-                                        if (!vm.isListening &&
-                                            vm.talkingGif != null)
-                                          ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                            child: Image.memory(
-                                                fit: BoxFit.cover,
-                                                height: height * (205 / 812),
-                                                vm.talkingGif!),
-                                          ),
-                                      ],
-                                    ),
-                                    8.height,
-                                    if (provider.apiCalled)
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                            ImageConstant
+                                                .backward_icon,
+                                            width: 25,
+                                            height: 25,
+                                          )),
+                                      Text(
+                                        "Slow",
+                                        style: secondaryTextStyle(
+                                            size: 11),
+                                        softWrap: false,
+                                        maxLines: 1,
+                                        overflow:
+                                        TextOverflow.visible,
+                                      ).onTap(() {
+                                        _onDecreaseRatePressed();
+                                      })
+                                    ],
+                                  ),
+                                  SizedBox(width: 25),
+                                  Container(
+                                    width: width * 0.14,
+                                    height: height * 0.07,
+                                    // color:Colors.redAccent,
+                                    child: Center(
+                                      child: Column(
                                         crossAxisAlignment:
-                                            CrossAxisAlignment.center,
+                                        CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.center,
                                         children: [
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              InkWell(
-                                                  onTap: () =>
-                                                      _onDecreaseRatePressed(),
-                                                  child: Image.asset(
-                                                    ImageConstant
-                                                        .backward_icon,
-                                                    width: 25,
-                                                    height: 25,
-                                                  )),
-                                              Text(
-                                                "Slow",
-                                                style: secondaryTextStyle(
-                                                    size: 11),
-                                                softWrap: false,
-                                                maxLines: 1,
-                                                overflow:
-                                                    TextOverflow.visible,
-                                              ).onTap(() {
-                                                _onDecreaseRatePressed();
-                                              })
-                                            ],
-                                          ),
-                                          SizedBox(width: 25),
-                                          Container(
-                                            width: width * 0.14,
-                                            height: height * 0.07,
-                                            // color:Colors.redAccent,
+                                          InkWell(
+                                            onTap: () async {
+                                              int currentTime = DateTime
+                                                  .now()
+                                                  .millisecondsSinceEpoch;
+                                              if (currentTime -
+                                                  lastTapTime <
+                                                  800) {
+                                                return;
+                                              }
+                                              lastTapTime =
+                                                  currentTime;
+                                              provider.setIsMuted(
+                                                  !provider.isMuted);
+                                              setValue(IS_MUTE,
+                                                  provider.isMuted);
+                                              if (provider.isMuted) {
+                                                await stopSpeaking();
+                                              } else {
+                                                await stopSpeaking();
+                                                animateAIMessageToStart();
+                                                Future.delayed(
+                                                    Duration(
+                                                        seconds: 1),
+                                                        () {
+                                                      speakText();
+                                                    });
+                                              }
+                                            },
                                             child: Center(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  InkWell(
-                                                    onTap: () async {
-                                                      int currentTime = DateTime
-                                                              .now()
-                                                          .millisecondsSinceEpoch;
-                                                      if (currentTime -
-                                                              lastTapTime <
-                                                          800) {
-                                                        return;
-                                                      }
-                                                      lastTapTime =
-                                                          currentTime;
-                                                      provider.setIsMuted(
-                                                          !provider.isMuted);
-                                                      setValue(IS_MUTE,
-                                                          provider.isMuted);
-                                                      if (provider.isMuted) {
-                                                        await stopSpeaking();
-                                                      } else {
-                                                        await stopSpeaking();
-                                                        animateAIMessageToStart();
-                                                        Future.delayed(
-                                                            Duration(
-                                                                seconds: 1),
-                                                            () {
-                                                          speakText();
-                                                        });
-                                                      }
-                                                    },
-                                                    child: Center(
-                                                      child: SvgPicture.asset(
-                                                        !provider.isMuted
-                                                            ? 'assets/svg/unmute.svg'
-                                                            : 'assets/svg/mute.svg',
-                                                        width: 35,
-                                                        height: 35,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Center(
-                                                    child: MyText(
-                                                      text: !provider.isMuted
-                                                          ? "Mute"
-                                                          : "Unmute",
-                                                      softwrap: false,
-                                                      maxLines: 1,
-                                                      overflow: TextOverflow
-                                                          .visible,
-                                                      fontSize: 12,
-                                                    ),
-                                                  ),
-                                                ],
+                                              child: SvgPicture.asset(
+                                                !provider.isMuted
+                                                    ? 'assets/svg/unmute.svg'
+                                                    : 'assets/svg/mute.svg',
+                                                width: 35,
+                                                height: 35,
                                               ),
                                             ),
                                           ),
-                                          SizedBox(width: 25),
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.end,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              InkWell(
-                                                  onTap: () =>
-                                                      _onIncreaseRatePressed(),
-                                                  child: Image.asset(
-                                                    ImageConstant
-                                                        .forward_icon,
-                                                    width: 25,
-                                                    height: 25,
-                                                  )),
-                                              Text(
-                                                "Fast",
-                                                style: secondaryTextStyle(
-                                                    size: 12),
-                                                softWrap: false,
-                                                maxLines: 1,
-                                                overflow:
-                                                    TextOverflow.visible,
-                                              ).onTap(() {
-                                                _onIncreaseRatePressed();
-                                              })
-                                            ],
-                                          )
+                                          Center(
+                                            child: MyText(
+                                              text: !provider.isMuted
+                                                  ? "Mute"
+                                                  : "Unmute",
+                                              softwrap: false,
+                                              maxLines: 1,
+                                              overflow: TextOverflow
+                                                  .visible,
+                                              fontSize: 12,
+                                            ),
+                                          ),
                                         ],
                                       ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 25),
+                                  Column(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.end,
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.center,
+                                    children: [
+                                      InkWell(
+                                          onTap: () =>
+                                              _onIncreaseRatePressed(),
+                                          child: Image.asset(
+                                            ImageConstant
+                                                .forward_icon,
+                                            width: 25,
+                                            height: 25,
+                                          )),
+                                      Text(
+                                        "Fast",
+                                        style: secondaryTextStyle(
+                                            size: 12),
+                                        softWrap: false,
+                                        maxLines: 1,
+                                        overflow:
+                                        TextOverflow.visible,
+                                      ).onTap(() {
+                                        _onIncreaseRatePressed();
+                                      })
                                     ],
-                                  )),
-                            8.height,
-                            if (provider.isFirstTime)
-                              LoadingWidget(message: "Listening..."),
-                            if (provider.isLoaderShow)
-                              CircularProgressIndicator(color: primaryColor),
-                            if (!provider.apiCalled && !provider.isLoading)
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: MyText(
-                                      text: provider.lastWords,
-                                      color: Color(0xff000000),
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
+                                  )
                                 ],
-                              ).paddingSymmetric(
-                                  horizontal: 16, vertical: 14),
-                            if(showSubtitle)SizedBox(height: 89*heightFactor,),
-                            if (provider.apiCalled &&
-                                !provider.isLoaderShow &&
-                                !showSubtitle &&
-                                !isLandscape &&
-                                !(keyboardHeight > 0) &&
-                                !provider.isFirstTime)
-                              vm.tabooGameChatPageModel.response == null
-                                  ? LoadingWidget(message: provider.message)
-                                  : Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 16.0, vertical: 0),
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                              child: provider.startListening
-                                                  ? MyText(
-                                                      text:
-                                                          provider.lastWords,
-                                                      color:
-                                                          Color(0xff000000),
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                    )
-                                                  : (vm
-                                                                  .tabooGameChatPageModel
-                                                                  .response!
-                                                                  .aiResponse!
-                                                                  .last ==
-                                                              null ||
-                                                          vm
-                                                                  .tabooGameChatPageModel
-                                                                  .response!
-                                                                  .aiResponse!
-                                                                  .last ==
-                                                              "")
-                                                  ? Text("")
-                                                  : SizedBox(
-                                                      height: provider
-                                                              .isExpanded
-                                                          ? height * 0.18
-                                                          : provider
-                                                                  .isLocked
-                                                              ? (completProvider.state ==
-                                                                      AnswerAssistState.completing || completProvider.state ==
-                                                                  AnswerAssistState.encouraging)
-                                                                  ? height *
-                                                                      0.1
-                                                                  : height *
-                                                                      .28
-                                                              : height *
-                                                                  0.28,
-                                                      // height: height* 0.30,
-                                                      child: Scrollbar(
-                                                        child:
-                                                            SingleChildScrollView(
-                                                          controller:
-                                                              aiMessageScrollController,
-                                                          child: RichText(
-                                                            textAlign:
-                                                                TextAlign
-                                                                    .left,
-                                                            text:
-                                                                TextSpan(
-                                                              children: buildHighlightedTextSpans(vm
-                                                                  .tabooGameChatPageModel
-                                                                  .response!
-                                                                  .aiResponse!
-                                                                  .last),
-                                                              style: primaryTextStyle(
-                                                                      size:
-                                                                          16)
-                                                                  .copyWith(
-                                                                height:
-                                                                    1.5,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    )),
-                                        ],
+                              ),
+                          ],
+                        )),
+                    8.height,
+                    if (provider.isFirstTime)
+                      LoadingWidget(message: "Listening..."),
+                    if (provider.isLoaderShow)
+                      CircularProgressIndicator(color: primaryColor),
+                    if (!provider.apiCalled && !provider.isLoading)
+                      Row(
+                        children: [
+                          Expanded(
+                            child: MyText(
+                              text: provider.lastWords,
+                              color: Color(0xff000000),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
+                      ).paddingSymmetric(
+                          horizontal: 16, vertical: 14),
+                    if(showSubtitle)SizedBox(height: 89*heightFactor,),
+                    if (provider.apiCalled &&
+                        !provider.isLoaderShow &&
+                        !showSubtitle &&
+                        !isLandscape &&
+                        !(keyboardHeight > 0) &&
+                        !provider.isFirstTime)
+                      vm.tabooGameChatPageModel.response == null
+                          ? LoadingWidget(message: provider.message)
+                          : (completProvider.state ==
+                          AnswerAssistState.completing || completProvider.state ==
+                          AnswerAssistState.encouraging)?Expanded(child: SizedBox()):Expanded(
+                            child: Padding(
+                                                    padding: EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 0),
+                                                    child: Row(
+                            children: [
+                              Expanded(
+                                  child: provider.startListening
+                                      ? MyText(
+                                    text:
+                                    provider.lastWords,
+                                    color:
+                                    Color(0xff000000),
+                                    fontSize: 18,
+                                    fontWeight:
+                                    FontWeight.w400,
+                                  )
+                                      : (vm
+                                          .tabooGameChatPageModel
+                                          .response!
+                                          .aiResponse!
+                                          .last ==
+                                          "")
+                                      ? Text("")
+                                      : SizedBox(
+                                    // height: provider
+                                    //     .isExpanded
+                                    //     ? height * 0.18
+                                    //     : provider.isLocked
+                                    //     ? height *
+                                    //     .23
+                                    //     : height *
+                                    //     0.28,
+                                    // height: height* 0.30,
+                                    child: Scrollbar(
+                                      child:
+                                      SingleChildScrollView(
+                                        controller:
+                                        aiMessageScrollController,
+                                        child: RichText(
+                                          textAlign:
+                                          TextAlign
+                                              .left,
+                                          text:
+                                          TextSpan(
+                                            children: buildHighlightedTextSpans(vm
+                                                .tabooGameChatPageModel
+                                                .response!
+                                                .aiResponse!
+                                                .last),
+                                            style: primaryTextStyle(
+                                                size:
+                                                16)
+                                                .copyWith(
+                                              height:
+                                              1.5,
+                                            ),
+                                          ),
+                                        ),
                                       ),
                                     ),
-                          ],
-                        ),
-                        if (!provider.isLoaderShow)
-                          vm.tabooGameChatPageModel.response == null
-                              ? SizedBox()
-                              : Container(
-                                child: SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
-                                    child: Row(
-
-                                      children: [
-                                        Suggetionswidget(
-                                            text: "Skip Question",
-                                            onTap: () {
-                                              stopSpeaking();
-                                              _sendAnalytics();
-                                             completProvider.wordController.text =
-                                                  "Skip Question";
-                                              _stopAndSendResponse(vm);
-                                            },
-                                            isIcon: true),
-                                        10.width,
-                                        Suggetionswidget(
-                                            text: "Yes, I'm ready",
-                                            onTap: () {
-                                              stopSpeaking();
-                                              _sendAnalytics();
-                                              completProvider.wordController.text =
-                                                  "Yes, I'm ready";
-                                              _stopAndSendResponse(vm);
-                                            }),
-                                        10.width,
-                                        Suggetionswidget(
-                                            text:
-                                                "No, help me understand the game",
-                                            onTap: () {
-                                              stopSpeaking();
-                                              _sendAnalytics();
-                                              completProvider.wordController.text =
-                                                  "No, help me understand the game";
-                                              _stopAndSendResponse(vm);
-                                            }),
-                                      ],
-                                    ).paddingSymmetric(
-                                        vertical: 4,),
-                                  ),
-                              ).paddingSymmetric(horizontal: 12),
-                        if (!provider.isLoaderShow)
-                          vm.tabooGameChatPageModel.response == null
-                              ? SizedBox()
-                              : CompletingUserMessage(userMessage: completProvider.wordController.text.trim(), sessionId: widget.sessionId, gameModel: widget.allGameModel, index: widget.index, modality: '',).paddingSymmetric(
-                                  vertical: 4, horizontal: 12),
-                        // Row(children: [Expanded(child: SizedBox()),Expanded(child: CompletingAnswer())]),
-                        if (!provider.isLoaderShow)
-                          vm.tabooGameChatPageModel.response == null
-                              ? SizedBox()
-                              : Center(
-                                  child: _showSpeakAndListen(vm, height, width,
-                                      heightFactor, keyboardHeight)),
-                      ],
-                     ),
-                   ),
+                                  )),
+                            ],
+                                                    ),
+                                                  ),
+                          ),
+                    if (!provider.isLoaderShow)
+                      vm.tabooGameChatPageModel.response == null
+                          ? SizedBox()
+                          :   Align(
+                        alignment: Alignment.centerRight,
+                            child: Suggetionswidget(
+                            text: "Skip Question",
+                            onTap: () {
+                              stopSpeaking();
+                              _sendAnalytics();
+                              completProvider.wordController.text =
+                              "Skip Question";
+                              _stopAndSendResponse(vm);
+                            },
+                            isIcon: true),
+                          ).paddingSymmetric(horizontal: 12),
+                      // Container(
+                      //       child: SingleChildScrollView(
+                      //           scrollDirection: Axis.horizontal,
+                      //           child: Row(
+                      //
+                      //             children: [
+                      //               Suggetionswidget(
+                      //                   text: "Skip Question",
+                      //                   onTap: () {
+                      //                     stopSpeaking();
+                      //                     _sendAnalytics();
+                      //                    completProvider.wordController.text =
+                      //                         "Skip Question";
+                      //                     _stopAndSendResponse(vm);
+                      //                   },
+                      //                   isIcon: true),
+                      //               10.width,
+                      //               Suggetionswidget(
+                      //                   text: "Yes, I'm ready",
+                      //                   onTap: () {
+                      //                     stopSpeaking();
+                      //                     _sendAnalytics();
+                      //                     completProvider.wordController.text =
+                      //                         "Yes, I'm ready";
+                      //                     _stopAndSendResponse(vm);
+                      //                   }),
+                      //               10.width,
+                      //               Suggetionswidget(
+                      //                   text:
+                      //                       "No, help me understand the game",
+                      //                   onTap: () {
+                      //                     stopSpeaking();
+                      //                     _sendAnalytics();
+                      //                     completProvider.wordController.text =
+                      //                         "No, help me understand the game";
+                      //                     _stopAndSendResponse(vm);
+                      //                   }),
+                      //             ],
+                      //           ).paddingSymmetric(
+                      //               vertical: 4,),
+                      //         ),
+                      //     ).paddingSymmetric(horizontal: 12),
+                    if (!provider.isLoaderShow && provider.isLocked)
+                      vm.tabooGameChatPageModel.response == null
+                          ? SizedBox()
+                          : CompletingUserMessage(userMessage: completProvider.wordController.text.trim(), sessionId: widget.sessionId, gameModel: widget.allGameModel, index: widget.index, modality: '',).paddingSymmetric(
+                              vertical: 4, horizontal: 12),
+                    // Row(children: [Expanded(child: SizedBox()),Expanded(child: CompletingAnswer())]),
+                    if (!provider.isLoaderShow)
+                      vm.tabooGameChatPageModel.response == null
+                          ? SizedBox()
+                          : Center(
+                              child: _showSpeakAndListen(vm, height, width,
+                                  heightFactor, keyboardHeight)),
+                  ],
                  ),
-              ),
+
             ),
           ),
         ),
@@ -1300,7 +1293,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
       // Update text in controller
       print(provider.isOnLockedAndRestartListening);
       if (provider.isOnLockedAndRestartListening) {
-        print("inside listener last word $_lastRecognizedText");
+        // print("inside listener last word $_lastRecognizedText");
         currentText = '${provider.previousSpokenTextWhenStateIsLocked} $currentText';
       }
 
@@ -1308,7 +1301,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
       print(currentText);
 
       // Track status
-      print("status of tts ${result.status}");
+      // print("status of tts ${result.status}");
 
       // Check recognizing state
       if (result.status == "recognizing") {
@@ -1324,7 +1317,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
           // Start a new 3-second timer
           _noChangeTimerFor3Sec = Timer(Duration(seconds: 3), () {
-            print("pause for 3 second called ");
+            // print("pause for 3 second called ");
             if(completeProvider.canDoActiveOrNot){
               var pro =  Provider.of<AnswerAssistProvider>(context,listen: false);
               pro.setActive();
@@ -1377,6 +1370,9 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                       },
                       onTap: () {
                         _stopListening();
+
+                        provider.setIsOnPressedEnd(false);
+
                       },
                       maxLines: 3,
                       minLines: 1,

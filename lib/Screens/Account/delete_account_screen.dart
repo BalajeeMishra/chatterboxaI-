@@ -10,6 +10,7 @@ import 'package:balajiicode/extensions/common.dart';
 import 'package:balajiicode/extensions/extension_util/context_extensions.dart';
 import 'package:balajiicode/extensions/extension_util/int_extensions.dart';
 import 'package:balajiicode/extensions/shared_pref.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 
 import '../../Model/error_model.dart';
@@ -31,9 +32,47 @@ class DeleteAccountScreen extends StatefulWidget {
   State<DeleteAccountScreen> createState() => _DeleteAccountScreenState();
 }
 
-class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
+class _DeleteAccountScreenState extends State<DeleteAccountScreen> with SingleTickerProviderStateMixin{
   bool isDeleted = false;
   bool isLoading = false;
+  final dropDownKey = GlobalKey<DropdownSearchState>();
+  String name = '';
+  bool isActive = false;
+
+  late AnimationController _colorController;
+  late Animation<Color?> _colorAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _colorController = AnimationController(
+      duration: Duration(seconds: 5),
+      vsync: this,
+    );
+
+    _colorAnimation = ColorTween(
+      begin: Colors.grey.shade400,
+      end: lightRedColor,
+    ).animate(CurvedAnimation(parent: _colorController, curve: Curves.easeInOut));
+
+    // Delay the animation by 1 second
+    Future.delayed(Duration(seconds: 1), () {
+      _colorController.forward();
+    });
+    Future.delayed(Duration(seconds: 4), () {
+      setState(() {
+        isActive = true;
+      });
+    });
+
+  }
+
+  @override
+  void dispose() {
+    _colorController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -151,20 +190,28 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                 ],
               ),
               Spacer(),
-              if(!isDeleted)ElevatedButton(
-                onPressed: () {
-                deleteuser();
-                },
-                style: ElevatedButton.styleFrom(
-                  minimumSize: Size(double.infinity, 50),
-                  backgroundColor: lightRedColor,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              if(!isDeleted)
+                AnimatedBuilder(
+                  animation: _colorAnimation,
+                  builder: (context, child) {
+                    return OutlinedButton.icon(
+                      onPressed: () {
+                       if(isActive) deleteuser();
+                      },
+                      icon: Icon(Icons.delete, color: _colorAnimation.value),
+                      label: MyText(
+                        text: "Delete Account",
+                        color: whiteColor,
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: Size(double.infinity, 50),
+                        side: BorderSide(color: _colorAnimation.value ?? Colors.grey),
+                        backgroundColor: _colorAnimation.value??grey,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                    );
+                  },
                 ),
-                child: MyText(
-                 text:  "Delete Account",
-                 color: whiteColor, fontSize: 16,
-                ),
-              ),
               16.height,
               OutlinedButton(
                 onPressed: () {

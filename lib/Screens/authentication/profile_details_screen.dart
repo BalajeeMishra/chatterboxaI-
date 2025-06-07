@@ -34,9 +34,13 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
   int englishLevel = 1; // 0: Beginner, 1: Intermediate, 2: Advanced
   GlobalKey<FormState> mFormKey = GlobalKey<FormState>();
   String countryCode ="";
+  List<Language> filteredLanguages = [];
+  TextEditingController searchController = TextEditingController();
+
 
   @override
   void initState() {
+    filteredLanguages = languages;
     if(widget.mobileNumber != '') {
       countryCode = extractCountryCode(widget.mobileNumber.toString());
       print("Country code $countryCode");
@@ -166,16 +170,25 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                         prefixIcon: Icon(Icons.search),
                         border: OutlineInputBorder(),
                         isDense: true,
+
                       ),
-                      // onChanged: ...
+                      onChanged: (value) {
+                        setState(() {
+                          filteredLanguages = languages
+                              .where((lang) =>
+                          lang.englishName.toLowerCase().contains(value.toLowerCase()) ||
+                              lang.nativeName.toLowerCase().contains(value.toLowerCase()))
+                              .toList();
+                        });
+                      },
                     ),
                   ),
                   const SizedBox(height: 8),
                   Expanded(
                     child: ListView.builder(
-                      itemCount: languages.length,
+                      itemCount: filteredLanguages.length,
                       itemBuilder: (context, index) {
-                        final language = languages[index];
+                        final language = filteredLanguages[index];
                         return Column(
                           children: [
                             Container(
@@ -334,10 +347,10 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment
                                       .spaceBetween,
-                                  children: const [
-                                    MyText(text: 'Beginner'),
-                                    MyText(text: 'Intermediate'),
-                                    MyText(text: 'Advanced'),
+                                  children: [
+                                    MyText(text: 'Beginner',color: englishLevel==0?primaryColor : textColor,),
+                                    MyText(text: 'Intermediate',color: englishLevel==1?primaryColor : textColor,),
+                                    MyText(text: 'Advanced',color: englishLevel==2?primaryColor : textColor,),
                                   ],
                                 ),
                                 Slider(
@@ -345,7 +358,9 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                                   min: 0,
                                   max: 2,
                                   divisions: 2,
-                                  activeColor: primaryColor,
+                                  activeColor: Colors.grey.shade200,
+                                  inactiveColor: Colors.grey.shade200,
+                                  thumbColor: primaryColor,
                                   onChanged: (value) {
                                     setState(() {
                                       englishLevel = value.toInt();
@@ -353,8 +368,8 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                                   },
                                 ),
                                 8.height,
-                                const Text(
-                                  'Can handle daily conversations and write or speak with some confidence on familiar topics.',
+                                 Text(
+                                 englishLevel==0 ? 'Can understand and use basic everyday expressions and simple phrases.' : englishLevel==1 ? 'Can handle daily conversations and write or speak with some confidence on familiar topics.':'Can communicate fluently and effectively in complex situations, both spoken and written.',
                                   style: TextStyle(
                                       fontSize: 12, color: Colors.black54),
                                 ),

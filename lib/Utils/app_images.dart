@@ -18,5 +18,7 @@ const zapAIAvtar = "assets/images/zapAIAvtar.png";
 const zapai2 = "assets/images/zapai2.png";
 const chatTyping = "assets/images/chat_typing.png";
 const tilt = "assets/images/tilt.png";
+const circle = "assets/images/circle.png";
+const chatTypingGit = "assets/images/chat_typing.gif";
 
 

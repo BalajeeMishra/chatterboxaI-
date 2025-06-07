@@ -22,9 +22,12 @@ class Suggetionswidget extends StatelessWidget {
                borderRadius: BorderRadius.circular(20),
                color: lightGreyBackground
              ),
+            width: 150,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12.0,vertical: 5),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   if(isIcon)Image.asset(ImageConstant.forward_icon, height: 15, width: 15,color: Colors.black54,),
                   MyText(text: text),

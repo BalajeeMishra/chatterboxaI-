@@ -60,12 +60,24 @@ class _CompletingUserMessageState extends State<CompletingUserMessage> {
                       if(provider.state == AnswerAssistState.encouraging) Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Image.asset(tilt, width: 20),
+                          InkWell(
+                              onTap: (){
+                                provider.setActive();
+                                provider.setIsAlreadyResponded(true);
+                              },
+                              child:
+                              Image.asset(tilt, width: 20)
+                          ),
                           3.width,
                           textGradient(
                               "You're Doing Good! Try Saying It Out Loud"),
                           3.width,
-                          Image.asset(chatTyping, width: 20,)
+                          Stack(
+                            children: [
+                              Image.asset(circle,width: 25,),
+                              Center(child: Image.asset(chatTypingGit,width: 24,)),
+                            ],
+                          )
                         ],
                       ),
                       if(provider.state == AnswerAssistState.completing)Row(
@@ -122,13 +134,17 @@ class _CompletingUserMessageState extends State<CompletingUserMessage> {
 
           }
           else if(pro.state == AnswerAssistState.active){
-            pro.clearCorrectedUserMessageController();
-            pro.setCompleting();
-          bool res =  await  pro.completeUserMessage(context,widget.userMessage,widget.sessionId,widget.gameModel,widget.index,widget.modality);
-          if(res){
-            // var provider = Provider.of<PlayTabooScreenProvider>(context,listen: false);
-            // provider.setIsOnLockedAndRestartListening(false);
-            // provider.setpreviousSpokenTextWhenStateIsLocked('');
+            if(pro.isAlreadyResponded){
+              pro.setEncouraging();
+            }else{
+              pro.clearCorrectedUserMessageController();
+              pro.setCompleting();
+              bool res =  await  pro.completeUserMessage(context,widget.userMessage,widget.sessionId,widget.gameModel,widget.index,widget.modality);
+              if(res){
+                // var provider = Provider.of<PlayTabooScreenProvider>(context,listen: false);
+                // provider.setIsOnLockedAndRestartListening(false);
+                // provider.setpreviousSpokenTextWhenStateIsLocked('');
+              }
             }
           }
           else if(pro.state == AnswerAssistState.encouraging){

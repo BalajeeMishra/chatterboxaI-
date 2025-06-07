@@ -291,6 +291,7 @@ class _OTPVerificationState extends State<OTPVerification> {
                             child: Image.asset(zapAIAvtar, fit: BoxFit.fill),
                           ),
                           Container(
+                            height: screenHeight*.30,
                             width: double.infinity,
                             padding: const EdgeInsets.symmetric(horizontal: 12),
                             decoration: const BoxDecoration(
@@ -302,6 +303,7 @@ class _OTPVerificationState extends State<OTPVerification> {
                             ),
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 10.height,
                                 Row(
@@ -377,7 +379,7 @@ class _OTPVerificationState extends State<OTPVerification> {
                                 ),
                                 10.height,
                               ],
-                            ),
+                            ).paddingSymmetric(vertical: 20),
                           ),
                         ],
                       ),
@@ -393,11 +395,11 @@ class _OTPVerificationState extends State<OTPVerification> {
   }
 
   Widget otpInputField() {
+
     return OTPTextField(
-      // key: otpTextFieldKey,
 
       pinLength: 6,
-      fieldWidth: context.width() * 0.1,
+      fieldWidth: context.width() * 0.11,
       onChanged: (s) {
         otpCode = s;
       },
@@ -407,6 +409,6 @@ class _OTPVerificationState extends State<OTPVerification> {
           () {},
         );
       },
-    ).center();
+    );
   }
 }

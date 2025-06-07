@@ -508,16 +508,18 @@ class GameEventManager {
     }
   }
 
-  Map<String, Object> _buildEventParameters(List<Map<String, dynamic>> events) {
+Map<String, Object> _buildEventParameters(List<Map<String, dynamic>> events) {
     return {
       'Game_name': events.first['Game_name'],
       'Modality': events.first['Modality'],
       'User_id': events.first['User_id'],
-      'content_name': events.first['content_name'], // Ensuring the correct content is logged
+      'content_name': events.first['content_name'],
       'days_since_install': events.first['days_since_install'],
     };
   }
 }
+
+
 
 // class GameEventManager {
 //   final String currentSessionId;

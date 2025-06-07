@@ -142,6 +142,7 @@ class _PhoneLoginState extends State<PhoneLogin> {
                                       Image.asset(zapAIAvtar, fit: BoxFit.fill),
                                 ),
                                 Container(
+                                  height: screenHeight*.29,
                                   width: double.infinity,
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 12, vertical: 20),
@@ -249,7 +250,7 @@ class _PhoneLoginState extends State<PhoneLogin> {
                                         ),
                                       ),
                                     ],
-                                  ),
+                                  ).paddingSymmetric(vertical: 20),
                                 ),
                               ],
                             ),

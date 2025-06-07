@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:balajiicode/Utils/app_common.dart';
 import 'package:flutter/material.dart';
 
@@ -18,7 +20,9 @@ class AnswerAssistProvider extends ChangeNotifier {
   TextEditingController correctedUserMessageController = TextEditingController();
   TextEditingController wordController = TextEditingController();
   bool canDoActiveOrNot = false;
-
+  bool isAlreadyResponded= false;
+  int _currentIndex =0;
+  Timer? _typingTimer;
 
   AnswerAssistState get state => _state;
 
@@ -27,7 +31,12 @@ class AnswerAssistProvider extends ChangeNotifier {
     canDoActiveOrNot = val;
     notifyListeners();
   }
+  void setIsAlreadyResponded(bool val){
+    isAlreadyResponded = val;
+    notifyListeners();
+  }
   void setIdle() {
+    isAlreadyResponded=false;
     _state = AnswerAssistState.idle;
     notifyListeners();
   }
@@ -55,7 +64,9 @@ class AnswerAssistProvider extends ChangeNotifier {
 
     String? res =  await completingUserMessage(context, userMessage, sessionId, allGameModel, index, modality);
     if (res !='' && res != null){
-      correctedUserMessageController.text = res;
+      // correctedUserMessageController.text = res;
+      _currentIndex= 0;
+      _startTypingEffect(res);
       setEncouraging();
       notifyListeners();
       return true;
@@ -109,4 +120,18 @@ class AnswerAssistProvider extends ChangeNotifier {
 
 
   }
+  void _startTypingEffect(String fullText) {
+    _typingTimer = Timer.periodic(Duration(milliseconds: 70), (timer) {
+      if (_currentIndex < fullText.length) {
+        correctedUserMessageController.text = fullText.substring(0, _currentIndex + 1);
+        correctedUserMessageController.selection = TextSelection.fromPosition(
+          TextPosition(offset: correctedUserMessageController.text.length),
+        );
+        _currentIndex++;
+      } else {
+        timer.cancel();
+      }
+    });
+  }
+
 }

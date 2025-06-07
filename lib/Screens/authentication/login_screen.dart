@@ -82,7 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 Container(
                 width: double.infinity,
-                // height: screenHeight*.26,
+                height: screenHeight*.29,
                 padding: const EdgeInsets.symmetric(horizontal: 24,),
                 decoration: const BoxDecoration(
                   color: Colors.white,
@@ -146,7 +146,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             },
                       ),
                     ),
-                    16.height,
+                    25.height,
                     Row(
                       children: [
                         MyText(
