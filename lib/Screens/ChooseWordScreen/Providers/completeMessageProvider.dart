@@ -19,6 +19,7 @@ class AnswerAssistProvider extends ChangeNotifier {
   AnswerAssistState _state = AnswerAssistState.idle;
   TextEditingController correctedUserMessageController = TextEditingController();
   TextEditingController wordController = TextEditingController();
+  ScrollController scrollControllerForAIMessage = ScrollController();
   bool canDoActiveOrNot = false;
   bool isAlreadyResponded= false;
   int _currentIndex =0;
@@ -126,7 +127,9 @@ class AnswerAssistProvider extends ChangeNotifier {
         correctedUserMessageController.text = fullText.substring(0, _currentIndex + 1);
         correctedUserMessageController.selection = TextSelection.fromPosition(
           TextPosition(offset: correctedUserMessageController.text.length),
+
         );
+
         _currentIndex++;
       } else {
         timer.cancel();

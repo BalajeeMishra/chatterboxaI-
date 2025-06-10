@@ -213,6 +213,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     setUserMessageScrollController();
     setAIMessageScrollController();
 
+
     appStore.setLoading(false);
     print("this is game name : ${widget.gameName}");
 
@@ -254,7 +255,8 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   }
 
   void setUserMessageScrollController() {
-    scrollController.addListener(() {
+    final completeProvider = Provider.of<AnswerAssistProvider>(context, listen: false);
+    completeProvider.wordController.addListener(() {
       // Scroll to bottom when text changes
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (scrollController.hasClients) {
@@ -791,9 +793,15 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
   @override
   void dispose() async {
+    // Remove listener for user message auto-scroll
+    try {
+      final completeProvider = Provider.of<AnswerAssistProvider>(context, listen: false);
+      completeProvider.wordController.clear();
+    } catch (_) {}
     await stopSpeaking();
     super.dispose();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -887,6 +895,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                 return false;
               },
               child: Column(
+
                   children: [
                     5.height,
                     if (showSubtitle && !isLandscape)
@@ -1112,7 +1121,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                         ],
                       ).paddingSymmetric(
                           horizontal: 16, vertical: 14),
-                    if(showSubtitle)SizedBox(height: 89*heightFactor,),
+                    if(showSubtitle)Expanded(child: SizedBox()),
                     if (provider.apiCalled &&
                         !provider.isLoaderShow &&
                         !showSubtitle &&
@@ -1189,7 +1198,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                                     ),
                                                   ),
                           ),
-                    if (!provider.isLoaderShow)
+                    if (!provider.isLoaderShow && !provider.isLocked)
                       vm.tabooGameChatPageModel.response == null
                           ? SizedBox()
                           :   Align(
@@ -1205,54 +1214,11 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                             },
                             isIcon: true),
                           ).paddingSymmetric(horizontal: 12),
-                      // Container(
-                      //       child: SingleChildScrollView(
-                      //           scrollDirection: Axis.horizontal,
-                      //           child: Row(
-                      //
-                      //             children: [
-                      //               Suggetionswidget(
-                      //                   text: "Skip Question",
-                      //                   onTap: () {
-                      //                     stopSpeaking();
-                      //                     _sendAnalytics();
-                      //                    completProvider.wordController.text =
-                      //                         "Skip Question";
-                      //                     _stopAndSendResponse(vm);
-                      //                   },
-                      //                   isIcon: true),
-                      //               10.width,
-                      //               Suggetionswidget(
-                      //                   text: "Yes, I'm ready",
-                      //                   onTap: () {
-                      //                     stopSpeaking();
-                      //                     _sendAnalytics();
-                      //                     completProvider.wordController.text =
-                      //                         "Yes, I'm ready";
-                      //                     _stopAndSendResponse(vm);
-                      //                   }),
-                      //               10.width,
-                      //               Suggetionswidget(
-                      //                   text:
-                      //                       "No, help me understand the game",
-                      //                   onTap: () {
-                      //                     stopSpeaking();
-                      //                     _sendAnalytics();
-                      //                     completProvider.wordController.text =
-                      //                         "No, help me understand the game";
-                      //                     _stopAndSendResponse(vm);
-                      //                   }),
-                      //             ],
-                      //           ).paddingSymmetric(
-                      //               vertical: 4,),
-                      //         ),
-                      //     ).paddingSymmetric(horizontal: 12),
                     if (!provider.isLoaderShow && provider.isLocked)
                       vm.tabooGameChatPageModel.response == null
                           ? SizedBox()
                           : CompletingUserMessage(userMessage: completProvider.wordController.text.trim(), sessionId: widget.sessionId, gameModel: widget.allGameModel, index: widget.index, modality: '',).paddingSymmetric(
                               vertical: 4, horizontal: 12),
-                    // Row(children: [Expanded(child: SizedBox()),Expanded(child: CompletingAnswer())]),
                     if (!provider.isLoaderShow)
                       vm.tabooGameChatPageModel.response == null
                           ? SizedBox()
@@ -1360,29 +1326,27 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                 borderRadius: BorderRadius.circular(20),
                 child: Scrollbar(
                   // optional for better UX
-                  child: SingleChildScrollView(
-                    // controller: scrollController,
-                    padding: EdgeInsets.zero,
-                    child: TextField(
-                      controller: completeProvider.wordController,
-                      onChanged: (val) {
-                        _stopListening();
-                      },
-                      onTap: () {
-                        _stopListening();
+                  child: TextField(
+                    controller: completeProvider.wordController,
+                    scrollController: scrollController,
+                    onChanged: (val) {
+                      _stopListening();
+                    },
+                    onTap: () {
+                      _stopListening();
 
-                        provider.setIsOnPressedEnd(false);
+                      provider.setIsOnPressedEnd(false);
 
-                      },
-                      maxLines: 3,
-                      minLines: 1,
-                      keyboardType: TextInputType.multiline,
-                      style: TextStyle(fontFamily: "inter", fontSize: 16),
-                      decoration: InputDecoration(
-                        hintText: "Spoken words here...",
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.all(10),
-                      ),
+                    },
+                    maxLines: 3,
+
+                    // minLines: 1,
+                    keyboardType: TextInputType.multiline,
+                    style: TextStyle(fontFamily: "inter", fontSize: 16),
+                    decoration: InputDecoration(
+                      hintText: "Spoken words here...",
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.all(10),
                     ),
                   ),
                 ),
@@ -1415,10 +1379,8 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                       provider.setIsExpanded(false);
                                       provider.setIsLocked(false);
                                       provider.setIsOnPressedEnd(false);
-                                      provider
-                                          .setIsshowHistoryAndSubtitle(true);
-                                      provider.setIsOnLockedAndRestartListening(
-                                          false);
+                                      provider.setIsshowHistoryAndSubtitle(true);
+                                      provider.setIsOnLockedAndRestartListening(false);
                                       provider.setpreviousSpokenTextWhenStateIsLocked('');
                                      completeProvider.setCanActiveOrNot(true);
                                       completeProvider.setIdle();

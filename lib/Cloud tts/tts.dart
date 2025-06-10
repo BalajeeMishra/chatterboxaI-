@@ -110,7 +110,7 @@ class GoogleCloudTTSService {
 
   Future<void> speakTexts(List<String> texts, {
     String languageCode = 'en-US',
-    String voiceName = 'en-GB-Standard-F',
+    String voiceName = 'en-US-Standard-C',
     String gender = 'FEMALE',
     double speakingRate = 0.8,
     double pitch = 0.0,

@@ -26,6 +26,29 @@ class CompletingUserMessage extends StatefulWidget {
 }
 
 class _CompletingUserMessageState extends State<CompletingUserMessage> {
+  ScrollController scrollController = ScrollController();
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    setUserMessageScrollController();
+
+  }
+  void setUserMessageScrollController() {
+    final provider = Provider.of<AnswerAssistProvider>(context, listen: false);
+    provider.correctedUserMessageController.addListener(() {
+      // Scroll to bottom when text changes
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (scrollController.hasClients) {
+          scrollController.animateTo(
+            scrollController.position.maxScrollExtent,
+            duration: Duration(milliseconds: 100),
+            curve: Curves.easeOut,
+          );
+        }
+      });
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<Object>(
@@ -50,35 +73,39 @@ class _CompletingUserMessageState extends State<CompletingUserMessage> {
                     children: [
                       AnimatedActivationMask(child: textGradient('Complete My Answer')),
                       8.width,
-                      Image.asset(chatTyping, width: 20, height: 20)
+                      Stack(
+                        children: [
+                          Image.asset(circle,width: 25,),
+                          Center(child: Image.asset(chatTypingGit,width: 24,)),
+                        ],
+                      )
                     ],
                   );
                 }
                 else {
                   return Column(
                     children: [
-                      if(provider.state == AnswerAssistState.encouraging) Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          InkWell(
-                              onTap: (){
-                                provider.setActive();
-                                provider.setIsAlreadyResponded(true);
-                              },
-                              child:
-                              Image.asset(tilt, width: 20)
-                          ),
-                          3.width,
-                          textGradient(
-                              "You're Doing Good! Try Saying It Out Loud"),
-                          3.width,
-                          Stack(
-                            children: [
-                              Image.asset(circle,width: 25,),
-                              Center(child: Image.asset(chatTypingGit,width: 24,)),
-                            ],
-                          )
-                        ],
+                      if(provider.state == AnswerAssistState.encouraging) GestureDetector(
+                        onTap: (){
+                          provider.setActive();
+                          provider.setIsAlreadyResponded(true);
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Image.asset(tilt, width: 30),
+                            0.width,
+                            textGradient(
+                                "You're Doing Good! Try Saying It Out Loud"),
+                            0.width,
+                            Stack(
+                              children: [
+                                Image.asset(circle,width: 25,),
+                                Center(child: Image.asset(chatTypingGit,width: 25,)),
+                              ],
+                            )
+                          ],
+                        ),
                       ),
                       if(provider.state == AnswerAssistState.completing)Row(
                           mainAxisAlignment: MainAxisAlignment.end, children: [
@@ -93,27 +120,26 @@ class _CompletingUserMessageState extends State<CompletingUserMessage> {
                         )
                       ]),
                       10.height,
-                      TextField(
-                        readOnly: true,
-                        controller: provider.correctedUserMessageController,
-                        onChanged: (val) {
-                          // _stopListening();
-                        },
-                        onTap: () {
-                          // _stopListening();
-                        },
-                        maxLines: 3,
-                        minLines: 1,
-                        keyboardType: TextInputType.multiline,
-                        style: TextStyle(fontFamily: "inter", fontSize: 16),
-                        decoration: InputDecoration(
-                          hintText: "Spoken words here...",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
+                      Scrollbar(
+                        thumbVisibility: true,
+                        child: TextField(
+                          controller: provider.correctedUserMessageController,
+                          scrollController: scrollController,
+                          readOnly: true,
+                          maxLines: 3, // allow unlimited growth
+                          keyboardType: TextInputType.multiline,
+                          style: const TextStyle(fontFamily: "inter", fontSize: 16),
+                          decoration: InputDecoration(
+                            hintText: "Spoken words here...",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            contentPadding: const EdgeInsets.all(10),
                           ),
-                          contentPadding: EdgeInsets.all(10),
-                        ),
-                      ).withGradient()
+                        ).withGradient(),
+                      ),
+
+
                     ],
                   );
                 }
@@ -148,7 +174,8 @@ class _CompletingUserMessageState extends State<CompletingUserMessage> {
             }
           }
           else if(pro.state == AnswerAssistState.encouraging){
-
+            pro.setActive();
+            pro.setIsAlreadyResponded(true);
           }else{
             // AnswerAssistState.encouraging
           }

@@ -35,7 +35,6 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
-    print(screenHeight);
     return Scaffold(
       backgroundColor: primaryColor,
       body: Stack(
@@ -160,7 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                           },
                           child: MyText(
-                              text: "Continue With OTP",
+                              text: "Signup using Mobile",
                               fontSize: 14,
                               textDecoration: TextDecoration.underline,
                               color: Colors.black54,

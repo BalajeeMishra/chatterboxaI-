@@ -41,7 +41,7 @@ class OTPVerification extends StatefulWidget {
   State<OTPVerification> createState() => _OTPVerificationState();
 }
 
-class _OTPVerificationState extends State<OTPVerification> {
+class _OTPVerificationState extends State<OTPVerification> with WidgetsBindingObserver {
   String otpCode = '';
   int _start = 30;
   bool _canResendOTP = false;
@@ -52,10 +52,12 @@ class _OTPVerificationState extends State<OTPVerification> {
   Telephony telephony = Telephony.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   GlobalKey<OTPTextFieldState> otpTextFieldKey = GlobalKey<OTPTextFieldState>();
+  bool isKeyboardVisible = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     print(widget.country);
     init();
   }
@@ -233,163 +235,166 @@ class _OTPVerificationState extends State<OTPVerification> {
     }
   }
 
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeMetrics() {
+    final bottomInset = WidgetsBinding.instance.window.viewInsets.bottom;
+    final newKeyboardVisible = bottomInset > 0.0;
+
+    if (newKeyboardVisible != isKeyboardVisible) {
+      setState(() {
+        isKeyboardVisible = newKeyboardVisible;
+      });
+
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
-    print(screenHeight);
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ),
+
       backgroundColor: primaryColor,
       body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              reverse: true,
-              padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: IntrinsicHeight(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+        child:  Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                   Align(
+                     alignment: Alignment.centerLeft,
+                     child: IconButton(  onPressed: () => Navigator.of(context).pop(), icon: Icon(Icons.arrow_back,color: whiteColor,)),
+                   ),
+                    MyText(
+                      text: 'Enter Verification\nCode',
+                      textAlign: TextAlign.center,
+                      color: whiteColor,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    8.height,
+                    MyText(
+                      text:
+                          'An OTP(One Time Password) Has Been\n Sent To Your Phone Number.',
+                      textAlign: TextAlign.center,
+                      color: whiteColor.withOpacity(0.8),
+                      fontSize: 14,
+                    ),
+                  ],
+                ),
+                20.height,
+                Column(
+                  children: [
+                    SizedBox(
+                      height: isKeyboardVisible?240:270,
+                      width: isKeyboardVisible?240:270,
+                      child: Image.asset(zapAIAvtar, fit: BoxFit.fill),
+                    ),
+                    Container(
+                      height: screenHeight*.30,
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(24),
+                          topRight: Radius.circular(24),
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(height: screenHeight * .18),
-                          MyText(
-                            text: 'Enter Verification\nCode',
-                            textAlign: TextAlign.center,
-                            color: whiteColor,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
+                          10.height,
+                          Row(
+                            children: [
+                              Text(
+                                'Code Sent To ${widget.mobileNumber}',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black54,
+                                ),
+                              ),
+                              5.width,
+                              const Icon(Icons.edit, color: primaryColor),
+                            ],
+                          ),
+                          18.height,
+                          Padding(
+                            padding: EdgeInsets.zero,
+                            child: otpInputField(),
+                          ),
+                          12.height,
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: () {
+                               submit();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: primaryColor,
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 14),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: const Text('Continue',
+                                  style: TextStyle(
+                                      fontSize: 16, color: Colors.white)),
+                            ),
                           ),
                           8.height,
-                          MyText(
-                            text:
-                                'An OTP(One Time Password) Has Been\n Sent To Your Phone Number.',
-                            textAlign: TextAlign.center,
-                            color: whiteColor.withOpacity(0.8),
-                            fontSize: 14,
-                          ),
-                        ],
-                      ),
-                      20.height,
-                      Column(
-                        children: [
-                          SizedBox(
-                            height: 270,
-                            width: 270,
-                            child: Image.asset(zapAIAvtar, fit: BoxFit.fill),
-                          ),
-                          Container(
-                            height: screenHeight*.30,
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(24),
-                                topRight: Radius.circular(24),
+                          Row(
+                            children: [
+                              MyText(
+                                text: "Didn't Get The Code? ",
+                                fontSize: 14,
                               ),
-                            ),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                10.height,
-                                Row(
+                              GestureDetector(
+                                child: Row(
                                   children: [
                                     Text(
-                                      'Code Sent To ${widget.mobileNumber}',
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.black54,
-                                      ),
-                                    ),
-                                    5.width,
-                                    const Icon(Icons.edit, color: primaryColor),
-                                  ],
-                                ),
-                                24.height,
-                                Padding(
-                                  padding: EdgeInsets.zero,
-                                  child: otpInputField(),
-                                ),
-                                16.height,
-                                SizedBox(
-                                  width: double.infinity,
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                     submit();
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: primaryColor,
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 14),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                    child: const Text('Continue',
-                                        style: TextStyle(
-                                            fontSize: 16, color: Colors.white)),
-                                  ),
-                                ),
-                                8.height,
-                                Row(
-                                  children: [
-                                    MyText(
-                                      text: "Didn't Get The Code? ",
-                                      fontSize: 14,
-                                    ),
-                                    GestureDetector(
-                                      child: Row(
-                                        children: [
-                                          Text(
-                                            _canResendOTP ? 'Resend' : '',
+                                      _canResendOTP ? 'Resend' : '',
+                                      style: primaryTextStyle(
+                                          color: primaryColor),
+                                    ).paddingLeft(4),
+                                    if (!_canResendOTP)
+                                      Container(
+                                        alignment: Alignment.center,
+                                        child: Text('$_start seconds',
                                             style: primaryTextStyle(
-                                                color: primaryColor),
-                                          ).paddingLeft(4),
-                                          if (!_canResendOTP)
-                                            Container(
-                                              alignment: Alignment.center,
-                                              child: Text('$_start seconds',
-                                                  style: primaryTextStyle(
-                                                      color: primaryColor)),
-                                            ),
-                                        ],
+                                                color: primaryColor)),
                                       ),
-                                      onTap: () {
-                                        if (_canResendOTP) {
-                                          resendOtpFunction();
-                                          setState(() {});
-                                        }
-                                      },
-                                    ),
                                   ],
                                 ),
-                                10.height,
-                              ],
-                            ).paddingSymmetric(vertical: 20),
+                                onTap: () {
+                                  if (_canResendOTP) {
+                                    resendOtpFunction();
+                                    setState(() {});
+                                  }
+                                },
+                              ),
+                            ],
                           ),
+                          10.height,
                         ],
-                      ),
-                    ],
-                  ),
+                      ).paddingSymmetric(vertical: 10),
+                    ),
+                  ],
                 ),
-              ),
-            );
-          },
-        ),
+              ],
+            )
+
       ),
     );
   }
@@ -408,6 +413,7 @@ class _OTPVerificationState extends State<OTPVerification> {
         setState(
           () {},
         );
+        submit();
       },
     );
   }
