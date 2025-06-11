@@ -159,13 +159,13 @@ class _PhoneLoginState extends State<PhoneLogin>  with WidgetsBindingObserver{
                       color: Colors.white,
                       fontSize: 12,
                     ),
-                    40.height,
+                    if(!isKeyboardVisible)40.height,
                     Align(
                       alignment: Alignment.topCenter,
                       child: Image.asset(
                         zapAIAvtar,
-                        height:isKeyboardVisible?240: 280,
-                        width: isKeyboardVisible?240:280,
+                        height:isKeyboardVisible?230: 280,
+                        width: isKeyboardVisible?230:280,
                         fit: BoxFit.fill,
                       ),
                     ),

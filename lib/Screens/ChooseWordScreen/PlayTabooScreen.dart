@@ -766,15 +766,15 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     provider.setSpeechRate(0.3);
     provider.setQues(completeProvider.wordController.text);
     provider.setLastWords(completeProvider.wordController.text);
-    completeProvider.wordController.clear();
     provider.setLastWords("");
     completeProvider.setCanActiveOrNot(true);
     completeProvider.setIdle();
     if (provider.ques.isNotEmpty) {
       save2(provider.ques, widget.sessionId);
     }
+    completeProvider.wordController.clear();
     Future.delayed(Duration( milliseconds: 1000)).then((val){ completeProvider.setIdle();completeProvider.wordController.clear();});
-    Future.delayed(Duration(milliseconds: 2100)).then((val){completeProvider.setIdle();});
+    Future.delayed(Duration(milliseconds: 2100)).then((val){completeProvider.setIdle();completeProvider.wordController.clear();});
   }
 
   void _startListening() async {
@@ -788,6 +788,8 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   }
 
   void _stopListening() {
+    _noChangeTimerFor3Sec?.cancel();
+    _noChangeTimer?.cancel();
     _speech.stopListening();
   }
 
@@ -1282,7 +1284,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
           _noChangeTimerFor3Sec?.cancel();
 
           // Start a new 3-second timer
-          _noChangeTimerFor3Sec = Timer(Duration(seconds: 3), () {
+          _noChangeTimerFor3Sec = Timer(Duration(seconds: 1), () {
             // print("pause for 3 second called ");
             if(completeProvider.canDoActiveOrNot){
               var pro =  Provider.of<AnswerAssistProvider>(context,listen: false);
@@ -1310,6 +1312,20 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
       }
     });
 
+    if(provider.isTtsCompleted){
+     WidgetsBinding.instance.addPostFrameCallback((val){
+       stopSpeaking();
+       provider.setIsTtsCompleted(false);
+       provider.setIsOnPressedEnd(true);
+       provider.setIsLocked(true);
+       provider.setIsOnLockedAndRestartListening(true);
+       provider.setIsshowHistoryAndSubtitle(false);
+       print("setIsOnLockedAndRestartListening ${provider.isOnLockedAndRestartListening}");
+       provider.setpreviousSpokenTextWhenStateIsLocked(completeProvider.wordController.text.trim());
+       print("last reconginzed $_lastRecognizedText");
+       _startListening();
+     });
+    }
     return Column(
       children: [
         if (provider.isLocked)
@@ -1376,6 +1392,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                   : () {
 
                                       _stopListening();
+
                                       provider.setIsExpanded(false);
                                       provider.setIsLocked(false);
                                       provider.setIsOnPressedEnd(false);

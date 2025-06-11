@@ -79,7 +79,7 @@ class GoogleCloudTTSService {
     var pro = Provider.of<PlayTabooScreenVM>(globalContext, listen: false);
     try {
       // If queue is empty, wait briefly (e.g., up to 2 seconds), checking every 200ms
-      int retries = 50; // 10 * 200ms = 2 seconds
+      int retries = 25; // 10 * 200ms = 2 seconds
       while (_audioFileQueue.isEmpty && retries > 0 && _isPlayingQueue) {
         await Future.delayed(Duration(milliseconds: 200));
         retries--;
@@ -91,6 +91,7 @@ class GoogleCloudTTSService {
         _isPlayingQueue = false;
         var provider = Provider.of<PlayTabooScreenProvider>(globalContext, listen: false);
         provider.setIsTtsCompleted(true);
+        print("tts  completed");
         return;
       }
 
