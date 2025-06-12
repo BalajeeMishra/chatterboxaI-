@@ -88,7 +88,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   String _lastRecognizedText = '';
   String currentText = '';
 
-
   ScrollController aiMessageScrollController = ScrollController();
   final bool _userScrolled = false;
   List<GlobalKey> _paraKeys = [];
@@ -213,7 +212,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     setUserMessageScrollController();
     setAIMessageScrollController();
 
-
     appStore.setLoading(false);
     print("this is game name : ${widget.gameName}");
 
@@ -230,7 +228,8 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     // ttsManager.setVoice();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       var vm = Provider.of<PlayTabooScreenVM>(context, listen: false);
-      var completeMessagePro = Provider.of<AnswerAssistProvider>(context, listen: false);
+      var completeMessagePro =
+          Provider.of<AnswerAssistProvider>(context, listen: false);
       completeMessagePro.setCanActiveOrNot(true);
       vm.seInitialValue(widget.allGameModel, widget.index, widget.sessionId);
       vm.chatPageAPI(
@@ -251,11 +250,11 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     Provider.of<PlayTabooScreenProvider>(context, listen: false)
         .setApiCalled(true);
     appStore.setLastWords("");
-
   }
 
   void setUserMessageScrollController() {
-    final completeProvider = Provider.of<AnswerAssistProvider>(context, listen: false);
+    final completeProvider =
+        Provider.of<AnswerAssistProvider>(context, listen: false);
     completeProvider.wordController.addListener(() {
       // Scroll to bottom when text changes
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -760,7 +759,8 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     _stopListening();
     vm.setIsPlayScreen(true);
     var provider = Provider.of<PlayTabooScreenProvider>(context, listen: false);
-    var completeProvider = Provider.of<AnswerAssistProvider>(context,listen: false);
+    var completeProvider =
+        Provider.of<AnswerAssistProvider>(context, listen: false);
     provider.setIsMuted(false);
     print("Mute state ${provider.isMuted}");
     provider.setSpeechRate(0.3);
@@ -773,8 +773,14 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
       save2(provider.ques, widget.sessionId);
     }
     completeProvider.wordController.clear();
-    Future.delayed(Duration( milliseconds: 1000)).then((val){ completeProvider.setIdle();completeProvider.wordController.clear();});
-    Future.delayed(Duration(milliseconds: 2100)).then((val){completeProvider.setIdle();completeProvider.wordController.clear();});
+    Future.delayed(Duration(milliseconds: 1000)).then((val) {
+      completeProvider.setIdle();
+      completeProvider.wordController.clear();
+    });
+    Future.delayed(Duration(milliseconds: 2100)).then((val) {
+      completeProvider.setIdle();
+      completeProvider.wordController.clear();
+    });
   }
 
   void _startListening() async {
@@ -797,13 +803,13 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   void dispose() async {
     // Remove listener for user message auto-scroll
     try {
-      final completeProvider = Provider.of<AnswerAssistProvider>(context, listen: false);
+      final completeProvider =
+          Provider.of<AnswerAssistProvider>(context, listen: false);
       completeProvider.wordController.clear();
     } catch (_) {}
     await stopSpeaking();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -819,28 +825,28 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
       builder: (context, completProvider, _) => Consumer<PlayTabooScreenVM>(
         builder: (context, vm, child) => Consumer<PlayTabooScreenProvider>(
           builder: (context, provider, child) => Scaffold(
-              resizeToAvoidBottomInset: true,
+            resizeToAvoidBottomInset: true,
             appBar: PreferredSize(
               preferredSize: const Size.fromHeight(40.0),
               child: AppBar(
                 centerTitle: false,
                 leading: provider.isPopAvailable
                     ? InkWell(
-                        onTap: () async {
-                          await stopSpeaking();
-                          appStore.setLoading(false);
-                          vm.setIsPlayScreen(false);
-                          provider.setIsExpanded(false);
-                          provider.setIsLocked(false);
-                          completProvider.wordController.clear();
-                          provider.setIsshowHistoryAndSubtitle(
-                              true);
-                          completProvider.setIdle();
-                          if (mounted) {
-                            pop(true);
-                          }
-                        },
-                        child: Icon(Icons.close)).withGradient()
+                            onTap: () async {
+                              await stopSpeaking();
+                              appStore.setLoading(false);
+                              vm.setIsPlayScreen(false);
+                              provider.setIsExpanded(false);
+                              provider.setIsLocked(false);
+                              completProvider.wordController.clear();
+                              provider.setIsshowHistoryAndSubtitle(true);
+                              completProvider.setIdle();
+                              if (mounted) {
+                                pop(true);
+                              }
+                            },
+                            child: Icon(Icons.close))
+                        .withGradient()
                     : SizedBox(),
                 title: Text(
                   softWrap: true,
@@ -897,339 +903,306 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                 return false;
               },
               child: Column(
-
-                  children: [
-                    5.height,
-                    if (showSubtitle && !isLandscape)
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height *
-                            0.175,
-                      ),
-                    Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
-                        child: Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.center,
-                          mainAxisAlignment: !provider.apiCalled
-                              ? MainAxisAlignment.center
-                              : MainAxisAlignment.spaceBetween,
-                          children: [
-                            Stack(
-                              children: [
+                children: [
+                  5.height,
+                  if (showSubtitle && !isLandscape)
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.175,
+                    ),
+                  Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: !provider.apiCalled
+                            ? MainAxisAlignment.center
+                            : MainAxisAlignment.spaceBetween,
+                        children: [
+                          Stack(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.asset(
+                                    fit: BoxFit.cover,
+                                    height: height * (205 / 812),
+                                    ImageConstant.listening_female),
+                              ),
+                              if (!vm.isGifDownloaded && vm.isListening)
                                 ClipRRect(
-                                  borderRadius:
-                                  BorderRadius.circular(8),
+                                  borderRadius: BorderRadius.circular(8),
                                   child: Image.asset(
                                       fit: BoxFit.cover,
                                       height: height * (205 / 812),
                                       ImageConstant.listening_female),
                                 ),
-                                if (!vm.isGifDownloaded &&
-                                    vm.isListening)
-                                  ClipRRect(
-                                    borderRadius:
-                                    BorderRadius.circular(8),
-                                    child: Image.asset(
-                                        fit: BoxFit.cover,
-                                        height: height * (205 / 812),
-                                        ImageConstant
-                                            .listening_female),
-                                  ),
-                                if (!vm.isGifDownloaded &&
-                                    !vm.isListening)
-                                  ClipRRect(
-                                    borderRadius:
-                                    BorderRadius.circular(8),
-                                    child: Image.asset(
-                                        fit: BoxFit.cover,
-                                        height: height * (205 / 812),
-                                        ImageConstant
-                                            .speaking_female),
-                                  ),
-                                if (vm.isListening &&
-                                    vm.listeningGif != null)
-                                  ClipRRect(
-                                    borderRadius:
-                                    BorderRadius.circular(8),
-                                    child: Image.memory(
-                                        fit: BoxFit.cover,
-                                        height: height * (205 / 812),
-                                        vm.listeningGif!),
-                                  ),
-                                if (!vm.isListening &&
-                                    vm.talkingGif != null)
-                                  ClipRRect(
-                                    borderRadius:
-                                    BorderRadius.circular(8),
-                                    child: Image.memory(
-                                        fit: BoxFit.cover,
-                                        height: height * (205 / 812),
-                                        vm.talkingGif!),
-                                  ),
-                              ],
-                            ),
-                            8.height,
-                            if (provider.apiCalled)
-                              Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.center,
-                                crossAxisAlignment:
-                                CrossAxisAlignment.center,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                    CrossAxisAlignment.start,
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.center,
-                                    children: [
-                                      InkWell(
-                                          onTap: () =>
-                                              _onDecreaseRatePressed(),
-                                          child: Image.asset(
-                                            ImageConstant
-                                                .backward_icon,
-                                            width: 25,
-                                            height: 25,
-                                          )),
-                                      Text(
-                                        "Slow",
-                                        style: secondaryTextStyle(
-                                            size: 11),
-                                        softWrap: false,
-                                        maxLines: 1,
-                                        overflow:
-                                        TextOverflow.visible,
-                                      ).onTap(() {
-                                        _onDecreaseRatePressed();
-                                      })
-                                    ],
-                                  ),
-                                  SizedBox(width: 25),
-                                  Container(
-                                    width: width * 0.14,
-                                    height: height * 0.07,
-                                    // color:Colors.redAccent,
-                                    child: Center(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.center,
-                                        children: [
-                                          InkWell(
-                                            onTap: () async {
-                                              int currentTime = DateTime
-                                                  .now()
-                                                  .millisecondsSinceEpoch;
-                                              if (currentTime -
-                                                  lastTapTime <
-                                                  800) {
-                                                return;
-                                              }
-                                              lastTapTime =
-                                                  currentTime;
-                                              provider.setIsMuted(
-                                                  !provider.isMuted);
-                                              setValue(IS_MUTE,
-                                                  provider.isMuted);
-                                              if (provider.isMuted) {
-                                                await stopSpeaking();
-                                              } else {
-                                                await stopSpeaking();
-                                                animateAIMessageToStart();
-                                                Future.delayed(
-                                                    Duration(
-                                                        seconds: 1),
-                                                        () {
-                                                      speakText();
-                                                    });
-                                              }
-                                            },
-                                            child: Center(
-                                              child: SvgPicture.asset(
-                                                !provider.isMuted
-                                                    ? 'assets/svg/unmute.svg'
-                                                    : 'assets/svg/mute.svg',
-                                                width: 35,
-                                                height: 35,
-                                              ),
-                                            ),
-                                          ),
-                                          Center(
-                                            child: MyText(
-                                              text: !provider.isMuted
-                                                  ? "Mute"
-                                                  : "Unmute",
-                                              softwrap: false,
-                                              maxLines: 1,
-                                              overflow: TextOverflow
-                                                  .visible,
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(width: 25),
-                                  Column(
-                                    crossAxisAlignment:
-                                    CrossAxisAlignment.end,
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.center,
-                                    children: [
-                                      InkWell(
-                                          onTap: () =>
-                                              _onIncreaseRatePressed(),
-                                          child: Image.asset(
-                                            ImageConstant
-                                                .forward_icon,
-                                            width: 25,
-                                            height: 25,
-                                          )),
-                                      Text(
-                                        "Fast",
-                                        style: secondaryTextStyle(
-                                            size: 12),
-                                        softWrap: false,
-                                        maxLines: 1,
-                                        overflow:
-                                        TextOverflow.visible,
-                                      ).onTap(() {
-                                        _onIncreaseRatePressed();
-                                      })
-                                    ],
-                                  )
-                                ],
-                              ),
-                          ],
-                        )),
-                    8.height,
-                    if (provider.isFirstTime)
-                      LoadingWidget(message: "Listening..."),
-                    if (provider.isLoaderShow)
-                      CircularProgressIndicator(color: primaryColor),
-                    if (!provider.apiCalled && !provider.isLoading)
-                      Row(
-                        children: [
-                          Expanded(
-                            child: MyText(
-                              text: provider.lastWords,
-                              color: Color(0xff000000),
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                            ),
+                              if (!vm.isGifDownloaded && !vm.isListening)
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.asset(
+                                      fit: BoxFit.cover,
+                                      height: height * (205 / 812),
+                                      ImageConstant.speaking_female),
+                                ),
+                              if (vm.isListening && vm.listeningGif != null)
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.memory(
+                                      fit: BoxFit.cover,
+                                      height: height * (205 / 812),
+                                      vm.listeningGif!),
+                                ),
+                              if (!vm.isListening && vm.talkingGif != null)
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.memory(
+                                      fit: BoxFit.cover,
+                                      height: height * (205 / 812),
+                                      vm.talkingGif!),
+                                ),
+                            ],
                           ),
-                        ],
-                      ).paddingSymmetric(
-                          horizontal: 16, vertical: 14),
-                    if(showSubtitle)Expanded(child: SizedBox()),
-                    if (provider.apiCalled &&
-                        !provider.isLoaderShow &&
-                        !showSubtitle &&
-                        !isLandscape &&
-                        !(keyboardHeight > 0) &&
-                        !provider.isFirstTime)
-                      vm.tabooGameChatPageModel.response == null
-                          ? LoadingWidget(message: provider.message)
-                          : (completProvider.state ==
-                          AnswerAssistState.completing || completProvider.state ==
-                          AnswerAssistState.encouraging)?Expanded(child: SizedBox()):Expanded(
-                            child: Padding(
-                                                    padding: EdgeInsets.symmetric(
-                              horizontal: 16.0, vertical: 0),
-                                                    child: Row(
-                            children: [
-                              Expanded(
-                                  child: provider.startListening
-                                      ? MyText(
-                                    text:
-                                    provider.lastWords,
-                                    color:
-                                    Color(0xff000000),
-                                    fontSize: 18,
-                                    fontWeight:
-                                    FontWeight.w400,
-                                  )
-                                      : (vm
-                                          .tabooGameChatPageModel
-                                          .response!
-                                          .aiResponse!
-                                          .last ==
-                                          "")
-                                      ? Text("")
-                                      : SizedBox(
-                                    // height: provider
-                                    //     .isExpanded
-                                    //     ? height * 0.18
-                                    //     : provider.isLocked
-                                    //     ? height *
-                                    //     .23
-                                    //     : height *
-                                    //     0.28,
-                                    // height: height* 0.30,
-                                    child: Scrollbar(
-                                      child:
-                                      SingleChildScrollView(
-                                        controller:
-                                        aiMessageScrollController,
-                                        child: RichText(
-                                          textAlign:
-                                          TextAlign
-                                              .left,
-                                          text:
-                                          TextSpan(
-                                            children: buildHighlightedTextSpans(vm
-                                                .tabooGameChatPageModel
-                                                .response!
-                                                .aiResponse!
-                                                .last),
-                                            style: primaryTextStyle(
-                                                size:
-                                                16)
-                                                .copyWith(
-                                              height:
-                                              1.5,
+                          8.height,
+                          if (provider.apiCalled)
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    InkWell(
+                                        onTap: () => _onDecreaseRatePressed(),
+                                        child: Image.asset(
+                                          ImageConstant.backward_icon,
+                                          width: 25,
+                                          height: 25,
+                                        )),
+                                    Text(
+                                      "Slow",
+                                      style: secondaryTextStyle(size: 11),
+                                      softWrap: false,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.visible,
+                                    ).onTap(() {
+                                      _onDecreaseRatePressed();
+                                    })
+                                  ],
+                                ),
+                                SizedBox(width: 25),
+                                Container(
+                                  width: width * 0.14,
+                                  height: height * 0.07,
+                                  // color:Colors.redAccent,
+                                  child: Center(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        InkWell(
+                                          onTap: () async {
+                                            int currentTime = DateTime.now()
+                                                .millisecondsSinceEpoch;
+                                            if (currentTime - lastTapTime <
+                                                800) {
+                                              return;
+                                            }
+                                            lastTapTime = currentTime;
+                                            provider
+                                                .setIsMuted(!provider.isMuted);
+                                            setValue(IS_MUTE, provider.isMuted);
+                                            if (provider.isMuted) {
+                                              await stopSpeaking();
+                                            } else {
+                                              await stopSpeaking();
+                                              animateAIMessageToStart();
+                                              Future.delayed(
+                                                  Duration(seconds: 1), () {
+                                                speakText();
+                                              });
+                                            }
+                                          },
+                                          child: Center(
+                                            child: SvgPicture.asset(
+                                              !provider.isMuted
+                                                  ? 'assets/svg/unmute.svg'
+                                                  : 'assets/svg/mute.svg',
+                                              width: 35,
+                                              height: 35,
                                             ),
                                           ),
                                         ),
-                                      ),
+                                        Center(
+                                          child: MyText(
+                                            text: !provider.isMuted
+                                                ? "Mute"
+                                                : "Unmute",
+                                            softwrap: false,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.visible,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  )),
-                            ],
-                                                    ),
-                                                  ),
+                                  ),
+                                ),
+                                SizedBox(width: 25),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    InkWell(
+                                        onTap: () => _onIncreaseRatePressed(),
+                                        child: Image.asset(
+                                          ImageConstant.forward_icon,
+                                          width: 25,
+                                          height: 25,
+                                        )),
+                                    Text(
+                                      "Fast",
+                                      style: secondaryTextStyle(size: 12),
+                                      softWrap: false,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.visible,
+                                    ).onTap(() {
+                                      _onIncreaseRatePressed();
+                                    })
+                                  ],
+                                )
+                              ],
+                            ),
+                        ],
+                      )),
+                  8.height,
+                  if (provider.isFirstTime)
+                    LoadingWidget(message: "Listening..."),
+                  if (provider.isLoaderShow)
+                    CircularProgressIndicator(color: primaryColor),
+                  if (!provider.apiCalled && !provider.isLoading)
+                    Row(
+                      children: [
+                        Expanded(
+                          child: MyText(
+                            text: provider.lastWords,
+                            color: Color(0xff000000),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
                           ),
-                    if (!provider.isLoaderShow && !provider.isLocked)
-                      vm.tabooGameChatPageModel.response == null
-                          ? SizedBox()
-                          :   Align(
-                        alignment: Alignment.centerRight,
+                        ),
+                      ],
+                    ).paddingSymmetric(horizontal: 16, vertical: 14),
+                  if (showSubtitle) Expanded(child: SizedBox()),
+                  if (provider.apiCalled &&
+                      !provider.isLoaderShow &&
+                      !showSubtitle &&
+                      !isLandscape &&
+                      !(keyboardHeight > 0) &&
+                      !provider.isFirstTime)
+                    vm.tabooGameChatPageModel.response == null
+                        ? LoadingWidget(message: provider.message)
+                        : (completProvider.state ==
+                                    AnswerAssistState.completing ||
+                                completProvider.state ==
+                                    AnswerAssistState.encouraging)
+                            ? Expanded(child: SizedBox())
+                            : Expanded(
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 16.0, vertical: 0),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                          child: provider.startListening
+                                              ? MyText(
+                                                  text: provider.lastWords,
+                                                  color: Color(0xff000000),
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w400,
+                                                )
+                                              : (vm
+                                                          .tabooGameChatPageModel
+                                                          .response!
+                                                          .aiResponse!
+                                                          .last ==
+                                                      "")
+                                                  ? Text("")
+                                                  : SizedBox(
+                                                      // height: provider
+                                                      //     .isExpanded
+                                                      //     ? height * 0.18
+                                                      //     : provider.isLocked
+                                                      //     ? height *
+                                                      //     .23
+                                                      //     : height *
+                                                      //     0.28,
+                                                      // height: height* 0.30,
+                                                      child: Scrollbar(
+                                                        child:
+                                                            SingleChildScrollView(
+                                                          controller:
+                                                              aiMessageScrollController,
+                                                          child: RichText(
+                                                            textAlign:
+                                                                TextAlign.left,
+                                                            text: TextSpan(
+                                                              children: buildHighlightedTextSpans(vm
+                                                                  .tabooGameChatPageModel
+                                                                  .response!
+                                                                  .aiResponse!
+                                                                  .last),
+                                                              style:
+                                                                  primaryTextStyle(
+                                                                          size:
+                                                                              16)
+                                                                      .copyWith(
+                                                                height: 1.5,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    )),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                  if (!provider.isLoaderShow && !provider.isLocked)
+                    vm.tabooGameChatPageModel.response == null
+                        ? SizedBox()
+                        : Align(
+                            alignment: Alignment.centerRight,
                             child: Suggetionswidget(
-                            text: "Skip Question",
-                            onTap: () {
-                              stopSpeaking();
-                              _sendAnalytics();
-                              completProvider.wordController.text =
-                              "Skip Question";
-                              _stopAndSendResponse(vm);
-                            },
-                            isIcon: true),
+                                text: "Skip Question",
+                                onTap: () {
+                                  stopSpeaking();
+                                  _sendAnalytics();
+                                  completProvider.wordController.text =
+                                      "Skip Question";
+                                  _stopAndSendResponse(vm);
+                                },
+                                isIcon: true),
                           ).paddingSymmetric(horizontal: 12),
-                    if (!provider.isLoaderShow && provider.isLocked)
-                      vm.tabooGameChatPageModel.response == null
-                          ? SizedBox()
-                          : CompletingUserMessage(userMessage: completProvider.wordController.text.trim(), sessionId: widget.sessionId, gameModel: widget.allGameModel, index: widget.index, modality: '',).paddingSymmetric(
-                              vertical: 4, horizontal: 12),
-                    if (!provider.isLoaderShow)
-                      vm.tabooGameChatPageModel.response == null
-                          ? SizedBox()
-                          : Center(
-                              child: _showSpeakAndListen(vm, height, width,
-                                  heightFactor, keyboardHeight)),
-                  ],
-                 ),
-
+                  if (!provider.isLoaderShow && provider.isLocked)
+                    vm.tabooGameChatPageModel.response == null
+                        ? SizedBox()
+                        : CompletingUserMessage(
+                            userMessage:
+                                completProvider.wordController.text.trim(),
+                            sessionId: widget.sessionId,
+                            gameModel: widget.allGameModel,
+                            index: widget.index,
+                            modality: '',
+                          ).paddingSymmetric(vertical: 4, horizontal: 12),
+                  if (!provider.isLoaderShow)
+                    vm.tabooGameChatPageModel.response == null
+                        ? SizedBox()
+                        : Center(
+                            child: _showSpeakAndListen(vm, height, width,
+                                heightFactor, keyboardHeight)),
+                ],
+              ),
             ),
           ),
         ),
@@ -1240,7 +1213,8 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   Widget _showSpeakAndListen(PlayTabooScreenVM vm, double height, double width,
       double heightFactor, double keyboardHeight) {
     var provider = Provider.of<PlayTabooScreenProvider>(context, listen: true);
-    var completeProvider = Provider.of<AnswerAssistProvider>(context,listen: false);
+    var completeProvider =
+        Provider.of<AnswerAssistProvider>(context, listen: false);
 
     // if( provider.isTtsCompleted){
     //   provider.setIsTtsCompleted(false);
@@ -1255,14 +1229,14 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     //   _startListening();
     // }
 
-
     _speech.onResults.listen((result) {
       currentText = result.text ?? '';
       // Update text in controller
       print(provider.isOnLockedAndRestartListening);
       if (provider.isOnLockedAndRestartListening) {
         // print("inside listener last word $_lastRecognizedText");
-        currentText = '${provider.previousSpokenTextWhenStateIsLocked} $currentText';
+        currentText =
+            '${provider.previousSpokenTextWhenStateIsLocked} $currentText';
       }
 
       completeProvider.wordController.text = currentText;
@@ -1286,8 +1260,9 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
           // Start a new 3-second timer
           _noChangeTimerFor3Sec = Timer(Duration(seconds: 1), () {
             // print("pause for 3 second called ");
-            if(completeProvider.canDoActiveOrNot){
-              var pro =  Provider.of<AnswerAssistProvider>(context,listen: false);
+            if (completeProvider.canDoActiveOrNot) {
+              var pro =
+                  Provider.of<AnswerAssistProvider>(context, listen: false);
               pro.setActive();
               pro.setCanActiveOrNot(false);
             }
@@ -1312,19 +1287,21 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
       }
     });
 
-    if(provider.isTtsCompleted){
-     WidgetsBinding.instance.addPostFrameCallback((val){
-       stopSpeaking();
-       provider.setIsTtsCompleted(false);
-       provider.setIsOnPressedEnd(true);
-       provider.setIsLocked(true);
-       provider.setIsOnLockedAndRestartListening(true);
-       provider.setIsshowHistoryAndSubtitle(false);
-       print("setIsOnLockedAndRestartListening ${provider.isOnLockedAndRestartListening}");
-       provider.setpreviousSpokenTextWhenStateIsLocked(completeProvider.wordController.text.trim());
-       print("last reconginzed $_lastRecognizedText");
-       _startListening();
-     });
+    if (provider.isTtsCompleted) {
+      WidgetsBinding.instance.addPostFrameCallback((val) {
+        stopSpeaking();
+        provider.setIsTtsCompleted(false);
+        provider.setIsOnPressedEnd(true);
+        provider.setIsLocked(true);
+        provider.setIsOnLockedAndRestartListening(true);
+        provider.setIsshowHistoryAndSubtitle(false);
+        print(
+            "setIsOnLockedAndRestartListening ${provider.isOnLockedAndRestartListening}");
+        provider.setpreviousSpokenTextWhenStateIsLocked(
+            completeProvider.wordController.text.trim());
+        print("last reconginzed $_lastRecognizedText");
+        _startListening();
+      });
     }
     return Column(
       children: [
@@ -1352,7 +1329,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                       _stopListening();
 
                       provider.setIsOnPressedEnd(false);
-
                     },
                     maxLines: 3,
 
@@ -1390,19 +1366,32 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                               onTap: provider.isExpanded
                                   ? null
                                   : () {
-
                                       _stopListening();
 
                                       provider.setIsExpanded(false);
                                       provider.setIsLocked(false);
                                       provider.setIsOnPressedEnd(false);
-                                      provider.setIsshowHistoryAndSubtitle(true);
-                                      provider.setIsOnLockedAndRestartListening(false);
-                                      provider.setpreviousSpokenTextWhenStateIsLocked('');
-                                     completeProvider.setCanActiveOrNot(true);
+                                      provider
+                                          .setIsshowHistoryAndSubtitle(true);
+                                      provider.setIsOnLockedAndRestartListening(
+                                          false);
+                                      provider
+                                          .setpreviousSpokenTextWhenStateIsLocked(
+                                              '');
+                                      completeProvider.setCanActiveOrNot(true);
                                       completeProvider.setIdle();
-                                     Future.delayed(Duration( milliseconds: 1000)).then((val){ completeProvider.setIdle();completeProvider.wordController.clear();});
-                                     Future.delayed(Duration( milliseconds: 2100)).then((val){ completeProvider.setIdle();completeProvider.wordController.clear();});
+                                      Future.delayed(
+                                              Duration(milliseconds: 1000))
+                                          .then((val) {
+                                        completeProvider.setIdle();
+                                        completeProvider.wordController.clear();
+                                      });
+                                      Future.delayed(
+                                              Duration(milliseconds: 2100))
+                                          .then((val) {
+                                        completeProvider.setIdle();
+                                        completeProvider.wordController.clear();
+                                      });
                                     },
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -1453,7 +1442,6 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                           _sendAnalytics();
                                           _stopAndSendResponse(vm);
 
-
                                           provider.setIsExpanded(false);
                                           provider.setIsLocked(false);
                                           provider.setIsshowHistoryAndSubtitle(
@@ -1462,8 +1450,9 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                           provider
                                               .setIsOnLockedAndRestartListening(
                                                   false);
-                                          provider.setpreviousSpokenTextWhenStateIsLocked('');
-
+                                          provider
+                                              .setpreviousSpokenTextWhenStateIsLocked(
+                                                  '');
 
                                           // scrollController = ScrollController();
                                           // setAIMessageScrollController();
@@ -1494,31 +1483,32 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                   child: GestureDetector(
                     // onTap: provider.isLocked
                     //     ?
-                       onTap:  () {
-                            if (provider.isOnPressedEnd) {
-                              provider.setIsOnPressedEnd(false);
-                              _stopListening();
-
-                            } else {
-                              stopSpeaking();
-                              provider.setIsOnPressedEnd(true);
-                              provider.setIsLocked(true);
-                              provider.setIsOnLockedAndRestartListening(true);
-                              provider.setIsshowHistoryAndSubtitle(false);
-                              print("setIsOnLockedAndRestartListening ${provider.isOnLockedAndRestartListening}");
-                              provider.setpreviousSpokenTextWhenStateIsLocked(completeProvider.wordController.text.trim());
-                              print("last reconginzed $_lastRecognizedText");
-                              _startListening();
-                            }
-                          },
-                        // : () {
-                        //     provider.setIsExpanded(true);
-                        //     provider.setIsshowHistoryAndSubtitle(false);
-                        //     Timer(Duration(milliseconds: 300), () {
-                        //       provider.setIsExpanded(false);
-                        //       provider.setIsshowHistoryAndSubtitle(true);
-                        //     });
-                        //   },
+                    onTap: () {
+                      if (provider.isOnPressedEnd) {
+                        provider.setIsOnPressedEnd(false);
+                        _stopListening();
+                      } else {
+                        stopSpeaking();
+                        provider.setIsOnPressedEnd(true);
+                        provider.setIsLocked(true);
+                        provider.setIsOnLockedAndRestartListening(true);
+                        provider.setIsshowHistoryAndSubtitle(false);
+                        print(
+                            "setIsOnLockedAndRestartListening ${provider.isOnLockedAndRestartListening}");
+                        provider.setpreviousSpokenTextWhenStateIsLocked(
+                            completeProvider.wordController.text.trim());
+                        print("last reconginzed $_lastRecognizedText");
+                        _startListening();
+                      }
+                    },
+                    // : () {
+                    //     provider.setIsExpanded(true);
+                    //     provider.setIsshowHistoryAndSubtitle(false);
+                    //     Timer(Duration(milliseconds: 300), () {
+                    //       provider.setIsExpanded(false);
+                    //       provider.setIsshowHistoryAndSubtitle(true);
+                    //     });
+                    //   },
                     onTapUp: (details) {
                       // if (details.localPosition.dy < -50) {
                       //   provider.setIsSwipingUp(true);
@@ -1575,11 +1565,13 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                 width: 76,
                                 // padding: EdgeInsets.only(left: 4,right: 4,bottom: 17),
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(43),
-                                   gradient:  LinearGradient(
-                                      colors: [ Color(0xff9840EB),Color(0xff09C8C8)], // Gradient Colors
-                                    )
-                                ),
+                                    borderRadius: BorderRadius.circular(43),
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Color(0xff9840EB),
+                                        Color(0xff09C8C8)
+                                      ], // Gradient Colors
+                                    )),
                                 child: Lottie.asset(
                                     delegates: LottieDelegates(
                                       values: [

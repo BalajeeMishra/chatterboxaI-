@@ -22,7 +22,6 @@ import '../JabberAIHomePage/JabberAIHomepage.dart';
 import '../profile_screen.dart';
 import 'add_phone.dart';
 
-
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
@@ -35,54 +34,53 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
+    print(screenHeight);
     return Scaffold(
       backgroundColor: primaryColor,
-      body: Stack(
-        children:[ Column(
+      body: Stack(children: [
+        Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             SizedBox(
               // height: screenHeight*.45,
-             child: Column(
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SizedBox(height: screenHeight*.18,),
+                  SizedBox(
+                    height: screenHeight * .18,
+                  ),
                   MyText(
-                   text:  'Learn English by\nSpeaking to AI',
+                    text: 'Learn English by\nSpeaking to AI',
                     textAlign: TextAlign.center,
-                      color: whiteColor,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-
+                    color: whiteColor,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
                   ),
                   8.height,
                   GestureDetector(
                     onTap: () {},
                     child: MyText(
                       text: 'We Make Talking to AI Fun',
-                        color: whiteColor.withOpacity(0.8),
-                        fontSize: 14,
+                      color: whiteColor.withOpacity(0.8),
+                      fontSize: 14,
                     ),
                   ),
                   // Avatar
-
                 ],
               ),
             ),
-            Column(
-              children:[
-                SizedBox(
-                  height: 280,
-                  width: 280,
-                  child: Image.asset(
-                    zapAIAvtar,
-                    fit: BoxFit.fill
-                  ),
-                ),
-                Container(
+            Column(children: [
+              SizedBox(
+                height: 280,
+                width: 280,
+                child: Image.asset(zapAIAvtar, fit: BoxFit.fill),
+              ),
+              Container(
                 width: double.infinity,
-                height: screenHeight*.29,
-                padding: const EdgeInsets.symmetric(horizontal: 24,),
+                // height: screenHeight*.26,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                ),
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
@@ -126,44 +124,43 @@ class _LoginScreenState extends State<LoginScreen> {
                           height: 24,
                         ),
                         label: const MyText(
-                          text: 'Login Using Google',
-                          fontSize: 16, color: whiteColor
-                        ),
-                        onPressed: () async{
+                            text: 'Login Using Google',
+                            fontSize: 16,
+                            color: whiteColor),
+                        onPressed: () async {
                           appStore.setLoading(true);
-                            final value = await signInWithGoogle(context);
-                            if (value == "success") {
-                              appStore.setLoading(false);
-                              // toast("Successfully login");
-                            }
-                            else{
-                              appStore.setLoading(false);
-                              PhoneLogin().launch(context);
-                              toast("Some issue occurred while login please try again $value");
-                            }
-                           appStore.setLoading(false);
-                            },
+                          final value = await signInWithGoogle(context);
+                          if (value == "success") {
+                            appStore.setLoading(false);
+                            // toast("Successfully login");
+                          } else {
+                            appStore.setLoading(false);
+                            PhoneLogin().launch(context);
+                            toast(
+                                "Some issue occurred while login please try again $value");
+                          }
+                          appStore.setLoading(false);
+                        },
                       ),
                     ),
-                    25.height,
+                    16.height,
                     Row(
                       children: [
                         MyText(
-                            text: "Don't Have A Google Account? ",
-                            fontSize: 14,
-                            color: Colors.black54,
+                          text: "Don't Have A Google Account? ",
+                          fontSize: 14,
+                          color: Colors.black54,
                         ),
                         GestureDetector(
-                          onTap: (){
-                           PhoneLogin().launch(context);
-
+                          onTap: () {
+                            PhoneLogin().launch(context);
                           },
                           child: MyText(
-                              text: "Signup using Mobile",
-                              fontSize: 14,
-                              textDecoration: TextDecoration.underline,
-                              color: Colors.black54,
-                              decorationcolor:  Colors.black54,
+                            text: "Signup using Mobile",
+                            fontSize: 14,
+                            textDecoration: TextDecoration.underline,
+                            color: Colors.black54,
+                            decorationcolor: Colors.black54,
                           ),
                         ),
                       ],
@@ -172,19 +169,16 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
                 ),
               ),
-
-              ]
-            ),
+            ]),
           ],
-        ), Observer(
-            builder: (context) {
-              // Show the custom Loader based on appStore.isLoading
-              return Loader().center().visible(appStore.isLoading);
-            },
-          ),
-      ]
-      ),
+        ),
+        Observer(
+          builder: (context) {
+            // Show the custom Loader based on appStore.isLoading
+            return Loader().center().visible(appStore.isLoading);
+          },
+        ),
+      ]),
     );
   }
-
 }

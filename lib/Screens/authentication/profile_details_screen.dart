@@ -16,13 +16,18 @@ import '../../extensions/shared_pref.dart';
 import '../../main.dart';
 import '../../network/rest_api.dart';
 
-
 class ProfileDetailsScreen extends StatefulWidget {
   final email;
   final country;
   final mobileNumber;
   final name;
-  const ProfileDetailsScreen({super.key,required  this.country,  this.mobileNumber = '', this.name='', this.email ='', });
+  const ProfileDetailsScreen({
+    super.key,
+    required this.country,
+    this.mobileNumber = '',
+    this.name = '',
+    this.email = '',
+  });
 
   @override
   State<ProfileDetailsScreen> createState() => _ProfileDetailsScreenState();
@@ -33,21 +38,22 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
   String selectedLanguage = 'Hindi';
   int englishLevel = 1; // 0: Beginner, 1: Intermediate, 2: Advanced
   GlobalKey<FormState> mFormKey = GlobalKey<FormState>();
-  String countryCode ="";
+  String countryCode = "";
   List<Language> filteredLanguages = [];
-  TextEditingController searchController = TextEditingController();
-
 
   @override
   void initState() {
-    filteredLanguages = languages;
-    if(widget.mobileNumber != '') {
+    filteredLanguages = List.from(languages);
+
+    if (widget.mobileNumber != '') {
       countryCode = extractCountryCode(widget.mobileNumber.toString());
       print("Country code $countryCode");
     }
-    if(widget.name != ''){
-    _nameController = TextEditingController(text: widget.name);}
+    if (widget.name != '') {
+      _nameController = TextEditingController(text: widget.name);
+    }
   }
+
   Future<void> save() async {
     hideKeyboard(context);
     String enLevel = getLevel();
@@ -57,7 +63,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
       'mobileNo': widget.mobileNumber,
       'country': widget.country,
       'engprolevel': enLevel,
-      'email':widget.email
+      'email': widget.email
     };
 
     if (mFormKey.currentState!.validate()) {
@@ -100,7 +106,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
               'User_id': value.newUser!.userId.toString(),
               'Native_language': value.newUser!.nativeLanguage.toString(),
               'Proficiency': value.newUser!.engprolevel.toString(),
-              'country_code':countryCode
+              'country_code': countryCode
             },
           ).then((_) {
             print('Logged event: Registration_complete with parameters:');
@@ -117,26 +123,51 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
       setState(() {});
     }
   }
-  String getLevel(){
-   switch(englishLevel){
-     case 0:
-         return "Beginner";
-     case 1:
-       return "Intermediate";
-     case 2:
-       return "Advanced";
-     default:
-       return "Beginner";
-   }
+
+  String getLevel() {
+    switch (englishLevel) {
+      case 0:
+        return "Beginner";
+      case 1:
+        return "Intermediate";
+      case 2:
+        return "Advanced";
+      default:
+        return "Beginner";
+    }
   }
+
+  void filterLanguages(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        filteredLanguages = List.from(languages); // ✅ Reset to original list
+      } else {
+        filteredLanguages = languages
+            .where((lang) =>
+                lang.englishName.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+      }
+
+      // Prevent accessing `first` when the list is empty
+      if (filteredLanguages.isNotEmpty) {
+        print(
+            "Search function result: query $query, result: ${filteredLanguages.first.englishName}, origin: ${languages.first.englishName}");
+      } else {
+        print("Search function result: query $query, no match found.");
+      }
+    });
+  }
+
   void showLanguagePicker() async {
-    // Placeholder for language picker modal
+    filteredLanguages = List.from(languages);
+
     final result = await showModalBottomSheet<String>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) =>
-          FractionallySizedBox(
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          return FractionallySizedBox(
             heightFactor: 0.9,
             child: Container(
               decoration: const BoxDecoration(
@@ -150,14 +181,21 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 12),
+                        horizontal: 12, vertical: 24),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const MyText(text:'Select Your Native Language', fontWeight: FontWeight.bold, fontSize: 18,color: Colors.black54),
+                        const MyText(
+                            text: 'Select Your Native Language',
+                            fontWeight: FontWeight.w500,
+                            fontSize: 16,
+                            color: Colors.black54),
                         GestureDetector(
                           onTap: () => Navigator.of(context).pop(),
-                          child: const MyText(text:'Close', color: primaryColor, fontWeight: FontWeight.bold),
+                          child: const MyText(
+                              text: 'Close',
+                              color: primaryColor,
+                              fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
@@ -165,22 +203,31 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: TextField(
-                      decoration: const InputDecoration(
-                        hintText: 'Search For Language',
-                        prefixIcon: Icon(Icons.search),
-                        border: OutlineInputBorder(),
-                        isDense: true,
-
-                      ),
                       onChanged: (value) {
                         setState(() {
-                          filteredLanguages = languages
-                              .where((lang) =>
-                          lang.englishName.toLowerCase().contains(value.toLowerCase()) ||
-                              lang.nativeName.toLowerCase().contains(value.toLowerCase()))
-                              .toList();
+                          filterLanguages(value);
                         });
                       },
+                      keyboardType: TextInputType.text,
+                      textInputAction: TextInputAction.done,
+                      decoration: const InputDecoration(
+                        hintText: 'Search For Language',
+                        hintStyle: TextStyle(
+                            color: Color(0xff7d7d7d),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400),
+                        prefixIcon: Padding(
+                          padding: EdgeInsets.only(left: 12.0),
+                          child: Icon(Icons.search),
+                        ),
+                        prefixIconConstraints: BoxConstraints(minWidth: 4),
+                        hintTextDirection: TextDirection.ltr,
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(8)),
+                            borderSide:
+                                BorderSide(color: Color(0xfff1f1f1), width: 1)),
+                        isDense: true,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -194,32 +241,60 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                             Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
-                                color:selectedLanguage == language.englishName? Colors.grey.shade100:Colors.transparent,
+                                color: selectedLanguage == language.englishName
+                                    ? Colors.grey.shade100
+                                    : Colors.transparent,
                               ),
                               child: ListTile(
-                                title: Text(language.englishName),
-                                trailing: Text(language.nativeName),
-                                selected: selectedLanguage == language.englishName,
-                                selectedTileColor: Colors.blue.withOpacity(0.1),
-                                selectedColor: primaryColor,
+                                title: selectedLanguage == language.englishName
+                                    ? Text(
+                                        "${language.englishName} (Selected)",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w400,
+                                            fontSize: 16),
+                                      )
+                                    : Text(language.englishName,
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w400,
+                                            fontSize: 16)),
+                                trailing:
+                                    selectedLanguage == language.englishName
+                                        ? Text(language.nativeName,
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w400,
+                                                fontSize: 16,
+                                                color: Color(0xff000000)))
+                                        : Text(language.nativeName,
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w400,
+                                                fontSize: 16,
+                                                color: Color(0xff7d7d7d))),
+                                selected:
+                                    selectedLanguage == language.englishName,
+                                selectedTileColor: Color(0xff1A1A1A),
+                                selectedColor: Color(0xff1A1A1A),
                                 contentPadding: EdgeInsets.zero,
-                                onTap: () =>
-                                    Navigator.of(context).pop(language.englishName),
+                                onTap: () => Navigator.of(context)
+                                    .pop(language.englishName),
                               ).paddingSymmetric(horizontal: 12),
                             ),
-                            Divider(thickness: 0.2,height: 10,)
-
+                            Divider(
+                              thickness: 0.2,
+                              height: 10,
+                            )
                           ],
                         ).paddingSymmetric(horizontal: 12);
                       },
-
                     ),
                   ),
                 ],
               ),
             ),
-          ),
+          );
+        },
+      ),
     );
+
     if (result != null) {
       setState(() {
         selectedLanguage = result;
@@ -229,6 +304,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
 
     return Form(
       key: mFormKey,
@@ -251,13 +327,11 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                 return SingleChildScrollView(
                   reverse: true,
                   padding: EdgeInsets.only(
-                    bottom: MediaQuery
-                        .of(context)
-                        .viewInsets
-                        .bottom,
+                    bottom: MediaQuery.of(context).viewInsets.bottom,
                   ),
                   child: ConstrainedBox(
-                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    constraints:
+                        BoxConstraints(minHeight: constraints.maxHeight),
                     child: IntrinsicHeight(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.end,
@@ -296,8 +370,10 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text('Your Name', style: TextStyle(
-                                    fontWeight: FontWeight.bold,color: Colors.black54)),
+                                const Text('Your Name',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black54)),
                                 10.height,
                                 TextFormField(
                                   controller: _nameController,
@@ -312,8 +388,11 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                                   ),
                                 ),
                                 20.height,
-                                const MyText(text: "Select Your Native Language",
-                                    fontWeight: FontWeight.bold,color: Colors.black54,),
+                                const MyText(
+                                  text: "Select Your Native Language",
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black54,
+                                ),
                                 8.height,
                                 GestureDetector(
                                   onTap: showLanguagePicker,
@@ -326,27 +405,45 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment
-                                          .spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(selectedLanguage,
-                                            style: const TextStyle(fontSize: 16)),
+                                            style:
+                                                const TextStyle(fontSize: 16)),
                                         const Icon(Icons.arrow_drop_down),
                                       ],
                                     ),
                                   ),
                                 ),
                                 20.height,
-                                const MyText(text: 'Your English Proficiency',
-                                    fontWeight: FontWeight.bold,color: Colors.black54),
+                                const MyText(
+                                    text: 'Your English Proficiency',
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black54),
                                 8.height,
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment
-                                      .spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    MyText(text: 'Beginner',color: englishLevel==0?primaryColor : textColor,),
-                                    MyText(text: 'Intermediate',color: englishLevel==1?primaryColor : textColor,),
-                                    MyText(text: 'Advanced',color: englishLevel==2?primaryColor : textColor,),
+                                    MyText(
+                                      text: 'Beginner',
+                                      color: englishLevel == 0
+                                          ? primaryColor
+                                          : Color(0xff7d7d7d),
+                                    ),
+                                    MyText(
+                                      text: 'Intermediate',
+                                      color: englishLevel == 1
+                                          ? primaryColor
+                                          : Color(0xff7d7d7d),
+                                    ),
+                                    MyText(
+                                      text: 'Advanced',
+                                      color: englishLevel == 2
+                                          ? primaryColor
+                                          : Color(0xff7d7d7d),
+                                    ),
                                   ],
                                 ),
                                 Slider(
@@ -354,9 +451,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                                   min: 0,
                                   max: 2,
                                   divisions: 2,
-                                  activeColor: Colors.grey.shade200,
-                                  inactiveColor: Colors.grey.shade200,
-                                  thumbColor: primaryColor,
+                                  activeColor: primaryColor,
                                   onChanged: (value) {
                                     setState(() {
                                       englishLevel = value.toInt();
@@ -364,8 +459,8 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                                   },
                                 ),
                                 8.height,
-                                 Text(
-                                 englishLevel==0 ? 'Can understand and use basic everyday expressions and simple phrases.' : englishLevel==1 ? 'Can handle daily conversations and write or speak with some confidence on familiar topics.':'Can communicate fluently and effectively in complex situations, both spoken and written.',
+                                const Text(
+                                  'Can handle daily conversations and write or speak with some confidence on familiar topics.',
                                   style: TextStyle(
                                       fontSize: 12, color: Colors.black54),
                                 ),
@@ -374,12 +469,13 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                                   width: double.infinity,
                                   child: ElevatedButton(
                                     onPressed: () {
-                                       save();
+                                      save();
                                       // JabberAIHomepage().launch(context);
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: primaryColor,
-                                      padding: EdgeInsets.symmetric(vertical: 14),
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 14),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(8),
                                       ),

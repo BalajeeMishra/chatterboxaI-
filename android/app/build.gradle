@@ -30,7 +30,8 @@ android {
             keyPassword "zapai1"
         }
         customDebug {
-            storeFile file("D:/chatterboxaI-/zapai.jks")
+            // storeFile file("D:/chatterboxaI-/zapai.jks")
+            storeFile file("E:/work/job/balajee mishra/khush/chatterboxaI-/zapai.jks")
             storePassword "zapai1"
             keyAlias "key0"
             keyPassword "zapai1"

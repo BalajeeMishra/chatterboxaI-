@@ -23,25 +23,23 @@ import '../../main.dart';
 import '../../network/rest_api.dart';
 import '../JabberAIHomePage/JabberAIHomepage.dart';
 
-
 class OTPVerification extends StatefulWidget {
   final String country;
   final String mobileNumber;
   final String? verificationId;
 
-  const OTPVerification(
-      {Key? key,
-      required this.country,
-      required this.mobileNumber,
-      required this.verificationId,
-      })
-      : super(key: key);
+  const OTPVerification({
+    Key? key,
+    required this.country,
+    required this.mobileNumber,
+    required this.verificationId,
+  }) : super(key: key);
 
   @override
   State<OTPVerification> createState() => _OTPVerificationState();
 }
 
-class _OTPVerificationState extends State<OTPVerification> with WidgetsBindingObserver {
+class _OTPVerificationState extends State<OTPVerification> {
   String otpCode = '';
   int _start = 30;
   bool _canResendOTP = false;
@@ -52,12 +50,10 @@ class _OTPVerificationState extends State<OTPVerification> with WidgetsBindingOb
   Telephony telephony = Telephony.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   GlobalKey<OTPTextFieldState> otpTextFieldKey = GlobalKey<OTPTextFieldState>();
-  bool isKeyboardVisible = false;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
     print(widget.country);
     init();
   }
@@ -235,176 +231,169 @@ class _OTPVerificationState extends State<OTPVerification> with WidgetsBindingOb
     }
   }
 
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  void didChangeMetrics() {
-    final bottomInset = WidgetsBinding.instance.window.viewInsets.bottom;
-    final newKeyboardVisible = bottomInset > 0.0;
-
-    if (newKeyboardVisible != isKeyboardVisible) {
-      setState(() {
-        isKeyboardVisible = newKeyboardVisible;
-      });
-
-    }
-  }
-
-
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
+    print(screenHeight);
+    bool isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
     return Scaffold(
-
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
       backgroundColor: primaryColor,
       body: SafeArea(
-        child:  Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                   Align(
-                     alignment: Alignment.centerLeft,
-                     child: IconButton(  onPressed: () => Navigator.of(context).pop(), icon: Icon(Icons.arrow_back,color: whiteColor,)),
-                   ),
-                    MyText(
-                      text: 'Enter Verification\nCode',
-                      textAlign: TextAlign.center,
-                      color: whiteColor,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    8.height,
-                    MyText(
-                      text:
-                          'An OTP(One Time Password) Has Been\n Sent To Your Phone Number.',
-                      textAlign: TextAlign.center,
-                      color: whiteColor.withOpacity(0.8),
-                      fontSize: 14,
-                    ),
-                  ],
-                ),
-                20.height,
-                Column(
-                  children: [
-                    SizedBox(
-                      height: isKeyboardVisible?240:270,
-                      width: isKeyboardVisible?240:270,
-                      child: Image.asset(zapAIAvtar, fit: BoxFit.fill),
-                    ),
-                    Container(
-                      height: screenHeight*.30,
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(24),
-                          topRight: Radius.circular(24),
-                        ),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return Align(
+                alignment: Alignment.bottomCenter,
+                child: SingleChildScrollView(
+                  reverse: true,
+                  physics: isKeyboardOpen
+                      ? const AlwaysScrollableScrollPhysics()
+                      : const NeverScrollableScrollPhysics(),
+                  child: Column(
+                    children: [
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          10.height,
-                          Row(
-                            children: [
-                              Text(
-                                'Code Sent To ${widget.mobileNumber}',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.black54,
-                                ),
-                              ),
-                              5.width,
-                              const Icon(Icons.edit, color: primaryColor),
-                            ],
-                          ),
-                          18.height,
-                          Padding(
-                            padding: EdgeInsets.zero,
-                            child: otpInputField(),
-                          ),
-                          12.height,
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: () {
-                               submit();
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: primaryColor,
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 14),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              child: const Text('Continue',
-                                  style: TextStyle(
-                                      fontSize: 16, color: Colors.white)),
-                            ),
+                          // SizedBox(height: screenHeight * .18),
+                          MyText(
+                            text: 'Enter Verification\nCode',
+                            textAlign: TextAlign.center,
+                            color: whiteColor,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
                           ),
                           8.height,
-                          Row(
-                            children: [
-                              MyText(
-                                text: "Didn't Get The Code? ",
-                                fontSize: 14,
+                          MyText(
+                            text:
+                                'An OTP(One Time Password) Has Been\n Sent To Your Phone Number.',
+                            textAlign: TextAlign.center,
+                            color: whiteColor.withOpacity(0.8),
+                            fontSize: 14,
+                          ),
+                        ],
+                      ),
+                      20.height,
+                      Column(
+                        children: [
+                          SizedBox(
+                            height: 270,
+                            width: 270,
+                            child: Image.asset(zapAIAvtar, fit: BoxFit.fill),
+                          ),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(24),
+                                topRight: Radius.circular(24),
                               ),
-                              GestureDetector(
-                                child: Row(
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                10.height,
+                                Row(
                                   children: [
                                     Text(
-                                      _canResendOTP ? 'Resend' : '',
-                                      style: primaryTextStyle(
-                                          color: primaryColor),
-                                    ).paddingLeft(4),
-                                    if (!_canResendOTP)
-                                      Container(
-                                        alignment: Alignment.center,
-                                        child: Text('$_start seconds',
-                                            style: primaryTextStyle(
-                                                color: primaryColor)),
+                                      'Code Sent To ${widget.mobileNumber}',
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.black54,
                                       ),
+                                    ),
+                                    5.width,
+                                    const Icon(Icons.edit, color: primaryColor),
                                   ],
                                 ),
-                                onTap: () {
-                                  if (_canResendOTP) {
-                                    resendOtpFunction();
-                                    setState(() {});
-                                  }
-                                },
-                              ),
-                            ],
+                                24.height,
+                                Padding(
+                                  padding: EdgeInsets.zero,
+                                  child: otpInputField(),
+                                ),
+                                16.height,
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      submit();
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: primaryColor,
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 14),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    child: const Text('Continue',
+                                        style: TextStyle(
+                                            fontSize: 16, color: Colors.white)),
+                                  ),
+                                ),
+                                8.height,
+                                Row(
+                                  children: [
+                                    MyText(
+                                      text: "Didn't Get The Code? ",
+                                      fontSize: 14,
+                                    ),
+                                    GestureDetector(
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                            _canResendOTP ? 'Resend' : '',
+                                            style: primaryTextStyle(
+                                                color: primaryColor),
+                                          ).paddingLeft(4),
+                                          if (!_canResendOTP)
+                                            Container(
+                                              alignment: Alignment.center,
+                                              child: Text('$_start seconds',
+                                                  style: primaryTextStyle(
+                                                      color: primaryColor)),
+                                            ),
+                                        ],
+                                      ),
+                                      onTap: () {
+                                        if (_canResendOTP) {
+                                          resendOtpFunction();
+                                          setState(() {});
+                                        }
+                                      },
+                                    ),
+                                  ],
+                                ),
+                                10.height,
+                              ],
+                            ),
                           ),
-                          10.height,
                         ],
-                      ).paddingSymmetric(vertical: 10),
-                    ),
-                  ],
-                ),
-              ],
-            )
-
+                      ),
+                    ],
+                  ),
+                ));
+          },
+        ),
       ),
     );
   }
 
   Widget otpInputField() {
-
     return OTPTextField(
+      // key: otpTextFieldKey,
 
       pinLength: 6,
-      fieldWidth: context.width() * 0.11,
+      fieldWidth: context.width() * 0.1,
       onChanged: (s) {
         otpCode = s;
       },
@@ -413,8 +402,7 @@ class _OTPVerificationState extends State<OTPVerification> with WidgetsBindingOb
         setState(
           () {},
         );
-        submit();
       },
-    );
+    ).center();
   }
 }

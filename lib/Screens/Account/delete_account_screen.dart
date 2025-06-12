@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
 
+import 'package:balajiicode/Constants/ImageConstant.dart';
 import 'package:balajiicode/Screens/authentication/login_screen.dart';
 import 'package:balajiicode/Screens/splash_screen.dart';
 import 'package:balajiicode/Services/auth_service.dart';
@@ -10,8 +11,8 @@ import 'package:balajiicode/extensions/common.dart';
 import 'package:balajiicode/extensions/extension_util/context_extensions.dart';
 import 'package:balajiicode/extensions/extension_util/int_extensions.dart';
 import 'package:balajiicode/extensions/shared_pref.dart';
-import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '../../Model/error_model.dart';
 import '../../Services/ApiResponseStatus.dart';
@@ -22,220 +23,214 @@ import '../../Utils/app_images.dart';
 import '../../Widget/text_widget.dart';
 import '../../main.dart';
 
-
 class DeleteAccountScreen extends StatefulWidget {
   final String name;
-  DeleteAccountScreen({
-   required this.name
-});
+  DeleteAccountScreen({required this.name});
   @override
   State<DeleteAccountScreen> createState() => _DeleteAccountScreenState();
 }
 
-class _DeleteAccountScreenState extends State<DeleteAccountScreen> with SingleTickerProviderStateMixin{
+class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
   bool isDeleted = false;
   bool isLoading = false;
-  final dropDownKey = GlobalKey<DropdownSearchState>();
-  String name = '';
-  bool isActive = false;
-
-  late AnimationController _colorController;
-  late Animation<Color?> _colorAnimation;
+  bool isButtonEnabled = false;
 
   @override
   void initState() {
     super.initState();
 
-    _colorController = AnimationController(
-      duration: Duration(seconds: 5),
-      vsync: this,
-    );
-
-    _colorAnimation = ColorTween(
-      begin: Colors.grey.shade400,
-      end: lightRedColor,
-    ).animate(CurvedAnimation(parent: _colorController, curve: Curves.easeInOut));
-
-    // Delay the animation by 1 second
-    Future.delayed(Duration(seconds: 1), () {
-      _colorController.forward();
-    });
+    // Enable button after 5 seconds
     Future.delayed(Duration(seconds: 4), () {
       setState(() {
-        isActive = true;
+        isButtonEnabled = true;
       });
     });
-
-  }
-
-  @override
-  void dispose() {
-    _colorController.dispose();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
-      appBar: isLoading?null:AppBar(
-        title: MyText(
-          text:"Delete Account",
-          color: lightRedColor,
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 1,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: lightRedColor),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
-      body:
-
-      Stack(
-        children:[
-          Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              20.height,
-              Stack(
-                clipBehavior: Clip.none,
-                alignment: Alignment.center,
-                children: [
-                  // The main container
-                  Container(
-                    width: context.width(),
-                    height: context.height() * 0.19,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.shade300,
-                          blurRadius: 10,
-                          spreadRadius: 2,
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        // Greeting text
-                        MyText(
-                          text: "Hello,",
-                          fontSize: 17, fontWeight: FontWeight.normal,
-                        ),
-                        MyText(
-                          text:widget.name,
-                         fontSize: 26, fontWeight: FontWeight.bold,
-                        ),
-                        SizedBox(height: 16),
-                      ],
-                    ),
-                  ),
-                  Positioned(
-                    top: -30,
-                    left: context.width() * 0.9/ 2 - 50,
-                    child: CircleAvatar(
-                      radius: 50,
-                      backgroundImage: AssetImage(profile_logo),
-                    ),
-                  ),
-                ],
-              ),
-              24.height,
-              Row(
-                children: [
-                  Icon(Icons.delete_outline, color: lightRedColor, size: 40),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: MyText(
-                      text:!isDeleted?"Are You Sure You Want To Delete Your Account?":"Your Account Has Been Deleted",
-
-                        color: lightRedColor,
-                        fontSize: 24  ,
-                        fontWeight: FontWeight.bold,
-
-                    )
-                  ),
-                ],
-              ),
-              Divider(
-                color: Colors.grey,
-                thickness: 1.0,
-                indent: 8.0,
-                endIndent: 8.0,
-              ),
-              16.height,
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Table(
-                    columnWidths: {
-                      0: FixedColumnWidth(24), // Set a fixed width for the bullet points
-                      1: FlexColumnWidth(),   // Let the text take the remaining space
-                    },
-                    children: [
-                      if(!isDeleted) _buildRow("You Will Be Signed Out First."),
-                      if(!isDeleted)  _buildRow( "Your Account Deletion Will Start Once You Are Signed Out.",),
-                      if(!isDeleted) _buildRow( "Your Account Will Be Deleted Within 10 Minutes.",),
-                      if(isDeleted) _buildRow("You will be signed Out Now."),
-                      if(isDeleted) _buildRow("Deletion Process should be complete in 10 minutes.")
-                    ],
-                  ),
-                ],
-              ),
-              Spacer(),
-              if(!isDeleted)
-                AnimatedBuilder(
-                  animation: _colorAnimation,
-                  builder: (context, child) {
-                    return OutlinedButton.icon(
-                      onPressed: () {
-                       if(isActive) deleteuser();
-                      },
-                      icon: Icon(Icons.delete, color: _colorAnimation.value),
-                      label: MyText(
-                        text: "Delete Account",
-                        color: whiteColor,
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        minimumSize: Size(double.infinity, 50),
-                        side: BorderSide(color: _colorAnimation.value ?? Colors.grey),
-                        backgroundColor: _colorAnimation.value??grey,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      ),
-                    );
+        backgroundColor: Colors.grey.shade100,
+        appBar: PreferredSize(
+            preferredSize: Size.fromHeight(60),
+            child: ImageFiltered(
+              imageFilter: isLoading
+                  ? ImageFilter.blur(sigmaX: 10, sigmaY: 10)
+                  : ImageFilter.blur(),
+              child: AppBar(
+                title: MyText(
+                  text: "Delete Account",
+                  color: lightRedColor,
+                ),
+                centerTitle: true,
+                backgroundColor: Colors.white,
+                elevation: 1,
+                leading: IconButton(
+                  icon: Icon(Icons.arrow_back, color: lightRedColor),
+                  onPressed: () {
+                    Navigator.pop(context);
                   },
                 ),
-              16.height,
-              OutlinedButton(
-                onPressed: () {
-                 !isDeleted? pop(): Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>LoginScreen()),(route)=>false );
-                },
-                style: OutlinedButton.styleFrom(
-                  minimumSize: Size(double.infinity, 50),
-                  side: BorderSide(color: Colors.grey.shade400),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-                child: MyText(
-                text: isDeleted?"Okay": "Cancel",
-                  color: blackColor, fontSize: 16,
-                ),
               ),
-              16.height
-            ],
+            )),
+        body: Stack(children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                24.height,
+                Stack(
+                  clipBehavior: Clip.none,
+                  alignment: Alignment.center,
+                  children: [
+                    // The main container
+                    Container(
+                      width: context.width(),
+                      height: context.height() * 0.12,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.shade300,
+                            blurRadius: 10,
+                            spreadRadius: 2,
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          MyText(
+                            text: widget.name,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xff1a1a1a),
+                          ),
+                          SizedBox(height: 16),
+                        ],
+                      ),
+                    ),
+                    Positioned(
+                      top: -30,
+                      child: SizedBox(
+                        height: 84,
+                        width: 84,
+                        child: CircleAvatar(
+                          radius: 50,
+                          backgroundImage: AssetImage(profile_logo),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                24.height,
+                Row(
+                  children: [
+                    SvgPicture.asset(
+                      ImageConstant.trash,
+                    ),
+                    16.width,
+                    Expanded(
+                        child: MyText(
+                      text: !isDeleted
+                          ? "Are You Sure You Want To Delete Your Account?"
+                          : "Your Account Has Been Deleted",
+                      color: Color(0xffff7171),
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                    )),
+                  ],
+                ),
+                Divider(
+                  color: lightGrey,
+                  thickness: 1.0,
+                  indent: 8.0,
+                  endIndent: 8.0,
+                ),
+                16.height,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Table(
+                      columnWidths: {
+                        0: FixedColumnWidth(
+                            24), // Set a fixed width for the bullet points
+                        1: FlexColumnWidth(), // Let the text take the remaining space
+                      },
+                      children: [
+                        if (!isDeleted)
+                          _buildRow("You Will Be Signed Out First."),
+                        if (!isDeleted)
+                          _buildRow(
+                            "Your Account Deletion Will Start Once You Are Signed Out.",
+                          ),
+                        if (!isDeleted)
+                          _buildRow(
+                            "Your Account Will Be Deleted Within 10 Minutes.",
+                          ),
+                        if (isDeleted) _buildRow("You will be signed Out Now."),
+                        if (isDeleted)
+                          _buildRow(
+                              "Deletion Process should be complete in 10 minutes.")
+                      ],
+                    ),
+                  ],
+                ),
+                Spacer(),
+                if (!isDeleted)
+                  ElevatedButton(
+                    onPressed: isButtonEnabled
+                        ? () {
+                            deleteuser();
+                          }
+                        : () {},
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: Size(double.infinity, 50),
+                      backgroundColor:
+                          isButtonEnabled ? lightRedColor : Color(0xffFFA8A8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: MyText(
+                      text: "Delete Account",
+                      color: whiteColor,
+                      fontSize: 16,
+                    ),
+                  ),
+                16.height,
+                OutlinedButton(
+                  onPressed: () {
+                    !isDeleted
+                        ? pop()
+                        : Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => LoginScreen()),
+                            (route) => false);
+                  },
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: Size(double.infinity, 50),
+                    side: BorderSide(color: Colors.grey.shade400),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                  ),
+                  child: MyText(
+                    text: isDeleted ? "Okay" : "Cancel",
+                    color: blackColor,
+                    fontSize: 16,
+                  ),
+                ),
+                16.height
+              ],
+            ),
           ),
-        ),
-          if(isLoading)
+          if (isLoading)
             BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
               child: Container(
-                color: Colors.red.withOpacity(0.2),
+                color: Colors.white.withOpacity(0.2),
                 child: Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -246,31 +241,24 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> with SingleTi
                       ),
                       SizedBox(height: 16),
                       MyText(
-                       text:  "Account Deletion In Progress",
-
-                          color: redColor,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-
+                        text: "Account Deletion In Progress",
+                        color: redColor,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ],
                   ),
                 ),
               ),
             )
-
-
-  ]
-      )
-    );
-
+        ]));
   }
 
-  TableRow _buildRow(String text){
-    return  TableRow(
+  TableRow _buildRow(String text) {
+    return TableRow(
       children: [
         Padding(
-          padding: const EdgeInsets.only(top: 6,bottom: 10),
+          padding: const EdgeInsets.only(top: 6, bottom: 10),
           child: Icon(Icons.circle, size: 9, color: Colors.black),
         ), // Larger bullet point
         Padding(
@@ -281,11 +269,10 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> with SingleTi
           ),
         ),
       ],
-
     );
   }
 
-  void deleteuser() async{
+  void deleteuser() async {
     setState(() {
       isLoading = true;
     });
@@ -306,7 +293,6 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> with SingleTi
           isDeleted = true;
         });
         toast("Successfully Deleted");
-
       } else {
         setState(() {
           isLoading = false;
@@ -315,7 +301,6 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> with SingleTi
         toast("Can\'t Delete User");
       }
       appStore.setLoading(false);
-
     } catch (e) {
       setState(() {
         isLoading = false;
@@ -323,7 +308,6 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> with SingleTi
       });
       toast('Can\'t Delete User');
       throw e.toString();
-
     }
   }
 }
