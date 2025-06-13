@@ -231,6 +231,9 @@ class _AddPhoneDetailsState extends State<AddPhoneDetails> {
                                       // if (!number.startsWith('+')) {
                                       //   number = '$selectedCode ${phoneController.text.trim()}';
                                       // }
+
+                                      print(
+                                          "Fixing Auth launching addponedetild: ${widget.user.email}");
                                       ProfileDetailsScreen(
                                         country: selectedCountry,
                                         email: widget.user.email,
@@ -257,6 +260,7 @@ class _AddPhoneDetailsState extends State<AddPhoneDetails> {
                                     ProfileDetailsScreen(
                                       name: widget.user.name,
                                       country: selectedCountry,
+                                      email: widget.user.email,
                                     ).launch(context);
                                   },
                                   child: Row(

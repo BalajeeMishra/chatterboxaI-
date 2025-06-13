@@ -276,11 +276,15 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
     setState(() {
       isLoading = true;
     });
+    print("Delete accout bug: start deletuser methhod");
     try {
       appStore.setLoading(true);
       final response = await ApiClass.delete("api/user/delete", isHeader: true);
-      print("This is inside home page api ${response.body}");
+      print(" This is inside home page api ${response.body}");
+
+      print("Delete accout bug ApiClass.delete: ${response.body}");
       final ApiResponseStatus status = mapStatusCode(response.statusCode);
+
       if (status == ApiResponseStatus.success) {
         removeKey(TOKEN);
         removeKey(IS_LOGIN);
@@ -288,6 +292,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
         removeKey(USER_NATIVE_LANGUAGE);
         removeKey(USER_ENGLISH_PROFICIENCY);
         userStore.clearUserData();
+        clearSharedPref(); // maybe fix
         setState(() {
           isLoading = false;
           isDeleted = true;

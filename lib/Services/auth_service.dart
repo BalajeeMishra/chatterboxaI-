@@ -1,7 +1,9 @@
 import 'package:balajiicode/Screens/authentication/otp_verification_screen.dart';
+import 'package:balajiicode/ViewModel/JabberHomeAIvm.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:provider/provider.dart';
 
 import '../../extensions/extension_util/widget_extensions.dart';
 import '../Model/CheckMobileNumberResponse.dart';
@@ -17,12 +19,11 @@ import '../utils/app_constants.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
-
 Future<void> loginWithOTP(
   BuildContext context,
   String phoneNumber,
   String mobileNo,
-String country,
+  String country,
 ) async {
   appStore.setLoading(true);
 
@@ -53,7 +54,6 @@ String country,
         verificationId: verificationId,
         mobileNumber: phoneNumber,
       ).launch(context);
-
     },
     codeAutoRetrievalTimeout: (String verificationId) {
       //
@@ -86,37 +86,38 @@ Future<void> logout(BuildContext context, {Function? onLogout}) async {
   onLogout?.call();
 }
 
-
-
 Future<String> signInWithGoogle(BuildContext context) async {
   try {
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
     if (googleUser == null) return "No google user";
 
-    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser.authentication;
 
     final credential = GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
     );
-    await checkForEmail(googleAuth.idToken!,context);
+    await checkForEmail(googleAuth.idToken!, context);
     return 'success';
-
   } catch (e) {
     print("Google sign-in error: $e");
     return '$e';
   }
 }
-Future  checkForEmail(String? idToken, BuildContext context) async{
-  Map<String, dynamic> req = {
-    'idToken':idToken ??'',
-  };
 
+Future checkForEmail(String? idToken, BuildContext context) async {
+  Map<String, dynamic> req = {
+    'idToken': idToken ?? '',
+  };
+  print("Fixing Auth Token: $idToken");
   try {
     final CheckPhoneNumberResponse value = await emailCheckApi(req);
 
-
+    print("Fixing Auth checkPhoneNumberResponse: ${value.accessToken}");
+    print(
+        "Fixing Auth checkPhoneNumberResponse number: ${value.user!.mobileNo}");
     if (value.accessToken != null) {
       setValue(TOKEN, value.accessToken);
       userStore.setToken(value.accessToken.toString());
@@ -128,17 +129,20 @@ Future  checkForEmail(String? idToken, BuildContext context) async{
       userStore.setUserEnglishProficiency(value.user!.engprolevel.toString());
       // setValue(DAYS_SINCE_INSTALL, value.user!.createdAt.toString());
       // userStore.setDaysSinceInstall(value.user!.createdAt.toString());
+
       await userStore.setLogin(true);
+      print(
+          "Fixing Auth launching JabberAIHomepage set all values : ${value.accessToken}");
+      // Provider.of<JabberHomeAIvm>(context, listen: false).setUser(value.user!);
       JabberAIHomepage().launch(context);
       return value;
-    }
-    else{
+    } else {
+      print(
+          "Fixing Auth launching AddPhoneDetails value.accessToken is null:  ${value.user!.email} ");
+      // Provider.of<JabberHomeAIvm>(context, listen: false).setUser(value.user!);
       AddPhoneDetails(user: value.user!).launch(context);
     }
   } catch (e) {
-
     appStore.setLoading(false);
-
-
   }
 }

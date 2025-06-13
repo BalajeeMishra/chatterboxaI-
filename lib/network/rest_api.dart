@@ -35,10 +35,11 @@ Future<CheckPhoneNumberResponse> mobileNumberCheckApi(
       await buildHttpResponse('user/checkphoneno',
           request: req, method: HttpMethod.POST)));
 }
-Future <CheckPhoneNumberResponse>emailCheckApi(Map req)async{
+
+Future<CheckPhoneNumberResponse> emailCheckApi(Map req) async {
   return CheckPhoneNumberResponse.fromJson(await handleResponse(
       await buildHttpResponse('user/auth/google',
-      request: req, method: HttpMethod.POST)));
+          request: req, method: HttpMethod.POST)));
 }
 
 Future<UpdateProficiencyModel> updateProficiencyApi(
@@ -50,16 +51,16 @@ Future<UpdateProficiencyModel> updateProficiencyApi(
 }
 
 Future<CorrectSentenceModel?> correctSentenceApi(Map req) async {
-  CorrectSentenceModel model = CorrectSentenceModel(
-    response: Response(text: req['sentence'])
-  );
+  CorrectSentenceModel model =
+      CorrectSentenceModel(response: Response(text: req['sentence']));
   try {
     final response = await handleResponse(
-      await buildHttpResponse('correctsentance', request: req, method: HttpMethod.POST),
+      await buildHttpResponse('correctsentance',
+          request: req, method: HttpMethod.POST),
     ).timeout(Duration(seconds: 3));
 
     print("return corrected sentence");
-    final model1 =  CorrectSentenceModel.fromJson(response);
+    final model1 = CorrectSentenceModel.fromJson(response);
     print(model1.response!.text);
     return model1;
   } on TimeoutException {

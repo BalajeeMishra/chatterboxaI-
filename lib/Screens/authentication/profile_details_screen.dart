@@ -1,10 +1,13 @@
 import 'package:balajiicode/Screens/JabberAIHomePage/JabberAIHomepage.dart';
 import 'package:balajiicode/Utils/app_colors.dart';
 import 'package:balajiicode/Utils/app_images.dart';
+import 'package:balajiicode/ViewModel/JabberHomeAIvm.dart';
 import 'package:balajiicode/extensions/colors.dart';
 import 'package:balajiicode/extensions/extension_util/int_extensions.dart';
 import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../Utils/app_common.dart';
 import '../../Utils/app_config.dart';
@@ -55,8 +58,10 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
   }
 
   Future<void> save() async {
+    // var jabHomeVm = Provider.of<JabberHomeAIvm>(context, listen: false);
     hideKeyboard(context);
     String enLevel = getLevel();
+    print("auth fixing : ${widget.email}");
     Map<String, dynamic> req = {
       'name': _nameController.text.trim(),
       'nativeLanguage': selectedLanguage,
@@ -65,6 +70,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
       'engprolevel': enLevel,
       'email': widget.email
     };
+    print("auth fixing req: ${req.entries}");
 
     if (mFormKey.currentState!.validate()) {
       appStore.setLoading(true);

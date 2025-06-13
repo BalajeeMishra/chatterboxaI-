@@ -56,14 +56,12 @@ Future<void> main() async {
   });
   FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
 
-
   SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(statusBarColor: Color(0xff755be8)));
   sharedPreferences = await SharedPreferences.getInstance();
   await InstallDateHelper.saveInstallDate();
 
   setLogInValue();
-
   runApp(MyApp());
 }
 
@@ -95,7 +93,6 @@ class MyAppState extends State<MyApp> {
   }
 
   void init() async {
-
     _connectivitySubscription =
         Connectivity().onConnectivityChanged.listen((e) {
       if (e.contains(ConnectivityResult.none)) {
@@ -129,7 +126,7 @@ class MyAppState extends State<MyApp> {
         debugShowCheckedModeBanner: false,
         home: getStringAsync(TOKEN).toString().isEmpty
             ? LoginScreen()
-            :JabberAIHomepage(),
+            : JabberAIHomepage(),
         // home:LoginScreen(),
         localizationsDelegates: [
           CountryLocalizations.delegate,
@@ -160,4 +157,3 @@ class MyAppState extends State<MyApp> {
     // ..customAnimation = CustomAnimation();
   }
 }
-

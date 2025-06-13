@@ -1,3 +1,4 @@
+import 'package:balajiicode/Model/CheckMobileNumberResponse.dart';
 import 'package:balajiicode/Model/HomePageModel.dart';
 import 'package:balajiicode/Utils/ShowSnackBar.dart';
 import 'package:balajiicode/Utils/app_colors.dart';
@@ -13,7 +14,8 @@ import '../extensions/loader_widget.dart';
 
 class JabberHomeAIvm extends ChangeNotifier {
   /// Calling Repository =====================================
-  final JabberHomeAIRepository _jabberHomeAIRepository = JabberHomeAIRepository();
+  final JabberHomeAIRepository _jabberHomeAIRepository =
+      JabberHomeAIRepository();
 
   BuildContext context;
 
@@ -23,6 +25,15 @@ class JabberHomeAIvm extends ChangeNotifier {
   /// Creating Variables =======================================>
   HomePageModel homePageModel = HomePageModel();
   bool apiHitStatus = false;
+
+// // user
+//   User? _user;
+//   User? get user => _user;
+
+//   setUser(User val) {
+//     _user = val;
+//     notifyListeners();
+//   }
 
   seInitialValue() {
     apiHitStatus = false;
@@ -70,7 +81,5 @@ class JabberHomeAIvm extends ChangeNotifier {
       MySnackBar.showSnackBar(context, e.toString());
     }
     appStore.setLoading(false);
-
   }
-
 }
