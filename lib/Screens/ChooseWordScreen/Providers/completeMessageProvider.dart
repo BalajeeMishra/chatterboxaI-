@@ -8,6 +8,7 @@ import '../../../Model/TabooGameChatPageModel.dart';
 import '../../../Repository/TaboogameChatPageRepository.dart';
 import '../../../Services/ApiResponseStatus.dart';
 import '../../../main.dart';
+
 enum AnswerAssistState {
   idle,
   active,
@@ -17,27 +18,30 @@ enum AnswerAssistState {
 
 class AnswerAssistProvider extends ChangeNotifier {
   AnswerAssistState _state = AnswerAssistState.idle;
-  TextEditingController correctedUserMessageController = TextEditingController();
+  TextEditingController correctedUserMessageController =
+      TextEditingController();
   TextEditingController wordController = TextEditingController();
+  final ScrollController scrollController = ScrollController();
   ScrollController scrollControllerForAIMessage = ScrollController();
   bool canDoActiveOrNot = false;
-  bool isAlreadyResponded= false;
-  int _currentIndex =0;
+  bool isAlreadyResponded = false;
+  int _currentIndex = 0;
   Timer? _typingTimer;
 
   AnswerAssistState get state => _state;
 
-
-  void setCanActiveOrNot(bool val){
+  void setCanActiveOrNot(bool val) {
     canDoActiveOrNot = val;
     notifyListeners();
   }
-  void setIsAlreadyResponded(bool val){
+
+  void setIsAlreadyResponded(bool val) {
     isAlreadyResponded = val;
     notifyListeners();
   }
+
   void setIdle() {
-    isAlreadyResponded=false;
+    isAlreadyResponded = false;
     _state = AnswerAssistState.idle;
     notifyListeners();
   }
@@ -51,49 +55,64 @@ class AnswerAssistProvider extends ChangeNotifier {
     _state = AnswerAssistState.encouraging;
     notifyListeners();
   }
-  void setCompleting(){
+
+  void setCompleting() {
     _state = AnswerAssistState.completing;
     notifyListeners();
   }
 
-  Future<bool> completeUserMessage( BuildContext context,
-      String userMessage,
-      String sessionId,
-      AllGameModel allGameModel,
-      int index,
-      String modality)async{
+  void updateText(String newText) {
+    wordController.text = newText;
+    wordController.selection = TextSelection.fromPosition(
+      TextPosition(offset: wordController.text.length),
+    );
 
-    String? res =  await completingUserMessage(context, userMessage, sessionId, allGameModel, index, modality);
-    if (res !='' && res != null){
-      // correctedUserMessageController.text = res;
-      _currentIndex= 0;
-      _startTypingEffect(res);
-      setEncouraging();
-      notifyListeners();
-      return true;
-    }
-    else{
-      toast("some error occurs");
-      setActive();
-      return false;
-    }
+    // **Auto Scroll After Text Update**
+    Future.delayed(Duration(milliseconds: 100), () {
+      if (scrollController.hasClients) {
+        scrollController.jumpTo(scrollController.position.maxScrollExtent);
+      }
+    });
 
-
-  }
-  void clearCorrectedUserMessageController(){
-    correctedUserMessageController.clear();
     notifyListeners();
   }
 
-  Future<String?> completingUserMessage(
+  Future<bool> completeUserMessage(
       BuildContext context,
       String userMessage,
       String sessionId,
       AllGameModel allGameModel,
       int index,
-      String modality,
- ) async {
+      String modality) async {
+    String? res = await completingUserMessage(
+        context, userMessage, sessionId, allGameModel, index, modality);
+    if (res != '' && res != null) {
+      // correctedUserMessageController.text = res;
+      _currentIndex = 0;
+      _startTypingEffect(res);
+      setEncouraging();
+      notifyListeners();
+      return true;
+    } else {
+      toast("some error occurs");
+      setActive();
+      return false;
+    }
+  }
 
+  void clearCorrectedUserMessageController() {
+    correctedUserMessageController.clear();
+    notifyListeners();
+  }
+
+  Future<String?> completingUserMessage(
+    BuildContext context,
+    String userMessage,
+    String sessionId,
+    AllGameModel allGameModel,
+    int index,
+    String modality,
+  ) async {
     notifyListeners();
     print("this is game id ${allGameModel.allGame![index].gameId}");
     try {
@@ -106,11 +125,9 @@ class AnswerAssistProvider extends ChangeNotifier {
       };
 
       String response =
-      await TabooGameChatPageRepository()
-          .correctUserMessageApi( data);
+          await TabooGameChatPageRepository().correctUserMessageApi(data);
       print("corrected message${response}");
       return response;
-
     } catch (e) {
       appStore.setLoading(false);
       setActive();
@@ -118,16 +135,15 @@ class AnswerAssistProvider extends ChangeNotifier {
       // EasyLoading.dismiss();
       // MySnackBar.showSnackBar(context, e.toString());
     }
-
-
   }
+
   void _startTypingEffect(String fullText) {
     _typingTimer = Timer.periodic(Duration(milliseconds: 70), (timer) {
       if (_currentIndex < fullText.length) {
-        correctedUserMessageController.text = fullText.substring(0, _currentIndex + 1);
+        correctedUserMessageController.text =
+            fullText.substring(0, _currentIndex + 1);
         correctedUserMessageController.selection = TextSelection.fromPosition(
           TextPosition(offset: correctedUserMessageController.text.length),
-
         );
 
         _currentIndex++;
@@ -136,5 +152,4 @@ class AnswerAssistProvider extends ChangeNotifier {
       }
     });
   }
-
 }

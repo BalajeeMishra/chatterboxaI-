@@ -13,22 +13,17 @@ import '../ViewModel/PlayTabooScreenVM.dart';
 import '../main.dart';
 
 class GoogleCloudTTSService {
-
   late ServiceAccountCredentials _credentials;
   late AuthClient _client;
   bool _isInitialized = false;
-
 
   // Instead of text queue, now AUDIO file paths queue
   final Queue<String> _audioFileQueue = Queue();
   List<String> ttsFilePaths = [];
   bool _isPlayingQueue = false;
   double audioSpeed = 0.9;
-  int currentParaIndex = 0 ;
+  int currentParaIndex = 0;
   BuildContext globalContext = navigatorKey.currentContext!;
-
-
-
 
   Future<void> initialize() async {
     if (_isInitialized) return;
@@ -52,19 +47,18 @@ class GoogleCloudTTSService {
 
       _credentials = ServiceAccountCredentials.fromJson(jsonData);
       _client = await clientViaServiceAccount(
-          _credentials, ['https://www.googleapis.com/auth/cloud-platform']
-      );
+          _credentials, ['https://www.googleapis.com/auth/cloud-platform']);
 
       audioPlayer.playerStateStream.listen((state) async {
         if (state.processingState == ProcessingState.completed) {
-          var pro = Provider.of<PlayTabooScreenVM>(globalContext, listen: false);
+          var pro =
+              Provider.of<PlayTabooScreenVM>(globalContext, listen: false);
           pro.setIsListening(true);
           pro.setIfDelayOfASecond(true);
           await Future.delayed(Duration(milliseconds: 750));
           print("Delay for a second called");
           pro.setIfDelayOfASecond(false);
           await _playNextInQueue();
-
         }
       });
 
@@ -89,7 +83,8 @@ class GoogleCloudTTSService {
         // Still empty after retries: stop
         pro.setIsListening(true);
         _isPlayingQueue = false;
-        var provider = Provider.of<PlayTabooScreenProvider>(globalContext, listen: false);
+        var provider =
+            Provider.of<PlayTabooScreenProvider>(globalContext, listen: false);
         provider.setIsTtsCompleted(true);
         print("tts  completed");
         return;
@@ -109,7 +104,8 @@ class GoogleCloudTTSService {
     }
   }
 
-  Future<void> speakTexts(List<String> texts, {
+  Future<void> speakTexts(
+    List<String> texts, {
     String languageCode = 'en-US',
     String voiceName = 'en-US-Standard-C',
     String gender = 'FEMALE',
@@ -127,11 +123,13 @@ class GoogleCloudTTSService {
       print("hii this is running");
       final directory = await getTemporaryDirectory();
       for (int i = 0; i < texts.length; i++) {
-        final filePath = '${directory.path}/tts_output_${DateTime.now().millisecondsSinceEpoch}.mp3';
+        final filePath =
+            '${directory.path}/tts_output_${DateTime.now().millisecondsSinceEpoch}.mp3';
         if (i == 1) {
           if (!_isPlayingQueue) {
             _isPlayingQueue = true;
-            var pro = Provider.of<PlayTabooScreenProvider>(globalContext, listen: false);
+            var pro = Provider.of<PlayTabooScreenProvider>(globalContext,
+                listen: false);
             pro.setIsLoaderShow(false);
             await _playNextInQueue();
           }
@@ -150,7 +148,8 @@ class GoogleCloudTTSService {
           _audioFileQueue.add(filePath);
           ttsFilePaths.add(filePath);
         } catch (e, stack) {
-          print('Error generating or writing audio for "$filePath": $e\n$stack');
+          print(
+              'Error generating or writing audio for "$filePath": $e\n$stack');
         }
       }
     } catch (e, stack) {
@@ -187,7 +186,8 @@ class GoogleCloudTTSService {
     }
   }
 
-  Future<List<int>> _getAudioFromAPI(String text, {
+  Future<List<int>> _getAudioFromAPI(
+    String text, {
     required String languageCode,
     required String voiceName,
     required String gender,

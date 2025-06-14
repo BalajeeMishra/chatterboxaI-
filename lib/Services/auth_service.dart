@@ -75,12 +75,15 @@ Future deleteUserFirebase() async {
   }
 }
 
-Future<void> logout(BuildContext context, {Function? onLogout}) async {
+Future<void> logout({Function? onLogout}) async {
   await removeKey(IS_LOGIN);
   await removeKey(USER_ID);
   await removeKey(PHONE_NUMBER);
   await removeKey(TOKEN);
+  deleteUser();
+  deleteUserFirebase();
   userStore.clearUserData();
+  clearSharedPref();
   userStore.setLogin(false);
   userStore.setToken('');
   onLogout?.call();

@@ -1239,7 +1239,8 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
             '${provider.previousSpokenTextWhenStateIsLocked} $currentText';
       }
 
-      completeProvider.wordController.text = currentText;
+      // completeProvider.wordController.text = currentText;
+      completeProvider.updateText(currentText);
       print(currentText);
 
       // Track status
@@ -1309,42 +1310,76 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
             child: Container(
-              // height: 95 * heightFactor,
               width: double.infinity,
+              constraints: BoxConstraints(maxHeight: 75),
               decoration: BoxDecoration(
                 color: lightGreyBackground,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Scrollbar(
-                  // optional for better UX
-                  child: TextField(
-                    controller: completeProvider.wordController,
-                    scrollController: scrollController,
-                    onChanged: (val) {
-                      _stopListening();
-                    },
-                    onTap: () {
-                      _stopListening();
-
-                      provider.setIsOnPressedEnd(false);
-                    },
-                    maxLines: 3,
-
-                    // minLines: 1,
-                    keyboardType: TextInputType.multiline,
-                    style: TextStyle(fontFamily: "inter", fontSize: 16),
-                    decoration: InputDecoration(
-                      hintText: "Spoken words here...",
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.all(10),
+              child: Scrollbar(
+                controller: completeProvider.scrollController,
+                child: ListView(
+                  controller: completeProvider.scrollController,
+                  shrinkWrap: true,
+                  children: [
+                    TextField(
+                      controller: completeProvider.wordController,
+                      onChanged: (val) => _stopListening(),
+                      onTap: () => _stopListening(),
+                      maxLines: null,
+                      minLines: 1,
+                      keyboardType: TextInputType.multiline,
+                      style: TextStyle(fontFamily: "Inter", fontSize: 16),
+                      decoration: InputDecoration(
+                        hintText: "Spoken words here...",
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.all(10),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
             ),
           ),
+        // Padding(
+        //   padding: const EdgeInsets.symmetric(horizontal: 12.0),
+        //   child: Container(
+        //     // height: 95 * heightFactor,
+        //     width: double.infinity,
+        //     decoration: BoxDecoration(
+        //       color: lightGreyBackground,
+        //       borderRadius: BorderRadius.circular(12),
+        //     ),
+        //     child: ClipRRect(
+        //       borderRadius: BorderRadius.circular(20),
+        //       child: Scrollbar(
+        //         // optional for better UX
+        //         child: TextField(
+        //           controller: completeProvider.wordController,
+        //           scrollController: scrollController,
+        //           onChanged: (val) {
+        //             _stopListening();
+        //           },
+        //           onTap: () {
+        //             _stopListening();
+
+        //             provider.setIsOnPressedEnd(false);
+        //           },
+        //           maxLines: 3,
+
+        //           // minLines: 1,
+        //           keyboardType: TextInputType.multiline,
+        //           style: TextStyle(fontFamily: "inter", fontSize: 16),
+        //           decoration: InputDecoration(
+        //             hintText: "Spoken words here...",
+        //             border: InputBorder.none,
+        //             contentPadding: EdgeInsets.all(10),
+        //           ),
+        //         ),
+        //       ),
+        //     ),
+        //   ),
+        // ),
         if (!(keyboardHeight > 0))
           Container(
             height:

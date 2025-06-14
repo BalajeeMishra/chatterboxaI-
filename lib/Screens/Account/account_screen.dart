@@ -63,7 +63,7 @@ class _AccountScreenState extends State<AccountScreen> {
         actions: [
           IconButton(
               onPressed: () {
-                logout(context);
+                logout();
                 LoginScreen().launch(context);
               },
               icon: Icon(Icons.logout))
