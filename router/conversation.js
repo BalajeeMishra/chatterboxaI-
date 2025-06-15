@@ -84,8 +84,12 @@ router.post(
 
     const promptTemplateContent = promptTemplate.content;
 
-    const template = `User native language is {nativeLanguage}. user is from this ${user.country}. user name is ${user.name}. maincontent is {maincontent}. detailofcontent is {detailOfContent}. User english proficiency is ${user.engprolevel}. ${promptTemplateContent} Previous conversation:
-{chat_history} current question is {question} `;
+//     const template = `User native language is {nativeLanguage}. user is from this ${user.country}. user name is ${user.name}. maincontent is {maincontent}. detailofcontent is {detailOfContent}. User english proficiency is ${user.engprolevel}. ${promptTemplateContent} Previous conversation:
+// {chat_history} current question is {question} `;
+
+const template = `User native language is {nativeLanguage}. user is from this ${user.country}. user name is ${user.name}. maincontent is {maincontent}. detailofcontent is {detailOfContent}. User english proficiency is ${user.engprolevel}. ${promptTemplateContent} Previous conversation:
+{chat_history} One thing you need to remember while giving answer is: Don't mention any type of emozi after fullstop(.) and before next Word.  current question is {question} `;
+
 
     const prompt = new PromptTemplate({
       inputVariables: [
@@ -207,9 +211,13 @@ router.post(
     const aiReply =
       userdatalog?.aiResponse[userdatalog?.aiResponse.length - 1]?.text;
 
-    const template = `User native language is {nativeLanguage}. user is from this ${user.country}. user name is ${user.name}. User english proficiency is ${user.engprolevel}.
-  user wants to give the answer on the basis of Previous AI response. Previous ai response is  ${aiReply}. User has tried to give the answer but this is incomplete or not upto the mark.
-  See user written answer {question} carefully and complete it so that this would be the answer of last one AI response.. Also don't write other text only answer. If you found nothing wrong with answer just return the original answer.`;
+  //   const template = `User native language is {nativeLanguage}. user is from this ${user.country}. user name is ${user.name}. User english proficiency is ${user.engprolevel}.
+  // user wants to give the answer on the basis of Previous AI response. Previous ai response is  ${aiReply}. User has tried to give the answer but this is incomplete or not upto the mark.
+  // See user written answer {question} carefully and complete it so that this would be the answer of last one AI response.. Also don't write other text only answer. If you found nothing wrong with answer just return the original answer.`;
+
+   const template = `User native language is {nativeLanguage}. user is from this ${user.country}. user name is ${user.name}. User english proficiency is ${user.engprolevel}.
+  user wants to give the answer on the basis of Previous AI response. Previous ai response is  ${aiReply}. You have been given a partial user's reponse.
+  See user written answer {question} carefully . You need to auto-complete the response by predicting what user might be trying to say.While trying to auto-complete, give a complete sentence as output including user's partial reply. Also don't write other text only answer. If you found nothing wrong with answer just return the original answer.`;
 
     // const prompt = new PromptTemplate({
     //   inputVariables: [
