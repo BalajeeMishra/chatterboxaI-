@@ -1,4 +1,5 @@
 import 'package:balajiicode/Constants/ImageConstant.dart';
+import 'package:balajiicode/Screens/JabberAIHomePage/JabberAIHomepage.dart';
 import 'package:balajiicode/ShareAndReview/share_and_review.dart';
 import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
 import 'package:flutter/material.dart';
@@ -113,7 +114,7 @@ class ShareAndReviewScreen extends StatelessWidget {
                    Align(
                      alignment: Alignment.centerLeft,
                      child: InkWell(
-                         onTap: ()=>pop(),
+                         onTap: ()=>Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>JabberAIHomepage()), (Route<dynamic> route) => false,),
                          child: Image.asset(ImageConstant.closeButton,height: 24,width: 24,)),
                    ).paddingSymmetric(horizontal: 20),
                    SizedBox(height: MediaQuery.of(context).size.height*.2,),
@@ -180,9 +181,9 @@ class ShareAndReviewScreen extends StatelessWidget {
                             text: "Share Zap AI With Friends",
                             color: Colors.white,
                           ),
-                          onPressed: () {
-                            Navigator.pop(context);
-                            ShareAndReview().share();
+                          onPressed: () async {
+                           await Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>JabberAIHomepage()), (Route<dynamic> route) => false,);
+                           ShareAndReview().share();
                           },
                         ),
                       ],

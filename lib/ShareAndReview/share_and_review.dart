@@ -1,5 +1,6 @@
 import 'package:balajiicode/Constants/shared_pref_constrants.dart';
 import 'package:balajiicode/ShareAndReview/share_dialogue.dart';
+import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
 import 'package:balajiicode/extensions/shared_pref.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -57,8 +58,7 @@ class ShareAndReview{
 
   Future<void> showSharePopup(BuildContext context) async {
     setValue(last_review_or_share_pop_up_timestamp, DateTime.now().millisecondsSinceEpoch);
-    Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ShareAndReviewScreen()));
-
+    ShareAndReviewScreen().launch(context);
   }
 
   Future<bool> isReviewFeatureEnabled() async {

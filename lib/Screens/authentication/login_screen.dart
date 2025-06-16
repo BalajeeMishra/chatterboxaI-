@@ -178,6 +178,7 @@ class _LoginScreenState extends State<LoginScreen> {
             return Loader().center().visible(appStore.isLoading);
           },
         ),
+
       ]),
     );
   }

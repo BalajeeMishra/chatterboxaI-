@@ -9,6 +9,7 @@ import 'package:balajiicode/extensions/extension_util/widget_extensions.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:telephony/telephony.dart';
 
 import '../../Utils/app_common.dart';
@@ -16,6 +17,7 @@ import '../../Utils/app_constants.dart';
 import '../../Utils/app_images.dart';
 import '../../Widget/text_widget.dart';
 import '../../extensions/common.dart';
+import '../../extensions/loader_widget.dart';
 import '../../extensions/otp_text_field.dart';
 import '../../extensions/shared_pref.dart';
 import '../../extensions/text_styles.dart';
@@ -250,138 +252,150 @@ class _OTPVerificationState extends State<OTPVerification> {
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            return Align(
-                alignment: Alignment.bottomCenter,
-                child: SingleChildScrollView(
-                  reverse: true,
-                  physics: isKeyboardOpen
-                      ? const AlwaysScrollableScrollPhysics()
-                      : const NeverScrollableScrollPhysics(),
-                  child: Column(
-                    children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          // SizedBox(height: screenHeight * .18),
-                          MyText(
-                            text: 'Enter Verification\nCode',
-                            textAlign: TextAlign.center,
-                            color: whiteColor,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          8.height,
-                          MyText(
-                            text:
-                                'An OTP(One Time Password) Has Been\n Sent To Your Phone Number.',
-                            textAlign: TextAlign.center,
-                            color: whiteColor.withOpacity(0.8),
-                            fontSize: 14,
-                          ),
-                        ],
-                      ),
-                      20.height,
-                      Column(
-                        children: [
-                          SizedBox(
-                            height: 270,
-                            width: 270,
-                            child: Image.asset(zapAIAvtar, fit: BoxFit.fill),
-                          ),
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(24),
-                                topRight: Radius.circular(24),
+            return Stack(
+              children:
+              [
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: SingleChildScrollView(
+                    reverse: true,
+                    physics: isKeyboardOpen
+                        ? const AlwaysScrollableScrollPhysics()
+                        : const NeverScrollableScrollPhysics(),
+                    child: Column(
+                      children: [
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // SizedBox(height: screenHeight * .18),
+                            MyText(
+                              text: 'Enter Verification\nCode',
+                              textAlign: TextAlign.center,
+                              color: whiteColor,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            8.height,
+                            MyText(
+                              text:
+                                  'An OTP(One Time Password) Has Been\n Sent To Your Phone Number.',
+                              textAlign: TextAlign.center,
+                              color: whiteColor.withOpacity(0.8),
+                              fontSize: 14,
+                            ),
+                          ],
+                        ),
+                        20.height,
+                        Column(
+                          children: [
+                            SizedBox(
+                              height: 270,
+                              width: 270,
+                              child: Image.asset(zapAIAvtar, fit: BoxFit.fill),
+                            ),
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(24),
+                                  topRight: Radius.circular(24),
+                                ),
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  10.height,
+                                  Row(
+                                    children: [
+                                      Text(
+                                        'Code Sent To ${widget.mobileNumber}',
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.black54,
+                                        ),
+                                      ),
+                                      5.width,
+                                      const Icon(Icons.edit, color: primaryColor),
+                                    ],
+                                  ),
+                                  24.height,
+                                  Padding(
+                                    padding: EdgeInsets.zero,
+                                    child: otpInputField(),
+                                  ),
+                                  16.height,
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        submit();
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: primaryColor,
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 14),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                      ),
+                                      child: const Text('Continue',
+                                          style: TextStyle(
+                                              fontSize: 16, color: Colors.white)),
+                                    ),
+                                  ),
+                                  8.height,
+                                  Row(
+                                    children: [
+                                      MyText(
+                                        text: "Didn't Get The Code? ",
+                                        fontSize: 14,
+                                      ),
+                                      GestureDetector(
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              _canResendOTP ? 'Resend' : '',
+                                              style: primaryTextStyle(
+                                                  color: primaryColor),
+                                            ).paddingLeft(4),
+                                            if (!_canResendOTP)
+                                              Container(
+                                                alignment: Alignment.center,
+                                                child: Text('$_start seconds',
+                                                    style: primaryTextStyle(
+                                                        color: primaryColor)),
+                                              ),
+                                          ],
+                                        ),
+                                        onTap: () {
+                                          if (_canResendOTP) {
+                                            resendOtpFunction();
+                                            setState(() {});
+                                          }
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                  10.height,
+                                ],
                               ),
                             ),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                10.height,
-                                Row(
-                                  children: [
-                                    Text(
-                                      'Code Sent To ${widget.mobileNumber}',
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.black54,
-                                      ),
-                                    ),
-                                    5.width,
-                                    const Icon(Icons.edit, color: primaryColor),
-                                  ],
-                                ),
-                                24.height,
-                                Padding(
-                                  padding: EdgeInsets.zero,
-                                  child: otpInputField(),
-                                ),
-                                16.height,
-                                SizedBox(
-                                  width: double.infinity,
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      submit();
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: primaryColor,
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 14),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                    child: const Text('Continue',
-                                        style: TextStyle(
-                                            fontSize: 16, color: Colors.white)),
-                                  ),
-                                ),
-                                8.height,
-                                Row(
-                                  children: [
-                                    MyText(
-                                      text: "Didn't Get The Code? ",
-                                      fontSize: 14,
-                                    ),
-                                    GestureDetector(
-                                      child: Row(
-                                        children: [
-                                          Text(
-                                            _canResendOTP ? 'Resend' : '',
-                                            style: primaryTextStyle(
-                                                color: primaryColor),
-                                          ).paddingLeft(4),
-                                          if (!_canResendOTP)
-                                            Container(
-                                              alignment: Alignment.center,
-                                              child: Text('$_start seconds',
-                                                  style: primaryTextStyle(
-                                                      color: primaryColor)),
-                                            ),
-                                        ],
-                                      ),
-                                      onTap: () {
-                                        if (_canResendOTP) {
-                                          resendOtpFunction();
-                                          setState(() {});
-                                        }
-                                      },
-                                    ),
-                                  ],
-                                ),
-                                10.height,
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ));
+                          ],
+                        ),
+                      ],
+                    ),
+                  )),
+                Observer(
+                  builder: (context) {
+                    return Loader().center().visible(appStore.isLoading);
+                  },
+                ),
+                if(appStore.isLoading)
+                  Container(height: screenHeight,color: Colors.transparent,)
+              ]
+            );
           },
         ),
       ),
