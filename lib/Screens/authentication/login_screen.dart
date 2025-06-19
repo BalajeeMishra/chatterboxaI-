@@ -144,7 +144,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     16.height,
-                    Row(
+                    Column(
                       children: [
                         MyText(
                           text: "Don't Have A Google Account? ",
@@ -156,7 +156,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             PhoneLogin().launch(context);
                           },
                           child: MyText(
-                            text: "Signup using Mobile",
+                            text: "Sign up using Mobile number",
                             fontSize: 14,
                             textDecoration: TextDecoration.underline,
                             color: Colors.black54,

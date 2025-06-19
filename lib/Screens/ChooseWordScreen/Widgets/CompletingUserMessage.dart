@@ -61,7 +61,7 @@ class _CompletingUserMessageState extends State<CompletingUserMessage> {
     return StreamBuilder<Object>(
         stream: null,
         builder: (context, snapshot) {
-          return Container(
+          return SizedBox(
             child:
                 Consumer<AnswerAssistProvider>(builder: (context, provider, _) {
               if (provider.state == AnswerAssistState.idle) {
@@ -112,8 +112,10 @@ class _CompletingUserMessageState extends State<CompletingUserMessage> {
                           children: [
                             Image.asset(tilt, width: 30),
                             0.width,
-                            textGradient(
-                                "You're Doing Good! Try Saying It Out Loud"),
+                            Expanded(
+                              child: textGradient(
+                                  "You're Doing Good! Try Saying It Out Loud"),
+                            ),
                             0.width,
                             Stack(
                               children: [
@@ -132,17 +134,19 @@ class _CompletingUserMessageState extends State<CompletingUserMessage> {
                         ),
                       ),
                     if (provider.state == AnswerAssistState.completing)
-                      Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                        textGradient('Completing Answer...'),
-                        8.width,
-                        SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 5,
-                          ).withGradient(),
-                        )
-                      ]),
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            textGradient('Completing Answer...'),
+                            8.width,
+                            SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 5,
+                              ).withGradient(),
+                            )
+                          ]),
                     10.height,
                     Container(
                       constraints: BoxConstraints(

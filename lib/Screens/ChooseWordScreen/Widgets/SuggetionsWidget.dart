@@ -8,33 +8,40 @@ import '../../../Utils/app_colors.dart';
 
 class Suggetionswidget extends StatelessWidget {
   final VoidCallback onTap;
-  final String text ;
+  final String text;
   final bool isIcon;
-  const Suggetionswidget({super.key,required this.text, required this.onTap,this.isIcon = false});
+  const Suggetionswidget(
+      {super.key,
+      required this.text,
+      required this.onTap,
+      this.isIcon = false});
 
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     return InkWell(
-         onTap:onTap ,
+        onTap: onTap,
         child: Container(
-             decoration:  BoxDecoration(
-               borderRadius: BorderRadius.circular(20),
-               color: lightGreyBackground
-             ),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: lightGreyBackground),
             width: 150,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0,vertical: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 5),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  if(isIcon)Image.asset(ImageConstant.forward_icon, height: 15, width: 15,color: Colors.black54,),
+                  if (isIcon)
+                    Image.asset(
+                      ImageConstant.forward_icon,
+                      height: 15,
+                      width: 15,
+                      color: Colors.black54,
+                    ),
                   MyText(text: text),
                 ],
               ),
-            )
-        )
-    );
+            )));
   }
 }

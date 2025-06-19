@@ -1184,23 +1184,66 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                 },
                                 isIcon: true),
                           ).paddingSymmetric(horizontal: 12),
-                  if (!provider.isLoaderShow && provider.isLocked)
-                    vm.tabooGameChatPageModel.response == null
-                        ? SizedBox()
-                        : CompletingUserMessage(
-                            userMessage:
-                                completProvider.wordController.text.trim(),
-                            sessionId: widget.sessionId,
-                            gameModel: widget.allGameModel,
-                            index: widget.index,
-                            modality: '',
-                          ).paddingSymmetric(vertical: 4, horizontal: 12),
-                  if (!provider.isLoaderShow)
-                    vm.tabooGameChatPageModel.response == null
-                        ? SizedBox()
-                        : Center(
-                            child: _showSpeakAndListen(vm, height, width,
-                                heightFactor, keyboardHeight)),
+                  // if (!provider.isLoaderShow &&
+                  //     provider.isLocked &&
+                  //     vm.tabooGameChatPageModel.response != null)
+                  //   CompletingUserMessage(
+                  //     userMessage: completProvider.wordController.text.trim(),
+                  //     sessionId: widget.sessionId,
+                  //     gameModel: widget.allGameModel,
+                  //     index: widget.index,
+                  //     modality: '',
+                  //   ).paddingSymmetric(vertical: 4, horizontal: 12),
+                  // if (!provider.isLoaderShow &&
+                  //     vm.tabooGameChatPageModel.response != null)
+                  //   _showSpeakAndListen(
+                  //       vm, height, width, heightFactor, keyboardHeight),
+                  MediaQuery.of(context).viewInsets.bottom == 0
+                      ? Column(
+                          children: [
+                            if (!provider.isLoaderShow &&
+                                provider.isLocked &&
+                                vm.tabooGameChatPageModel.response != null)
+                              CompletingUserMessage(
+                                userMessage:
+                                    completProvider.wordController.text.trim(),
+                                sessionId: widget.sessionId,
+                                gameModel: widget.allGameModel,
+                                index: widget.index,
+                                modality: '',
+                              ).paddingSymmetric(vertical: 4, horizontal: 12),
+                          ],
+                        )
+                      : Flexible(
+                          child: SingleChildScrollView(
+                            padding: EdgeInsets.only(
+                              left: 12,
+                              right: 12,
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (!provider.isLoaderShow &&
+                                    provider.isLocked &&
+                                    vm.tabooGameChatPageModel.response != null)
+                                  CompletingUserMessage(
+                                    userMessage: completProvider
+                                        .wordController.text
+                                        .trim(),
+                                    sessionId: widget.sessionId,
+                                    gameModel: widget.allGameModel,
+                                    index: widget.index,
+                                    modality: '',
+                                  ).paddingSymmetric(vertical: 4),
+                              ],
+                            ),
+                          ),
+                        ),
+                  if (!provider.isLoaderShow &&
+                      vm.tabooGameChatPageModel.response != null)
+                    _showSpeakAndListen(
+                        vm, height, width, heightFactor, keyboardHeight),
                 ],
               ),
             ),
@@ -1380,6 +1423,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
         //     ),
         //   ),
         // ),
+
         if (!(keyboardHeight > 0))
           Container(
             height:
@@ -1989,6 +2033,7 @@ class _BuildMassageScreenState extends State<BuildMassageScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        resizeToAvoidBottomInset: true,
         body: WillPopScope(
             onWillPop: () async {
               var chatPageVM =
