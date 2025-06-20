@@ -1,3 +1,4 @@
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
@@ -450,18 +451,20 @@ class GameEventManager {
 
     print("Game events added: $gameEvents");
 
-    if (isFirstBatch) {
-      isFirstBatch = false;
-      print("Skipping batching for the first set of events.");
-      return;
-    }
+    // if (isFirstBatch) {
+    //   isFirstBatch = false;
+    //   print("Skipping batching for the first set of events.");
+    //   return;
+    // }
 
     // Check if the same content was played 4 times
     if (contentEventCounts[gameName]![contentName]! >= 4) {
       int nextCount = gameEventCounts[gameName]! + 4;
+
       if(nextCount%8==0){
         print("game 8 count called");
         await ShareAndReview().increaseGameCounter();
+
       }
       List<Map<String, dynamic>> batch = gameEvents.where((event) => event['content_name'] == contentName).toList();
 

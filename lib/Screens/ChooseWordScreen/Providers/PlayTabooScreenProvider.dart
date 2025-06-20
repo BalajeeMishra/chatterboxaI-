@@ -211,6 +211,9 @@ class PlayTabooScreenProvider extends ChangeNotifier {
   void setIsTtsCompleted(bool val){
     _isTtsComplete = val;
   }
+  // void setIsAllTextProcessedByCloud(bool val){
+  //   _isAlltextProccessedByCloud = val;
+  // }
 
   // Reset all states
   void resetAllStates() {

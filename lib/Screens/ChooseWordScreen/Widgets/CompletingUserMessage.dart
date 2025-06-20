@@ -61,122 +61,108 @@ class _CompletingUserMessageState extends State<CompletingUserMessage> {
     return StreamBuilder<Object>(
         stream: null,
         builder: (context, snapshot) {
-          return SizedBox(
-            child:
-                Consumer<AnswerAssistProvider>(builder: (context, provider, _) {
-              if (provider.state == AnswerAssistState.idle) {
-                return Opacity(
-                    opacity: .4,
+          return Container(child:
+              Consumer<AnswerAssistProvider>(builder: (context, provider, _) {
+            if (provider.state == AnswerAssistState.idle) {
+              return Opacity(
+                  opacity: .4,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      textGradient('Complete My Answer'),
+                      8.width,
+                      Image.asset(chatTyping, width: 20, height: 20)
+                    ],
+                  ));
+            }
+            if (provider.state == AnswerAssistState.active) {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  AnimatedActivationMask(
+                      child: textGradient('Complete My Answer')),
+                  8.width,
+                  Stack(
+                    children: [
+                      Image.asset(
+                        circle,
+                        width: 25,
+                      ),
+                      Center(
+                          child: Image.asset(
+                        chatTypingGit,
+                        width: 24,
+                      )),
+                    ],
+                  )
+                ],
+              );
+            } else {
+              return Column(children: [
+                if (provider.state == AnswerAssistState.encouraging)
+                  GestureDetector(
+                    onTap: () {
+                      provider.setActive();
+                      provider.setIsAlreadyResponded(true);
+                    },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        textGradient('Complete My Answer'),
-                        8.width,
-                        Image.asset(chatTyping, width: 20, height: 20)
-                      ],
-                    ));
-              }
-              if (provider.state == AnswerAssistState.active) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    AnimatedActivationMask(
-                        child: textGradient('Complete My Answer')),
-                    8.width,
-                    Stack(
-                      children: [
-                        Image.asset(
-                          circle,
-                          width: 25,
-                        ),
-                        Center(
-                            child: Image.asset(
-                          chatTypingGit,
-                          width: 24,
-                        )),
-                      ],
-                    )
-                  ],
-                );
-              } else {
-                return Column(
-                  children: [
-                    if (provider.state == AnswerAssistState.encouraging)
-                      GestureDetector(
-                        onTap: () {
-                          provider.setActive();
-                          provider.setIsAlreadyResponded(true);
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
+                        Image.asset(tilt, width: 30),
+                        0.width,
+                        textGradient(
+                            "You're Doing Good! Try Saying It Out Loud"),
+                        0.width,
+                        Stack(
                           children: [
-                            Image.asset(tilt, width: 30),
-                            0.width,
-                            Expanded(
-                              child: textGradient(
-                                  "You're Doing Good! Try Saying It Out Loud"),
+                            Image.asset(
+                              circle,
+                              width: 25,
                             ),
-                            0.width,
-                            Stack(
-                              children: [
-                                Image.asset(
-                                  circle,
-                                  width: 25,
-                                ),
-                                Center(
-                                    child: Image.asset(
-                                  chatTypingGit,
-                                  width: 25,
-                                )),
-                              ],
-                            )
+                            Center(
+                                child: Image.asset(
+                              chatTypingGit,
+                              width: 25,
+                            )),
                           ],
-                        ),
-                      ),
-                    if (provider.state == AnswerAssistState.completing)
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            textGradient('Completing Answer...'),
-                            8.width,
-                            SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 5,
-                              ).withGradient(),
-                            )
-                          ]),
-                    10.height,
-                    Container(
-                      constraints: BoxConstraints(
-                        maxHeight: 85,
-                      ),
-                      child: Scrollbar(
-                        thumbVisibility: true,
-                        child: TextField(
-                          controller: provider.correctedUserMessageController,
-                          scrollController: scrollController,
-                          readOnly: true,
-                          maxLines: null, // allow unlimited growth
-                          keyboardType: TextInputType.multiline,
-                          style: const TextStyle(
-                              fontFamily: "inter", fontSize: 16),
-                          decoration: InputDecoration(
-                            hintText: "Spoken words here...",
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            contentPadding: const EdgeInsets.all(10),
-                          ),
-                        ).withGradient(),
-                      ),
+                        )
+                      ],
                     ),
-                  ],
-                );
-              }
-            }),
-          );
+                  ),
+                if (provider.state == AnswerAssistState.completing)
+                  Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                    textGradient('Completing Answer...'),
+                    8.width,
+                    SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 5,
+                      ).withGradient(),
+                    )
+                  ]),
+                10.height,
+                Scrollbar(
+                  thumbVisibility: true,
+                  child: TextField(
+                    controller: provider.correctedUserMessageController,
+                    scrollController: scrollController,
+                    readOnly: true,
+                    maxLines: null, // allow unlimited growth
+                    keyboardType: TextInputType.multiline,
+                    style: const TextStyle(fontFamily: "inter", fontSize: 16),
+                    decoration: InputDecoration(
+                      hintText: "Spoken words here...",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      contentPadding: const EdgeInsets.all(10),
+                    ),
+                  ).withGradient(),
+                ),
+              ]);
+            }
+          }));
         });
   }
 

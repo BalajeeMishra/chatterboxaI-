@@ -24,6 +24,7 @@ class GoogleCloudTTSService {
   double audioSpeed = 0.9;
   int currentParaIndex = 0;
   BuildContext globalContext = navigatorKey.currentContext!;
+  int index = 99999;
 
   Future<void> initialize() async {
     if (_isInitialized) return;
@@ -71,8 +72,15 @@ class GoogleCloudTTSService {
 
   Future<void> _playNextInQueue() async {
     var pro = Provider.of<PlayTabooScreenVM>(globalContext, listen: false);
+    var provider = Provider.of<PlayTabooScreenProvider>(globalContext, listen: false);
     try {
-      // If queue is empty, wait briefly (e.g., up to 2 seconds), checking every 200ms
+
+        // If queue is empty, wait briefly (e.g., up to 2 seconds), checking every 200ms
+      print("index $index");
+        if(_audioFileQueue.isEmpty && index==0){
+          // print("index $index");
+          provider.setIsTtsCompleted(true);
+        }
       int retries = 25; // 10 * 200ms = 2 seconds
       while (_audioFileQueue.isEmpty && retries > 0 && _isPlayingQueue) {
         await Future.delayed(Duration(milliseconds: 200));
@@ -81,16 +89,18 @@ class GoogleCloudTTSService {
 
       if (_audioFileQueue.isEmpty) {
         // Still empty after retries: stop
+
         pro.setIsListening(true);
         _isPlayingQueue = false;
         var provider =
             Provider.of<PlayTabooScreenProvider>(globalContext, listen: false);
-        provider.setIsTtsCompleted(true);
+
         print("tts  completed");
         return;
       }
 
       final nextFilePath = _audioFileQueue.removeFirst();
+      index--;
       await audioPlayer.setSpeed(audioSpeed);
       await audioPlayer.setFilePath(nextFilePath);
       pro.setIsListening(false);
@@ -120,11 +130,12 @@ class GoogleCloudTTSService {
       print("length of filepath ${ttsFilePaths.length}");
       ttsFilePaths.clear();
       _audioFileQueue.clear();
+      var pro = Provider.of<PlayTabooScreenProvider>(globalContext, listen: false);
       print("hii this is running");
       final directory = await getTemporaryDirectory();
+      index = texts.length;
       for (int i = 0; i < texts.length; i++) {
-        final filePath =
-            '${directory.path}/tts_output_${DateTime.now().millisecondsSinceEpoch}.mp3';
+        final filePath = '${directory.path}/tts_output_${DateTime.now().millisecondsSinceEpoch}.mp3';
         if (i == 1) {
           if (!_isPlayingQueue) {
             _isPlayingQueue = true;
@@ -151,15 +162,18 @@ class GoogleCloudTTSService {
           print(
               'Error generating or writing audio for "$filePath": $e\n$stack');
         }
+
       }
     } catch (e, stack) {
       print('Error in speakTexts: $e\n$stack');
     }
+
   }
 
   void speekSaved() async {
     try {
       _audioFileQueue.clear();
+      index = ttsFilePaths.length;
       for (int i = 0; i < ttsFilePaths.length; i++) {
         _audioFileQueue.add(ttsFilePaths[i]);
         if (i == 1) {

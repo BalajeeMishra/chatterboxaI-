@@ -213,7 +213,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     setAIMessageScrollController();
 
     appStore.setLoading(false);
-    print("this is game name : ${widget.gameName}");
+    // print("this is game name : ${widget.gameName}");
 
     setisPop();
     currentSessionId = widget.sessionId;
@@ -343,7 +343,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     String updatedText = vm.cleanTextForTTS(text);
 
     await stopSpeaking();
-    print("This speak to text called");
+    // print("This speak to text called");
     if (text.isNotEmpty) {
       Provider.of<PlayTabooScreenProvider>(context, listen: false)
           .setLastWords(updatedText);
@@ -361,7 +361,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
 
   Future<void> stopSpeaking() async {
     var vm = Provider.of<PlayTabooScreenVM>(context, listen: false);
-    print("Called stop speaking");
+    // print("Called stop speaking");
     vm.setIsListening(true);
     vm.setIsBreakLoop(true);
     cloudTtsService.stop();
@@ -399,7 +399,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     if (newSpeed >= 0.5 && newSpeed <= 1.7) {
       audioPlayer.setSpeed(newSpeed);
       cloudTtsService.audioSpeed = newSpeed;
-      print("Adjusted speed: $newSpeed");
+      // print("Adjusted speed: $newSpeed");
       // cloudTtsService.speekSaved();
     }
   }
@@ -704,7 +704,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
       final value = await updateProficiencyApi(req);
       newEnglishLevel = englishProficiency!;
       ques = appStore.userResponse;
-      print("UserResponse is =>" + ques.toString());
+      // print("UserResponse is =>" + ques.toString());
       if (ques.isNotEmpty) {
         vm.setIsListening(true);
         vm.setIsBreakLoop(true);
@@ -736,9 +736,9 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
         'User_id': getStringAsync(USER_ID),
       },
     ).then((_) {
-      print('Logged event: speak with parameters:');
+      // print('Logged event: speak with parameters:');
     }).catchError((error) {
-      print('Failed to log event: $error');
+      // print('Failed to log event: $error');
     });
     facebookAppEvents.logEvent(
       name: 'speak',
@@ -749,9 +749,9 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
         'User_id': getStringAsync(USER_ID),
       },
     ).then((_) {
-      print('Logged event: speak with parameters:');
+      // print('Logged event: speak with parameters:');
     }).catchError((error) {
-      print('Failed to log event: $error');
+      // print('Failed to log event: $error');
     });
   }
 
@@ -762,7 +762,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     var completeProvider =
         Provider.of<AnswerAssistProvider>(context, listen: false);
     provider.setIsMuted(false);
-    print("Mute state ${provider.isMuted}");
+    // print("Mute state ${provider.isMuted}");
     provider.setSpeechRate(0.3);
     provider.setQues(completeProvider.wordController.text);
     provider.setLastWords(completeProvider.wordController.text);
@@ -784,7 +784,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
   }
 
   void _startListening() async {
-    print("called");
+    // print("called");
     final hasPermission = await _speech.startListening();
     if (!hasPermission) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1259,18 +1259,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     var completeProvider =
         Provider.of<AnswerAssistProvider>(context, listen: false);
 
-    // if( provider.isTtsCompleted){
-    //   provider.setIsTtsCompleted(false);
-    //   stopSpeaking();
-    //   provider.setIsOnPressedEnd(true);
-    //   provider.setIsLocked(true);
-    //   provider.setIsOnLockedAndRestartListening(true);
-    //   provider.setIsshowHistoryAndSubtitle(false);
-    //   print("setIsOnLockedAndRestartListening ${provider.isOnLockedAndRestartListening}");
-    //   provider.setpreviousSpokenTextWhenStateIsLocked(completeProvider.wordController.text.trim());
-    //   print("last reconginzed $_lastRecognizedText");
-    //   _startListening();
-    // }
+
 
     _speech.onResults.listen((result) {
       currentText = result.text ?? '';
@@ -1331,7 +1320,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
       }
     });
 
-    if (provider.isTtsCompleted) {
+    if (provider.isTtsCompleted ) {
       WidgetsBinding.instance.addPostFrameCallback((val) {
         stopSpeaking();
         provider.setIsTtsCompleted(false);
@@ -1339,8 +1328,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
         provider.setIsLocked(true);
         provider.setIsOnLockedAndRestartListening(true);
         provider.setIsshowHistoryAndSubtitle(false);
-        print(
-            "setIsOnLockedAndRestartListening ${provider.isOnLockedAndRestartListening}");
+        print("setIsOnLockedAndRestartListening ${provider.isOnLockedAndRestartListening}");
         provider.setpreviousSpokenTextWhenStateIsLocked(
             completeProvider.wordController.text.trim());
         print("last reconginzed $_lastRecognizedText");
@@ -1532,6 +1520,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                           provider
                                               .setpreviousSpokenTextWhenStateIsLocked(
                                                   '');
+                                          provider.setIsTtsCompleted(false);
 
                                           // scrollController = ScrollController();
                                           // setAIMessageScrollController();
@@ -1572,11 +1561,11 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                         provider.setIsLocked(true);
                         provider.setIsOnLockedAndRestartListening(true);
                         provider.setIsshowHistoryAndSubtitle(false);
-                        print(
-                            "setIsOnLockedAndRestartListening ${provider.isOnLockedAndRestartListening}");
+                        // print(
+                        //     "setIsOnLockedAndRestartListening ${provider.isOnLockedAndRestartListening}");
                         provider.setpreviousSpokenTextWhenStateIsLocked(
                             completeProvider.wordController.text.trim());
-                        print("last reconginzed $_lastRecognizedText");
+                        // print("last reconginzed $_lastRecognizedText");
                         _startListening();
                       }
                     },
@@ -1611,7 +1600,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                     onLongPressEnd: (details) async {
                       if (details.localPosition.dx < -50) {
                         _stopListening();
-                        print("swip left");
+                        // print("swip left");
                         provider.setIsExpanded(false);
                         provider.setIsLocked(false);
                         provider.setIsshowHistoryAndSubtitle(true);
@@ -1796,9 +1785,9 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                 'User_id': getStringAsync(USER_ID),
                               },
                             ).then((_) {
-                              print('Logged event: write with parameters:');
+                              // print('Logged event: write with parameters:');
                             }).catchError((error) {
-                              print('Failed to log event: $error');
+                              // print('Failed to log event: $error');
                             });
                             facebookAppEvents.logEvent(
                               name: 'write',
@@ -1810,9 +1799,9 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                 'User_id': getStringAsync(USER_ID),
                               },
                             ).then((_) {
-                              print('Logged event: write with parameters:');
+                              // print('Logged event: write with parameters:');
                             }).catchError((error) {
-                              print('Failed to log event: $error');
+                              // print('Failed to log event: $error');
                             });
                             await stopSpeaking();
                             final bool res = await TaboogamechatPage(
@@ -1930,7 +1919,7 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
     for (int j = 0; j < paragraphs.length; j++) {
       String paragraph = paragraphs[j].replaceAll(RegExp(r'\*+'), '');
       paragraph = cleanString(paragraph);
-      print(paragraph);
+      // print(paragraph);
       bool isBold = (j == vm.currentParaIndex.value);
       spans.add(
         WidgetSpan(
