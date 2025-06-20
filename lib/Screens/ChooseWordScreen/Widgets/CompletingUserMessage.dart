@@ -110,8 +110,10 @@ class _CompletingUserMessageState extends State<CompletingUserMessage> {
                       children: [
                         Image.asset(tilt, width: 30),
                         0.width,
-                        textGradient(
-                            "You're Doing Good! Try Saying It Out Loud"),
+                        Expanded(
+                          child: textGradient(
+                              "You're Doing Good! Try Saying It Out Loud"),
+                        ),
                         0.width,
                         Stack(
                           children: [
