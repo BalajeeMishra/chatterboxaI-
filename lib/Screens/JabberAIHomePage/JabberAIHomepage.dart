@@ -73,11 +73,11 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
         center: true,
         showBack: false,
         color: primaryColor,
-
         actions: [
-
           InkWell(
-            onTap: (){  AccountScreen().launch(context);},
+            onTap: () {
+              AccountScreen().launch(context);
+            },
             child: Container(
               height: 24,
               width: 24,
@@ -120,242 +120,251 @@ class _JabberAIHomepage extends State<JabberAIHomepage> {
               await Provider.of<JabberHomeAIvm>(context, listen: false)
                   .homepageAPI(context);
             },
-              child: Column(
-                children: [
-                Expanded(
-                  flex: 7,
-                  child: Stack(
-                    children: [
-                      Consumer<JabberHomeAIvm>(
-                        builder: (context, vm, child) {
-                          return vm.apiHitStatus
-                              ? vm.homePageModel.allGame == null
-                                  ? Center(
-                                      child: MyText(
-                                        text: 'No Game Found',
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: blackColor,
-                                      ),
-                                    )
-                                  : ListView.builder(
-                                      itemCount: vm.homePageModel.allGame!.length,
-                                      scrollDirection: Axis.vertical,
-                                      shrinkWrap: true,
-                                      itemBuilder: (context, index) {
-                                        var data = vm.homePageModel.allGame![index];
-                                        Color containerColor = (index % 2 == 0)
-                                            ? Color(0xffd3e2f5)
-                                            : Color(0xffe4d7f1);
+            child: Column(children: [
+              Expanded(
+                flex: 7,
+                child: Stack(
+                  children: [
+                    Consumer<JabberHomeAIvm>(
+                      builder: (context, vm, child) {
+                        return vm.apiHitStatus
+                            ? vm.homePageModel.allGame == null
+                                ? Center(
+                                    child: MyText(
+                                      text: 'No Game Found',
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: blackColor,
+                                    ),
+                                  )
+                                : ListView.builder(
+                                    itemCount: vm.homePageModel.allGame!.length,
+                                    scrollDirection: Axis.vertical,
+                                    shrinkWrap: true,
+                                    itemBuilder: (context, index) {
+                                      var data =
+                                          vm.homePageModel.allGame![index];
+                                      Color containerColor = (index % 2 == 0)
+                                          ? Color(0xffd3e2f5)
+                                          : Color(0xffe4d7f1);
 
-                                        return Column(
-                                          children: [
-                                            InkWell(
-                                              onTap: () async {
-                                                // if (isStatus == false) {
-                                                //   ExpiredScreen()
-                                                //       .launch(context);
-                                                // } else {
-                                                analytics.logEvent(
-                                                  name: 'game_selection',
-                                                  parameters: {
-                                                    'Game_name': data.gameName!,
-                                                    'User_id':
-                                                    getStringAsync(USER_ID),
-                                                    'days_since_install':
-                                                    await InstallDateHelper
-                                                        .getDaysSinceInstall()
-                                                  },
-                                                ).then((_) {
-                                                  print(
-                                                      'Logged event: game_selection with parameters: Game_name=${data.gameName!}, User_id=${getStringAsync(USER_ID)}');
-                                                }).catchError((error) {
-                                                  print(
-                                                      'Failed to log event: $error');
-                                                });
-                                                facebookAppEvents.logEvent(
-                                                  name: 'game_selection',
-                                                  parameters: {
-                                                    'Game_name': data.gameName!,
-                                                    'User_id':
-                                                    getStringAsync(USER_ID),
-                                                    'days_since_install':
-                                                    await InstallDateHelper
-                                                        .getDaysSinceInstall()
-                                                  },
-                                                ).then((_) {
-                                                  print(
-                                                      'Logged Facebook event: game_selection with parameters: Game_name=${data.gameName!}, User_id=${getStringAsync(USER_ID)}');
-                                                }).catchError((error) {
-                                                  print(
-                                                      'Failed to log event: $error');
-                                                });
+                                      return Column(
+                                        children: [
+                                          InkWell(
+                                            onTap: () async {
+                                              // if (isStatus == false) {
+                                              //   ExpiredScreen()
+                                              //       .launch(context);
+                                              // } else {
+                                              analytics.logEvent(
+                                                name: 'game_selection',
+                                                parameters: {
+                                                  'Game_name': data.gameName!,
+                                                  'User_id':
+                                                      getStringAsync(USER_ID),
+                                                  'days_since_install':
+                                                      await InstallDateHelper
+                                                          .getDaysSinceInstall()
+                                                },
+                                              ).then((_) {
+                                                print(
+                                                    'Event_Bug Logged event: game_selection with parameters: Game_name=${data.gameName!}, User_id=${getStringAsync(USER_ID)}');
+                                              }).catchError((error) {
+                                                print(
+                                                    'Failed to log event: $error');
+                                              });
+                                              facebookAppEvents.logEvent(
+                                                name: 'game_selection',
+                                                parameters: {
+                                                  'Game_name': data.gameName!,
+                                                  'User_id':
+                                                      getStringAsync(USER_ID),
+                                                  'days_since_install':
+                                                      await InstallDateHelper
+                                                          .getDaysSinceInstall()
+                                                },
+                                              ).then((_) {
+                                                print(
+                                                    'Event_Bug Logged Facebook event: game_selection with parameters: Game_name=${data.gameName!}, User_id=${getStringAsync(USER_ID)}');
+                                              }).catchError((error) {
+                                                print(
+                                                    'Event_Bug Failed to log event: $error');
+                                              });
 
-                                               print("Data: ${data.sId}  ${data.gameName}");
-                                          bool ispop   = await  Navigator.of(context).push(
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            ChooseWordScreen(
-                                                                data.sId!,
-                                                                data.gameName!)));
-                                             if(ispop){
-                                               checkAndShowPopup();
-                                             }
+                                              print(
+                                                  "Data: ${data.sId}  ${data.gameName}");
+                                              bool ispop = await Navigator.of(
+                                                      context)
+                                                  .push(MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          ChooseWordScreen(
+                                                              data.sId!,
+                                                              data.gameName!)));
+                                              print(
+                                                  'Event_Bug isPop ChooseWordScreen $ispop');
 
-                                              },
-                                              child: Container(
-                                                  width:double.infinity,
-                                                  decoration: BoxDecoration(
-                                                      color: containerColor,
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                              Radius.circular(
-                                                                  10.0))),
-                                                  child: Padding(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 16.0,
-                                                        vertical: 10.0),
-                                                    child: Row(
-                                                      children: [
-                                                        Expanded(
-                                                          flex: 2,
-                                                          child: Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              MyText(
-                                                                text: "${data.gameName}",
-
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w800,
-                                                                    color: blackColor,
-                                                                    fontSize:
-                                                                        20
-                                                              ),
-                                                              SizedBox(
-                                                                height: 10,
-                                                              ),
-                                                              MyText(
-                                                                text: "${data.description}",
-
-                                                                    fontSize:
-                                                                        14,
-                                                                    color: Color(
-                                                                        0xff000000),
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w400
-                                                              )
-                                                            ],
-                                                          ),
+                                              if (ispop) {
+                                                checkAndShowPopup();
+                                              }
+                                            },
+                                            child: Container(
+                                                width: double.infinity,
+                                                decoration: BoxDecoration(
+                                                    color: containerColor,
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                            Radius.circular(
+                                                                10.0))),
+                                                child: Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 16.0,
+                                                      vertical: 10.0),
+                                                  child: Row(
+                                                    children: [
+                                                      Expanded(
+                                                        flex: 2,
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            MyText(
+                                                                text:
+                                                                    "${data.gameName}",
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w800,
+                                                                color:
+                                                                    blackColor,
+                                                                fontSize: 20),
+                                                            SizedBox(
+                                                              height: 10,
+                                                            ),
+                                                            MyText(
+                                                                text:
+                                                                    "${data.description}",
+                                                                fontSize: 14,
+                                                                color: Color(
+                                                                    0xff000000),
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400)
+                                                          ],
                                                         ),
-                                                        SizedBox(
-                                                            height: 100,
-                                                            width: 100,
-                                                            child: cachedImage(
-                                                                data.gameIcon)
+                                                      ),
+                                                      SizedBox(
+                                                          height: 100,
+                                                          width: 100,
+                                                          child: cachedImage(
+                                                              data.gameIcon)
 
-                                                            // WebViewWidget(
-                                                            //     controller: WebViewHelper.getWebView(
-                                                            //         url: data.gameIcon!,
-                                                            //         onPageFinished: (url) {})
-                                                            //
-                                                            // ),
-                                                            )
-                                                      ],
-                                                    ),
-                                                  )),
-                                            ),
-                                            const SizedBox(
-                                              height: 15.0,
-                                            )
-                                          ],
-                                        );
-                                      })
-                              : SizedBox();
-                        },
-                      ),
-                      Observer(
-                        builder: (context) {
-                          return Loader().center().visible(appStore.isLoading);
-                        },
-                      ),
-                    ],
-                  ),
+                                                          // WebViewWidget(
+                                                          //     controller: WebViewHelper.getWebView(
+                                                          //         url: data.gameIcon!,
+                                                          //         onPageFinished: (url) {})
+                                                          //
+                                                          // ),
+                                                          )
+                                                    ],
+                                                  ),
+                                                )),
+                                          ),
+                                          const SizedBox(
+                                            height: 15.0,
+                                          )
+                                        ],
+                                      );
+                                    })
+                            : SizedBox();
+                      },
+                    ),
+                    Observer(
+                      builder: (context) {
+                        return Loader().center().visible(appStore.isLoading);
+                      },
+                    ),
+                  ],
                 ),
-                  Expanded(
-                       flex: 1,
-                      child:
-                      InkWell(
-                        onTap: (){
-                          ShareAndReview().share();
-                          // ShareAndReview().removeAllKeys();
-
-                        },
-                        child: Container(
-                          width: double.infinity,
-                          height: 84,
-                          margin: EdgeInsets.only(bottom: 0),
-                          decoration: BoxDecoration(
-                            color: Color(0xFF01875F),
-                            borderRadius: BorderRadius.circular(15)
-
-                          ),
-                          child: Center(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 10),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      MyText(text:"Sharing is Caring!" ,fontSize: 18,fontWeight: FontWeight.bold,color: whiteColor,),
-                                      MyText(text:"Share The Zap AI App" ,fontSize: 15,color: whiteColor)
-                                    ],
+              ),
+              Expanded(
+                  flex: 1,
+                  child: InkWell(
+                    onTap: () {
+                      ShareAndReview().share();
+                      // ShareAndReview().removeAllKeys();
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      height: 84,
+                      margin: EdgeInsets.only(bottom: 0),
+                      decoration: BoxDecoration(
+                          color: Color(0xFF01875F),
+                          borderRadius: BorderRadius.circular(15)),
+                      child: Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  MyText(
+                                    text: "Sharing is Caring!",
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: whiteColor,
                                   ),
-                                ),
-                               Expanded(child: SizedBox()),
-                                Container(
-                                  height: 52,width: 96,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(25),
-                                    color: Color(0xFF19BD73),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      5.width,
-                                      Image.asset(home_share_logo,fit: BoxFit.cover,height: 25,width: 25,),
-                                      // Icon(Icons.share,color: Colors.white,),
-                                      5.width,
-                                      MyText(text: "Share",fontSize:16,color: Colors.white)
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(width:20),
-                              ],
+                                  MyText(
+                                      text: "Share The Zap AI App",
+                                      fontSize: 15,
+                                      color: whiteColor)
+                                ],
+                              ),
                             ),
-                          ),
+                            Expanded(child: SizedBox()),
+                            Container(
+                              height: 52,
+                              width: 96,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(25),
+                                color: Color(0xFF19BD73),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  5.width,
+                                  Image.asset(
+                                    home_share_logo,
+                                    fit: BoxFit.cover,
+                                    height: 25,
+                                    width: 25,
+                                  ),
+                                  // Icon(Icons.share,color: Colors.white,),
+                                  5.width,
+                                  MyText(
+                                      text: "Share",
+                                      fontSize: 16,
+                                      color: Colors.white)
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: 20),
+                          ],
                         ),
-                      )
-                  )
-               ]
-              ).paddingSymmetric(horizontal: 16,vertical: 8),
-
+                      ),
+                    ),
+                  ))
+            ]).paddingSymmetric(horizontal: 16, vertical: 8),
           ),
         ),
       ),
     );
   }
 
-  void checkAndShowPopup() async{
-
+  void checkAndShowPopup() async {
     ShareAndReview().checkAndShowPopup(context);
-
   }
 }

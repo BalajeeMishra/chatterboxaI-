@@ -1785,9 +1785,9 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                 'User_id': getStringAsync(USER_ID),
                               },
                             ).then((_) {
-                              // print('Logged event: write with parameters:');
+                              print('Event_Bug: write with parameters:');
                             }).catchError((error) {
-                              // print('Failed to log event: $error');
+                            print('Event_Bug: write with parameters: error $error');
                             });
                             facebookAppEvents.logEvent(
                               name: 'write',
@@ -1799,9 +1799,9 @@ class _PlayTabooScreen extends State<PlayTabooScreen> {
                                 'User_id': getStringAsync(USER_ID),
                               },
                             ).then((_) {
-                              // print('Logged event: write with parameters:');
+                            print('Event_Bug: write with parameters:');
                             }).catchError((error) {
-                              // print('Failed to log event: $error');
+                            print('Event_Bug: write with error: $error');
                             });
                             await stopSpeaking();
                             final bool res = await TaboogamechatPage(

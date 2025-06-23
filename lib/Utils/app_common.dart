@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
@@ -30,6 +29,7 @@ import '../network/rest_api.dart';
 import 'app_config.dart';
 import 'app_constants.dart';
 import 'package:libphonenumber_plugin/libphonenumber_plugin.dart';
+
 class DiagonalPathClipperTwo extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
@@ -287,8 +287,6 @@ String formatDateTime(DateTime dateTime) {
   return DateFormat('hh:mm a dd MMM yyyy').format(localDateTime);
 }
 
-
-
 String getDynamicDescription(String createdAt) {
   final createdDate = DateTime.parse(createdAt)
       .toUtc()
@@ -370,9 +368,6 @@ String extractCountryCode(String fullNumber) {
   }
 }
 
-
-
-
 class InstallDateHelper {
   /// Save the install date if not already saved
   static Future<void> saveInstallDate() async {
@@ -407,7 +402,8 @@ class GameEventManager {
   final String currentSessionId;
   List<Map<String, dynamic>> gameEvents = [];
   Map<String, int> gameEventCounts = {};
-  Map<String, Map<String, int>> contentEventCounts = {}; // Stores content count per game
+  Map<String, Map<String, int>> contentEventCounts =
+      {}; // Stores content count per game
   String? lastGameName;
 
   static GameEventManager? _instance;
@@ -415,10 +411,12 @@ class GameEventManager {
   GameEventManager._internal({required this.currentSessionId});
 
   factory GameEventManager({required String currentSessionId}) {
-    return _instance ??= GameEventManager._internal(currentSessionId: currentSessionId);
+    return _instance ??=
+        GameEventManager._internal(currentSessionId: currentSessionId);
   }
 
   bool isFirstBatch = true;
+  int longConvioCount = 0;
 
   Future<void> saveGameEvent({
     required String contentName,
@@ -427,8 +425,11 @@ class GameEventManager {
     required String modality,
     required int daysSinceInstall,
   }) async {
+    print(
+        "Event_Bug start method of save Game Value contentName $contentName, gameName: $gameName, userID $userId, modality: $modality, daysSinceInstall $daysSinceInstall");
     if (lastGameName != gameName) {
-      print("Game name changed from $lastGameName to $gameName. Resetting event count.");
+      print(
+          "Event_Bug Game name changed from $lastGameName to $gameName. Resetting event count.");
       gameEvents.clear();
       gameEventCounts[gameName] = 0;
       contentEventCounts[gameName] = {};
@@ -439,7 +440,8 @@ class GameEventManager {
     gameEventCounts.putIfAbsent(gameName, () => 0);
     contentEventCounts.putIfAbsent(gameName, () => {});
     contentEventCounts[gameName]!.putIfAbsent(contentName, () => 0);
-    contentEventCounts[gameName]![contentName] = contentEventCounts[gameName]![contentName]! + 1;
+    contentEventCounts[gameName]![contentName] =
+        contentEventCounts[gameName]![contentName]! + 1;
 
     gameEvents.add({
       'content_name': contentName,
@@ -449,24 +451,40 @@ class GameEventManager {
       'days_since_install': daysSinceInstall,
     });
 
-    print("Game events added: $gameEvents");
+    print("Event_Bug Game events added: $gameEvents");
 
     // if (isFirstBatch) {
     //   isFirstBatch = false;
     //   print("Skipping batching for the first set of events.");
     //   return;
     // }
-
+    print(
+        "Event_Bug contentEventCounts[gameName]![contentName]! ${contentEventCounts[gameName]![contentName]!}");
     // Check if the same content was played 4 times
     if (contentEventCounts[gameName]![contentName]! >= 4) {
       int nextCount = gameEventCounts[gameName]! + 4;
 
-      if(nextCount%8==0){
+      if (nextCount % 8 == 0) {
         print("game 8 count called");
-        await ShareAndReview().increaseGameCounter();
+        // 2,3,4,5
 
+        List<Map<String, dynamic>> batch = gameEvents
+            .where((event) => event['content_name'] == contentName)
+            .toList();
+
+        longConvioCount = longConvioCount + 1;
+
+        if (longConvioCount > 1 && longConvioCount < 6) {
+          await _logEvent('long_conversation ', batch);
+          await _logFacebookEvent('long_conversation ', batch);
+          print('Long Convo Called only (2,3,4,5): $longConvioCount');
+        }
+        print('Long Convo count: $longConvioCount');
+        await ShareAndReview().increaseGameCounter();
       }
-      List<Map<String, dynamic>> batch = gameEvents.where((event) => event['content_name'] == contentName).toList();
+      List<Map<String, dynamic>> batch = gameEvents
+          .where((event) => event['content_name'] == contentName)
+          .toList();
 
       await _logEvent('Game_complete_$nextCount', batch);
       await _logFacebookEvent('Game_complete_$nextCount', batch);
@@ -475,13 +493,16 @@ class GameEventManager {
       gameEvents.removeWhere((event) => event['content_name'] == contentName);
       contentEventCounts[gameName]![contentName] = 0; // Reset content count
 
-      print("Logged batch: Game_complete_$nextCount for content: $contentName");
+      print(
+          "Event_Bug Logged batch: Game_complete_$nextCount for content: $contentName");
     } else {
-      print("Waiting for more events of the same content to form a batch for $gameName.");
+      print(
+          "Event_bug Waiting for more events of the same content to form a batch for $gameName.");
     }
   }
 
-  Future<void> _logEvent(String eventName, List<Map<String, dynamic>> events) async {
+  Future<void> _logEvent(
+      String eventName, List<Map<String, dynamic>> events) async {
     try {
       final parameters = _buildEventParameters(events);
 
@@ -496,7 +517,8 @@ class GameEventManager {
     }
   }
 
-  Future<void> _logFacebookEvent(String eventName, List<Map<String, dynamic>> events) async {
+  Future<void> _logFacebookEvent(
+      String eventName, List<Map<String, dynamic>> events) async {
     try {
       final parameters = _buildEventParameters(events);
 
@@ -511,7 +533,7 @@ class GameEventManager {
     }
   }
 
-Map<String, Object> _buildEventParameters(List<Map<String, dynamic>> events) {
+  Map<String, Object> _buildEventParameters(List<Map<String, dynamic>> events) {
     return {
       'Game_name': events.first['Game_name'],
       'Modality': events.first['Modality'],
@@ -521,8 +543,6 @@ Map<String, Object> _buildEventParameters(List<Map<String, dynamic>> events) {
     };
   }
 }
-
-
 
 // class GameEventManager {
 //   final String currentSessionId;

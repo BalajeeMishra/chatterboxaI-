@@ -72,15 +72,15 @@ class GoogleCloudTTSService {
 
   Future<void> _playNextInQueue() async {
     var pro = Provider.of<PlayTabooScreenVM>(globalContext, listen: false);
-    var provider = Provider.of<PlayTabooScreenProvider>(globalContext, listen: false);
+    var provider =
+        Provider.of<PlayTabooScreenProvider>(globalContext, listen: false);
     try {
-
-        // If queue is empty, wait briefly (e.g., up to 2 seconds), checking every 200ms
+      // If queue is empty, wait briefly (e.g., up to 2 seconds), checking every 200ms
       print("index $index");
-        if(_audioFileQueue.isEmpty && index==0){
-          // print("index $index");
-          provider.setIsTtsCompleted(true);
-        }
+      if (_audioFileQueue.isEmpty && index == 0) {
+        // print("index $index");
+        provider.setIsTtsCompleted(true);
+      }
       int retries = 25; // 10 * 200ms = 2 seconds
       while (_audioFileQueue.isEmpty && retries > 0 && _isPlayingQueue) {
         await Future.delayed(Duration(milliseconds: 200));
@@ -117,7 +117,7 @@ class GoogleCloudTTSService {
   Future<void> speakTexts(
     List<String> texts, {
     String languageCode = 'en-US',
-    String voiceName = 'en-US-Standard-C',
+    String voiceName = 'en-US-Standard-F',
     String gender = 'FEMALE',
     double speakingRate = 0.8,
     double pitch = 0.0,
@@ -130,12 +130,14 @@ class GoogleCloudTTSService {
       print("length of filepath ${ttsFilePaths.length}");
       ttsFilePaths.clear();
       _audioFileQueue.clear();
-      var pro = Provider.of<PlayTabooScreenProvider>(globalContext, listen: false);
+      var pro =
+          Provider.of<PlayTabooScreenProvider>(globalContext, listen: false);
       print("hii this is running");
       final directory = await getTemporaryDirectory();
       index = texts.length;
       for (int i = 0; i < texts.length; i++) {
-        final filePath = '${directory.path}/tts_output_${DateTime.now().millisecondsSinceEpoch}.mp3';
+        final filePath =
+            '${directory.path}/tts_output_${DateTime.now().millisecondsSinceEpoch}.mp3';
         if (i == 1) {
           if (!_isPlayingQueue) {
             _isPlayingQueue = true;
@@ -162,12 +164,10 @@ class GoogleCloudTTSService {
           print(
               'Error generating or writing audio for "$filePath": $e\n$stack');
         }
-
       }
     } catch (e, stack) {
       print('Error in speakTexts: $e\n$stack');
     }
-
   }
 
   void speekSaved() async {

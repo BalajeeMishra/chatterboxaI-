@@ -34,7 +34,6 @@ class ChooseWordScreen extends StatefulWidget {
 }
 
 class _ChooseWordScreen extends State<ChooseWordScreen> {
-
   @override
   void initState() {
     super.initState();
@@ -42,16 +41,17 @@ class _ChooseWordScreen extends State<ChooseWordScreen> {
     Provider.of<AllGameVm>(context, listen: false).seInitialValue();
     Provider.of<AllGameVm>(context, listen: false)
         .allGamePageAPI(context, widget.dataId);
-
   }
-  initCloudTTS()async{
+
+  initCloudTTS() async {
     await cloudTtsService.initialize();
   }
+
   timerFunction() {
     print("Timer function calling");
     int elapsedSeconds = 0;
     const int maxDuration = 10;
-    var vm = Provider.of<PlayTabooScreenVM>(context,listen: false);
+    var vm = Provider.of<PlayTabooScreenVM>(context, listen: false);
 
     Timer.periodic(Duration(seconds: 2, milliseconds: 400),
         (Timer timer) async {
@@ -84,22 +84,21 @@ class _ChooseWordScreen extends State<ChooseWordScreen> {
             backButtonshow: true,
             centerTile: false,
             onPressed: () {
-              Navigator.pop(context,true);
+              Navigator.pop(context, true);
             },
-
             title: widget.gameName),
         body: RefreshIndicator(
           color: primaryColor,
           onRefresh: () async {
-            await Provider.of<AllGameVm>(context, listen: false).seInitialValue();
+            await Provider.of<AllGameVm>(context, listen: false)
+                .seInitialValue();
             await Provider.of<AllGameVm>(context, listen: false)
                 .allGamePageAPI(context, widget.dataId);
           },
           child: Stack(
             children: [
               Consumer<PlayTabooScreenVM>(
-               builder: (context,playVm,child)=>
-               Consumer<AllGameVm>(
+                builder: (context, playVm, child) => Consumer<AllGameVm>(
                   builder: (context, vm, child) {
                     return Column(
                       children: [
@@ -135,7 +134,8 @@ class _ChooseWordScreen extends State<ChooseWordScreen> {
                                     shrinkWrap: true,
                                     scrollDirection: Axis.vertical,
                                     itemBuilder: (context, index) {
-                                      var data = vm.homePageModel.allGame![index];
+                                      var data =
+                                          vm.homePageModel.allGame![index];
                                       Color containerColor = (index % 2 == 0)
                                           ? Color(0xffd3e2f5)
                                           : Color(0xffe4d7f1);
@@ -144,13 +144,19 @@ class _ChooseWordScreen extends State<ChooseWordScreen> {
                                         children: [
                                           InkWell(
                                             onTap: () async {
+                                              print(
+                                                  "Event_Bug: start on click");
                                               setValue(SESSION_ID, Uuid().v4());
-                                               playVm.clearUint8list();
-                                               playVm.talkingString = data.talkingCharacter ?? "";
-                                               playVm.listeningString = data.listeningCharacter ?? "";
-                                               if(playVm.talkingString != '' && playVm.listeningString !='') {
-                                                 playVm.saveGifs();
-                                               }
+                                              playVm.clearUint8list();
+                                              playVm.talkingString =
+                                                  data.talkingCharacter ?? "";
+                                              playVm.listeningString =
+                                                  data.listeningCharacter ?? "";
+                                              if (playVm.talkingString != '' &&
+                                                  playVm.listeningString !=
+                                                      '') {
+                                                playVm.saveGifs();
+                                              }
 
                                               final bool res =
                                                   await Navigator.push(
@@ -164,6 +170,7 @@ class _ChooseWordScreen extends State<ChooseWordScreen> {
                                                                 widget.gameName,
                                                               )));
 
+                                              print("Event_Bug: $res");
                                               if (res == true) {
                                                 // await ttsManager.stopAndReset();
                                                 // cloudTtsService.stop();
@@ -172,8 +179,9 @@ class _ChooseWordScreen extends State<ChooseWordScreen> {
                                               analytics.logEvent(
                                                 name: 'content_selection',
                                                 parameters: {
-                                                  'content_name':
-                                                      data.mainContent.toString(),
+                                                  'content_name': data
+                                                      .mainContent
+                                                      .toString(),
                                                   'Game_name': widget.gameName,
                                                   'User_id':
                                                       getStringAsync(USER_ID),
@@ -183,16 +191,17 @@ class _ChooseWordScreen extends State<ChooseWordScreen> {
                                                 },
                                               ).then((_) {
                                                 print(
-                                                    'Logged event: content_selection with parameters:');
+                                                    'Event_Bug Logged event: content_selection with parameters:');
                                               }).catchError((error) {
                                                 print(
-                                                    'Failed to log event: $error');
+                                                    'Event_Bug Failed to log event: $error');
                                               });
                                               facebookAppEvents.logEvent(
                                                 name: 'content_selection',
                                                 parameters: {
-                                                  'content_name':
-                                                      data.mainContent.toString(),
+                                                  'content_name': data
+                                                      .mainContent
+                                                      .toString(),
                                                   'Game_name': widget.gameName,
                                                   'User_id':
                                                       getStringAsync(USER_ID),
@@ -202,49 +211,51 @@ class _ChooseWordScreen extends State<ChooseWordScreen> {
                                                 },
                                               ).then((_) {
                                                 print(
-                                                    'Logged event: content_selection with parameters:');
+                                                    'Event_Bug Logged event: content_selection with parameters:');
                                               }).catchError((error) {
                                                 print(
-                                                    'Failed to log event: $error');
+                                                    'Event_Bug Failed to log event: $error');
                                               });
                                             },
-                                            child:
-                                            Container(
+                                            child: Container(
                                                 // width: MediaQuery.of(context)
                                                 //         .size
                                                 //         .width * 0.9,
                                                 width: double.infinity,
                                                 decoration: BoxDecoration(
                                                     color: containerColor,
-                                                    borderRadius: BorderRadius.all(
-                                                        Radius.circular(10.0))),
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                            Radius.circular(
+                                                                10.0))),
                                                 child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                          horizontal: 15.0,
-                                                          vertical: 10.0),
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 15.0,
+                                                      vertical: 10.0),
                                                   child: Column(
                                                     crossAxisAlignment:
-                                                        CrossAxisAlignment.start,
+                                                        CrossAxisAlignment
+                                                            .start,
                                                     children: [
                                                       MyText(
-                                                       text:  "${data.mainContent}",
-                                                            fontWeight:
-                                                                FontWeight.w800,
-                                                            color: Colors.black,
-                                                            fontSize: 20),
-
+                                                          text:
+                                                              "${data.mainContent}",
+                                                          fontWeight:
+                                                              FontWeight.w800,
+                                                          color: Colors.black,
+                                                          fontSize: 20),
                                                       const SizedBox(
                                                         height: 10,
                                                       ),
                                                       MyText(
-                                                        text: "#${data.level}",
-                                                            fontSize: 14,
-                                                            color:
-                                                                Color(0xff646464),
-                                                            fontWeight:
-                                                                FontWeight.w400
-                                                      )
+                                                          text:
+                                                              "#${data.level}",
+                                                          fontSize: 14,
+                                                          color:
+                                                              Color(0xff646464),
+                                                          fontWeight:
+                                                              FontWeight.w400)
                                                     ],
                                                   ),
                                                 )).paddingSymmetric(horizontal: 16),

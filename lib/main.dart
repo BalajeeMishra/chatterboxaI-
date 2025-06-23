@@ -31,6 +31,7 @@ AppStore appStore = AppStore();
 UserStore userStore = UserStore();
 late SharedPreferences sharedPreferences;
 final navigatorKey = GlobalKey<NavigatorState>();
+
 FirebaseAnalytics analytics = FirebaseAnalytics.instance;
 final facebookAppEvents = FacebookAppEvents();
 

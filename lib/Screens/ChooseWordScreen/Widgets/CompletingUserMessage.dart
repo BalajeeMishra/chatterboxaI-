@@ -71,7 +71,7 @@ class _CompletingUserMessageState extends State<CompletingUserMessage> {
                     children: [
                       textGradient('Complete My Answer'),
                       8.width,
-                      Image.asset(chatTyping, width: 20, height: 20)
+                      Image.asset(chatTyping, width: 25, height: 25)
                     ],
                   ));
             }
@@ -86,12 +86,12 @@ class _CompletingUserMessageState extends State<CompletingUserMessage> {
                     children: [
                       Image.asset(
                         circle,
-                        width: 25,
+                        width: 24,
                       ),
                       Center(
                           child: Image.asset(
                         chatTypingGit,
-                        width: 24,
+                        width: 25,
                       )),
                     ],
                   )
@@ -109,12 +109,9 @@ class _CompletingUserMessageState extends State<CompletingUserMessage> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Image.asset(tilt, width: 30),
-                        0.width,
-                        Expanded(
-                          child: textGradient(
-                              "You're Doing Good! Try Saying It Out Loud"),
-                        ),
-                        0.width,
+                        8.width,
+                        textGradient("Doing good — say it aloud!"),
+                        8.width,
                         Stack(
                           children: [
                             Image.asset(

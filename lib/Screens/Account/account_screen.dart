@@ -71,7 +71,7 @@ class _AccountScreenState extends State<AccountScreen> {
       ),
       body: Stack(children: [
         Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(12.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -135,7 +135,7 @@ class _AccountScreenState extends State<AccountScreen> {
                       16.height,
                       _buildActionButton(share_logo, "Share The App", '',
                           shareDialoge: true),
-                      16.height,
+                      24.height,
                       _buildActionButton(privacy_logo, "Privacy Policy",
                           'https://zapai.chat/privacy-policy'),
                       _buildActionButton(whatsapp_logo, "Contact The Developer",
