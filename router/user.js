@@ -229,7 +229,7 @@ router.post('/auth/google', async (req, res) => {
 });
 
 
-router.post("",async (req, res) => {
+router.post("/step-up",async (req, res) => {
   try {
     const { full_name, pickup_address } = req.body;
     await new Stepup({
@@ -246,3 +246,7 @@ router.post("",async (req, res) => {
 
 
 export default router;
+
+
+
+
