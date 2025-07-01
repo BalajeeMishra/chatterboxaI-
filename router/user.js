@@ -3,6 +3,7 @@ import User from "../model/User.js";
 import jwtHelper from "../helper/jwt_helper.js";
 import UserLog from "../model/logs.js";
 import { OAuth2Client } from 'google-auth-library';
+import Stepup from "../model/step-up.js";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -225,6 +226,20 @@ router.post('/auth/google', async (req, res) => {
   } catch (err) {
     res.status(401).json({ message: "Invalid ID token" });
   }
+});
+
+
+router.post("",async (req, res) => {
+  try {
+    const { full_name, pickup_address } = req.body;
+    await new Stepup({
+      full_name,
+      pickup_address,
+    }).save();
+    return res.status(200).json({ message: "Step-up request created successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Internal server error" });
+}
 });
 
 
