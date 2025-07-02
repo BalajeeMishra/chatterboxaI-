@@ -303,7 +303,7 @@ class _AccountScreenState extends State<AccountScreen> {
   Widget _buildActionButton(String image, String label, String url,
       {bool shareDialoge = false}) {
     return Container(
-      height: context.height() * 0.08,
+      // height: context.height() * 0.08,
       padding: EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white,

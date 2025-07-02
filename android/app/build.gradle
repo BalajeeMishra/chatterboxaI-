@@ -39,10 +39,10 @@ android {
     defaultConfig {
         applicationId "com.talkyplay.zapai"
         minSdk 23
-        targetSdkVersion 34
+        targetSdkVersion 35
         multiDexEnabled true
         versionCode 15
-        versionName "1.2"
+        versionName "1.4"
     }
 
     buildTypes {
