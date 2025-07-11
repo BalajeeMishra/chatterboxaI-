@@ -61,7 +61,7 @@ export const encryptResponse = (
   aesKeyBuffer,
   initialVectorBuffer
 ) => {
-
+  
   try{
   // flip initial vector
   const flipped_iv = [];
@@ -76,6 +76,8 @@ export const encryptResponse = (
     Buffer.from(flipped_iv)
   );
   console.log("🔐 Encrypting Response:", response);
+
+ 
   return Buffer.concat([
     cipher.update(JSON.stringify(response), "utf-8"),
     cipher.final(),

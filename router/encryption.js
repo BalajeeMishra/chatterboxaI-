@@ -1,122 +1,119 @@
-import express from 'express';
-import bcrypt from 'bcryptjs';
-import crypto from 'crypto';
-import { decryptRequest, encryptResponse, FlowEndpointException } from "../controller/encryption.js";
-
+import express from "express";
+import crypto from "crypto";
+import fs from "fs";
 const router = express.Router();
 
-const APP_SECRET = process.env.APP_SECRET;
-const PRIVATE_KEY = process.env.PRIVATE_KEY;
-const PASSPHRASE = process.env.PASSPHRASE;
+const privateKey = fs.readFileSync('private.pem', 'utf8');
 
-// function isRequestSignatureValid(req) {
-//   console.log("Validating Request Signature...");
-//   if(!APP_SECRET) {
-//     console.warn("App Secret is not set up. Please Add your app secret in /.env file to check for request validation");
-//     return true;
-//   }
-
-//   const signatureHeader = req.get("x-hub-signature-256");
-//   const signatureBuffer = Buffer.from(signatureHeader.replace("sha256=", ""), "utf-8");
-
-//   const hmac = crypto.createHmac("sha256", APP_SECRET);
-//   const digestString = hmac.update(req.rawBody).digest('hex');
-//   const digestBuffer = Buffer.from(digestString, "utf-8");
-//   console.log("Header Signature:", signatureHex);
-// console.log("Digest Calculated:", digestHex);
-// console.log("Raw Body (Buffer):", req.rawBody);
-
-//   if ( !crypto.timingSafeEqual(digestBuffer, signatureBuffer)) {
-//     console.error("Error: Request Signature did not match");
-//     return false;
-//   }
-//   return true;
-// }
-
-function isRequestSignatureValid(req) {
-  if (!APP_SECRET) {
-    console.warn("APP_SECRET not set");
-    return true;
-  }
-
-  const signatureHeader = req.get("x-hub-signature-256");
-  if (!signatureHeader || !signatureHeader.startsWith("sha256=")) {
-    console.error("Missing or malformed signature header");
-    return false;
-  }
-
-  const signatureHex = signatureHeader.replace("sha256=", "");
-
-  const hmac = crypto.createHmac("sha256", APP_SECRET);
-  const digestHex = hmac.update(req.rawBody).digest("hex");
-
-  console.log("Expected:", digestHex);
-  console.log("Actual:", signatureHex);
-
-  const signatureBuffer = Buffer.from(signatureHex, "hex");
-  const digestBuffer = Buffer.from(digestHex, "hex");
-
-  if (
-    signatureBuffer.length !== digestBuffer.length ||
-    !crypto.timingSafeEqual(signatureBuffer, digestBuffer)
-  ) {
-    console.error("❌ Signature mismatch");
-    return false;
-  }
-
-  console.log("✅ Signature match");
-  return true;
-}
-
-
-router.post("/", async (req, res) => {
-  if (!PRIVATE_KEY) {
-    throw new Error(
-      'Private key is empty. Please check your env variable "PRIVATE_KEY".'
-    );
-  }
-
-  if(!isRequestSignatureValid(req)) {
-    // Return status code 432 if request signature does not match.
-    // To learn more about return error codes visit: https://developers.facebook.com/docs/whatsapp/flows/reference/error-codes#endpoint_error_codes
-    return res.status(432).send();
-  }
-
-  let decryptedRequest = null;
-  try {
-    decryptedRequest = decryptRequest(req.body, PRIVATE_KEY, PASSPHRASE);
-  } catch (err) {
-    console.error(err);
-    if (err instanceof FlowEndpointException) {
-      return res.status(err.statusCode).send();
-    }
-    return res.status(500).send();
-  }
-
-  const { aesKeyBuffer, initialVectorBuffer, decryptedBody } = decryptedRequest;
-  console.log("💬 Decrypted Request:", decryptedBody);
-
-  // TODO: Uncomment this block and add your flow token validation logic.
-  // If the flow token becomes invalid, return HTTP code 427 to disable the flow and show the message in `error_msg` to the user
-  // Refer to the docs for details https://developers.facebook.com/docs/whatsapp/flows/reference/error-codes#endpoint_error_codes
-
-  /*
-  if (!isValidFlowToken(decryptedBody.flow_token)) {
-    const error_response = {
-      error_msg: `The message is no longer available`,
-    };
-    return res
-      .status(427)
-      .send(
-        encryptResponse(error_response, aesKeyBuffer, initialVectorBuffer)
-      );
-  }
-  */
-
-  // const screenResponse = await getNextScreen(decryptedBody);
-  console.log("👉 Response to Encrypt:", screenResponse);
-
-  res.send(encryptResponse(screenResponse, aesKeyBuffer, initialVectorBuffer));
+const key = crypto.createPrivateKey({
+  key: privateKey,
+  format: 'pem',     // must be 'pem'
+  type: 'pkcs1',     // or 'pkcs8' depending on key
+  passphrase: 'balajee'// if needed
 });
+// console.log(key.export({ type: 'pkcs1', format: 'pem' })); // Export the key in PEM format
+// console.log("Private Key:", key);
+router.post("/data", async ({ body }, res) => {
+  // const PRIVATE_KEY = process.env.PRIVATE_KEY;
+  const { decryptedBody, aesKeyBuffer, initialVectorBuffer } = decryptRequest(
+    body,
+    key
+  );
+
+  // console.log(firstname, "Decrypted Body:", decryptedBody);
+
+  console.log(decryptedBody," Decrypted Body:");
+
+  const { screen, data, version, action } = decryptedBody;
+  // Return the next screen & data to the client
+  // const screenData = {
+  //   screen: "SCREEN_NAME",
+  //   data: {
+  //     some_key: "some_value",
+  //   },
+  // };
+
+  const responseData = {
+    data: {
+      status: "active", // or dynamic logic based on input
+    },
+  };
+
+  // Return the response as plaintext
+  res.send(encryptResponse(responseData, aesKeyBuffer, initialVectorBuffer));
+});
+
+const decryptRequest = (body, privatePem) => {
+ 
+  try{
+  const { encrypted_aes_key, encrypted_flow_data, initial_vector } = body;
+
+  // Decrypt the AES key created by the client
+  const decryptedAesKey = crypto.privateDecrypt(
+    {
+      key: privatePem,
+      padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+      oaepHash: "sha256",
+    },
+    Buffer.from(encrypted_aes_key, "base64"),
+  );
+
+  // Decrypt the Flow data
+  const flowDataBuffer = Buffer.from(encrypted_flow_data, "base64");
+  const initialVectorBuffer = Buffer.from(initial_vector, "base64");
+
+  const TAG_LENGTH = 16;
+  const encrypted_flow_data_body = flowDataBuffer.subarray(0, -TAG_LENGTH);
+  const encrypted_flow_data_tag = flowDataBuffer.subarray(-TAG_LENGTH);
+
+  const decipher = crypto.createDecipheriv(
+    "aes-128-gcm",
+    decryptedAesKey,
+    initialVectorBuffer,
+  );
+  decipher.setAuthTag(encrypted_flow_data_tag);
+
+  const decryptedJSONString = Buffer.concat([
+    decipher.update(encrypted_flow_data_body),
+    decipher.final(),
+  ]).toString("utf-8");
+
+  return {
+    decryptedBody: JSON.parse(decryptedJSONString),
+    aesKeyBuffer: decryptedAesKey,
+    initialVectorBuffer,
+  };
+}
+catch (error) {
+    console.error("Decryption error:", error);
+    // throw new Error("Decryption failed");
+  } 
+};
+
+const encryptResponse = (
+  response,
+  aesKeyBuffer,
+  initialVectorBuffer,
+) => {
+
+  console.log(response, "Response to encrypt");
+  // Flip the initialization vector
+  const flipped_iv = [];
+  for (const pair of initialVectorBuffer.entries()) {
+    flipped_iv.push(~pair[1]);
+  }
+  // Encrypt the response data
+  const cipher = crypto.createCipheriv(
+    "aes-128-gcm",
+    aesKeyBuffer,
+    Buffer.from(flipped_iv),
+  );
+
+  return Buffer.concat([
+    cipher.update(JSON.stringify(response), "utf-8"),
+    cipher.final(),
+    cipher.getAuthTag(),
+  ]).toString("base64");
+};
 
 export default router;
