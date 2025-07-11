@@ -7,6 +7,7 @@ import ConverSation from "./router/conversation.js"
 import Admin from "./router/admin.js";
 import cors from "cors";
 import AI from './model/ai.js';
+import Encryption from "./router/encryption.js";
 
 const app = express();
 connectDB();
@@ -18,11 +19,22 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(express.json());
+// app.use(express.json());
+app.use(
+  express.json({
+    // store the raw request body to use it for signature verification
+    verify: (req, res, buf, encoding) => {
+      req.rawBody = buf?.toString(encoding || "utf8");
+    },
+  }),
+);
 app.use("/api/game", Game);
 app.use("/api/user", User);
 app.use("/api", ConverSation);
 app.use("/api/auth", Admin);
+
+
+app.use("/api/encryption", Encryption);
 app.get("/", async (_, res) => res.send("Server is running"));
 
 app.post("/api/ai", async (req, res) => {
