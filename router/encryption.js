@@ -11,8 +11,77 @@ const key = crypto.createPrivateKey({
   type: 'pkcs1',     // or 'pkcs8' depending on key
   passphrase: 'balajee'// if needed
 });
-// console.log(key.export({ type: 'pkcs1', format: 'pem' })); // Export the key in PEM format
-// console.log("Private Key:", key);
+
+// 0|chatterb | started
+// 0|chatterb | {
+// 0|chatterb |   data: { full_name: 'Hhh', pickup_address: 'Hhhh' },
+// 0|chatterb |   flow_token: 'unused',
+// 0|chatterb |   screen: 'PROFILE_UPDATE',
+// 0|chatterb |   action: 'data_exchange',
+// 0|chatterb |   version: '3.0'
+// 0|chatterb | }  Decrypted Body:
+// 0|chatterb | { data: { status: 'active' } } Response to encrypt
+
+const getNextScreen = async (decryptedBody) => {
+  const { screen, data, version, action, flow_token } = decryptedBody;
+  // handle health check request
+  if (action === "ping") {
+    return {
+      data: {
+        status: "active",
+      },
+    };
+  }
+
+  // handle error notification
+  if (data?.error) {
+    
+    return {
+      data: {
+        acknowledged: true,
+      },
+    };
+  }
+
+  // // handle initial request when opening the flow
+  // if (action === "INIT") {
+  //   return {
+  //     screen: "PROFILE_UPDATE",
+  //     data: {
+  //       // custom data for the screen
+  //       greeting: "Hey there! 👋",
+  //     },
+  //   };
+  // }
+
+  if (action === "data_exchange") {
+    // handle the request based on the current screen
+    switch (screen) {
+      case "PROFILE_UPDATE":
+        // TODO: process flow input data
+        console.info("Input name:", data?.name);
+
+        // send success response to complete and close the flow
+        return {
+          screen: "COMPLETE",
+          data: {
+            extension_message_response: {
+              params: {
+                flow_token,
+              },
+            },
+          },
+        };
+      default:
+        break;
+    }
+  }
+  throw new Error(
+    "Unhandled endpoint request. Make sure you handle the request action & screen logged above."
+  );
+};
+
+
 router.post("/data", async ({ body }, res) => {
   // const PRIVATE_KEY = process.env.PRIVATE_KEY;
   const { decryptedBody, aesKeyBuffer, initialVectorBuffer } = decryptRequest(
@@ -25,6 +94,9 @@ router.post("/data", async ({ body }, res) => {
   console.log(decryptedBody," Decrypted Body:");
 
   const { screen, data, version, action } = decryptedBody;
+
+  const screenResponse = await getNextScreen(decryptedBody);
+
   // Return the next screen & data to the client
   // const screenData = {
   //   screen: "SCREEN_NAME",
@@ -33,14 +105,14 @@ router.post("/data", async ({ body }, res) => {
   //   },
   // };
 
-  const responseData = {
-    data: {
-      status: "active", // or dynamic logic based on input
-    },
-  };
+  // const responseData = {
+  //   data: {
+  //     status: "active", // or dynamic logic based on input
+  //   },
+  // };
 
   // Return the response as plaintext
-  res.send(encryptResponse(responseData, aesKeyBuffer, initialVectorBuffer));
+  res.send(encryptResponse(screenResponse, aesKeyBuffer, initialVectorBuffer));
 });
 
 const decryptRequest = (body, privatePem) => {
