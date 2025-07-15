@@ -44,15 +44,17 @@ const getNextScreen = async (decryptedBody) => {
   }
 
   // // handle initial request when opening the flow
-  // if (action === "INIT") {
-  //   return {
-  //     screen: "PROFILE_UPDATE",
-  //     data: {
-  //       // custom data for the screen
-  //       greeting: "Hey there! 👋",
-  //     },
-  //   };
-  // }
+  if (action === "INIT") {
+    console.log("Flow initialized with screen:okkkkkkkkkkkkkkkkkkkkkkkkkk");
+    console.log("Flow started with screen:", screen);
+    return {
+      screen: "PROFILE_UPDATE",
+      data: {
+        // custom data for the screen
+        greeting: "Hey there! 👋",
+      },
+    };
+  }
 
   if (action === "data_exchange") {
     // handle the request based on the current screen
@@ -83,33 +85,17 @@ const getNextScreen = async (decryptedBody) => {
 
 
 router.post("/data", async ({ body }, res) => {
-  // const PRIVATE_KEY = process.env.PRIVATE_KEY;
+  console.log("hello world")
   const { decryptedBody, aesKeyBuffer, initialVectorBuffer } = decryptRequest(
     body,
     key
   );
 
-  // console.log(firstname, "Decrypted Body:", decryptedBody);
-
   console.log(decryptedBody," Decrypted Body:");
 
-  const { screen, data, version, action } = decryptedBody;
+  // const { screen, data, version, action } = decryptedBody;
 
   const screenResponse = await getNextScreen(decryptedBody);
-
-  // Return the next screen & data to the client
-  // const screenData = {
-  //   screen: "SCREEN_NAME",
-  //   data: {
-  //     some_key: "some_value",
-  //   },
-  // };
-
-  // const responseData = {
-  //   data: {
-  //     status: "active", // or dynamic logic based on input
-  //   },
-  // };
 
   // Return the response as plaintext
   res.send(encryptResponse(screenResponse, aesKeyBuffer, initialVectorBuffer));
