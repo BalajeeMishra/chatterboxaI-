@@ -23,6 +23,7 @@ const key = crypto.createPrivateKey({
 // 0|chatterb | { data: { status: 'active' } } Response to encrypt
 
 const getNextScreen = async (decryptedBody) => {
+  console.log("balajee mishra", decryptedBody);
   const { screen, data, version, action, flow_token } = decryptedBody;
   // handle health check request
   if (action === "ping") {
