@@ -81,7 +81,7 @@ const getNextScreen = async (decryptedBody) => {
   //   }
   // }
 
-  console.log("Flow started with screen:", screen),action;
+  console.log("Flow started with screen:", screen, action);
 
   if (action === "data_exchange") {
     Console.log("Flow completed with screen: SCHOOL balajeeeee",Screen);
