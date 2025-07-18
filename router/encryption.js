@@ -83,7 +83,7 @@ const getNextScreen = async (decryptedBody) => {
 
   console.log("Flow started with screen:", screen, action);
 
-  if (1) {
+  if (action === "complete") {
     Console.log("Flow completed with screen: SCHOOL balajeeeee",Screen);
     // handle the request based on the current screen
     switch (screen) {
