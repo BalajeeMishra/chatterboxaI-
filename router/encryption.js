@@ -67,7 +67,7 @@ const getNextScreen = async (decryptedBody) => {
         };
       default:
          return {
-          // screen: "COMPLETE",
+          screen: "SCHOOL",
           data: {
             extension_message_response: {
               params: {
