@@ -23,25 +23,6 @@ const key = crypto.createPrivateKey({
 // 0|chatterb | { data: { status: 'active' } } Response to encrypt
 
 
-hello world
-0|chatterbox-api  | {
-0|chatterbox-api  |   data: {},
-0|chatterbox-api  |   flow_token: 'unused',
-0|chatterbox-api  |   screen: 'SCHOOL',
-0|chatterbox-api  |   action: 'data_exchange',
-0|chatterbox-api  |   version: '3.0'
-0|chatterbox-api  | }  Decrypted Body:
-0|chatterbox-api  | balajee mishra {
-0|chatterbox-api  |   data: {},
-0|chatterbox-api  |   flow_token: 'unused',
-0|chatterbox-api  |   screen: 'SCHOOL',
-0|chatterbox-api  |   action: 'data_exchange',
-0|chatterbox-api  |   version: '3.0'
-0|chatterbox-api  | }
-
-
-
-
 
 const getNextScreen = async (decryptedBody) => {
   console.log("balajee mishra", decryptedBody);
