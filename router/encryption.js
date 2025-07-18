@@ -57,30 +57,30 @@ const getNextScreen = async (decryptedBody) => {
     };
   }
 
-  if (action === "data_exchange") {
-    // handle the request based on the current screen
-    switch (screen) {
-      case "PROFILE_UPDATE":
+  // if (action === "data_exchange") {
+  //   // handle the request based on the current screen
+  //   switch (screen) {
+  //     case "PROFILE_UPDATE":
         
 
-        // send success response to complete and close the flow
-        return {
-          screen: "COMPLETE",
-          data: {
-            extension_message_response: {
-              params: {
-                flow_token,
-              },
-            },
-          },
-        };
-      default:
-        break;
-    }
-  }
+  //       // send success response to complete and close the flow
+  //       return {
+  //         screen: "COMPLETE",
+  //         data: {
+  //           extension_message_response: {
+  //             params: {
+  //               flow_token,
+  //             },
+  //           },
+  //         },
+  //       };
+  //     default:
+  //       break;
+  //   }
+  // }
 
-  if (action === "complete") {
-    Console.log("Flow completed with screen: SCHOOL");
+  if (action === "data_exchange") {
+    Console.log("Flow completed with screen: SCHOOL balajeeeee");
     // handle the request based on the current screen
     switch (screen) {
       case "SCHOOL":
