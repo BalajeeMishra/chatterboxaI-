@@ -47,6 +47,7 @@ const getNextScreen = async (decryptedBody) => {
   }
 
   if (action === "data_exchange") {
+    console.log("worrld mrityunjayyy")
     // handle the request based on the current screen
     switch (screen) {
       case "PROFILE_UPDATE":
