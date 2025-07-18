@@ -66,7 +66,22 @@ const getNextScreen = async (decryptedBody) => {
           },
         };
       default:
-        break;
+         return {
+          // screen: "COMPLETE",
+          data: {
+            extension_message_response: {
+              params: {
+                flow_token,
+              },
+            },
+            school: [
+              { id: "abc", title: "Modern School" },
+              { id: "xyz", title: "IPS" },
+              { id: "pqr", title: "DPS" },
+            ],
+          },
+        };
+        // break;
     }
   }
 
