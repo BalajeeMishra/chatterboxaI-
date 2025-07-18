@@ -3,18 +3,14 @@ import crypto from "crypto";
 import fs from "fs";
 const router = express.Router();
 
-const privateKey = fs.readFileSync('private.pem', 'utf8');
+const privateKey = fs.readFileSync("private.pem", "utf8");
 
 const key = crypto.createPrivateKey({
   key: privateKey,
-  format: 'pem',     // must be 'pem'
-  type: 'pkcs1',     // or 'pkcs8' depending on key
-  passphrase: 'balajee'// if needed
+  format: "pem", // must be 'pem'
+  type: "pkcs1", // or 'pkcs8' depending on key
+  passphrase: "balajee", // if needed
 });
-
-
-
-
 
 const getNextScreen = async (decryptedBody) => {
   console.log("balajee mishra", decryptedBody);
@@ -30,7 +26,6 @@ const getNextScreen = async (decryptedBody) => {
 
   // handle error notification
   if (data?.error) {
-    
     return {
       data: {
         acknowledged: true,
@@ -66,6 +61,23 @@ const getNextScreen = async (decryptedBody) => {
             },
           },
         };
+      case "SCHOOL":
+        // send success response to complete and close the flow
+        return {
+          // screen: "COMPLETE",
+          data: {
+            extension_message_response: {
+              params: {
+                flow_token,
+              },
+            },
+            school: [
+              { id: "abc", title: "Modern School" },
+              { id: "xyz", title: "IPS" },
+              { id: "pqr", title: "DPS" },
+            ],
+          },
+        };
       default:
         break;
     }
@@ -96,23 +108,19 @@ const getNextScreen = async (decryptedBody) => {
   //   }
   // }
 
-
-
-
   throw new Error(
     "Unhandled endpoint request. Make sure you handle the request action & screen logged above."
   );
 };
 
-
 router.post("/data", async ({ body }, res) => {
-  console.log("hello world")
+  console.log("hello world");
   const { decryptedBody, aesKeyBuffer, initialVectorBuffer } = decryptRequest(
     body,
     key
   );
 
-  console.log(decryptedBody," Decrypted Body:");
+  console.log(decryptedBody, " Decrypted Body:");
 
   // const { screen, data, version, action } = decryptedBody;
 
@@ -121,16 +129,15 @@ router.post("/data", async ({ body }, res) => {
   // Return the response as plaintext
   res.send(encryptResponse(screenResponse, aesKeyBuffer, initialVectorBuffer));
 });
-
 
 router.post("/school", async ({ body }, res) => {
-  console.log("hello world")
+  console.log("hello world");
   const { decryptedBody, aesKeyBuffer, initialVectorBuffer } = decryptRequest(
     body,
     key
   );
 
-  console.log(decryptedBody," Decrypted Body:");
+  console.log(decryptedBody, " Decrypted Body:");
 
   // const { screen, data, version, action } = decryptedBody;
 
@@ -140,62 +147,52 @@ router.post("/school", async ({ body }, res) => {
   res.send(encryptResponse(screenResponse, aesKeyBuffer, initialVectorBuffer));
 });
 
-
-
-
-
 const decryptRequest = (body, privatePem) => {
-  try{
-  const { encrypted_aes_key, encrypted_flow_data, initial_vector } = body;
+  try {
+    const { encrypted_aes_key, encrypted_flow_data, initial_vector } = body;
 
-  // Decrypt the AES key created by the client
-  const decryptedAesKey = crypto.privateDecrypt(
-    {
-      key: privatePem,
-      padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
-      oaepHash: "sha256",
-    },
-    Buffer.from(encrypted_aes_key, "base64"),
-  );
+    // Decrypt the AES key created by the client
+    const decryptedAesKey = crypto.privateDecrypt(
+      {
+        key: privatePem,
+        padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+        oaepHash: "sha256",
+      },
+      Buffer.from(encrypted_aes_key, "base64")
+    );
 
-  // Decrypt the Flow data
-  const flowDataBuffer = Buffer.from(encrypted_flow_data, "base64");
-  const initialVectorBuffer = Buffer.from(initial_vector, "base64");
+    // Decrypt the Flow data
+    const flowDataBuffer = Buffer.from(encrypted_flow_data, "base64");
+    const initialVectorBuffer = Buffer.from(initial_vector, "base64");
 
-  const TAG_LENGTH = 16;
-  const encrypted_flow_data_body = flowDataBuffer.subarray(0, -TAG_LENGTH);
-  const encrypted_flow_data_tag = flowDataBuffer.subarray(-TAG_LENGTH);
+    const TAG_LENGTH = 16;
+    const encrypted_flow_data_body = flowDataBuffer.subarray(0, -TAG_LENGTH);
+    const encrypted_flow_data_tag = flowDataBuffer.subarray(-TAG_LENGTH);
 
-  const decipher = crypto.createDecipheriv(
-    "aes-128-gcm",
-    decryptedAesKey,
-    initialVectorBuffer,
-  );
-  decipher.setAuthTag(encrypted_flow_data_tag);
+    const decipher = crypto.createDecipheriv(
+      "aes-128-gcm",
+      decryptedAesKey,
+      initialVectorBuffer
+    );
+    decipher.setAuthTag(encrypted_flow_data_tag);
 
-  const decryptedJSONString = Buffer.concat([
-    decipher.update(encrypted_flow_data_body),
-    decipher.final(),
-  ]).toString("utf-8");
+    const decryptedJSONString = Buffer.concat([
+      decipher.update(encrypted_flow_data_body),
+      decipher.final(),
+    ]).toString("utf-8");
 
-  return {
-    decryptedBody: JSON.parse(decryptedJSONString),
-    aesKeyBuffer: decryptedAesKey,
-    initialVectorBuffer,
-  };
-}
-catch (error) {
+    return {
+      decryptedBody: JSON.parse(decryptedJSONString),
+      aesKeyBuffer: decryptedAesKey,
+      initialVectorBuffer,
+    };
+  } catch (error) {
     console.error("Decryption error:", error);
     // throw new Error("Decryption failed");
-  } 
+  }
 };
 
-const encryptResponse = (
-  response,
-  aesKeyBuffer,
-  initialVectorBuffer,
-) => {
-
+const encryptResponse = (response, aesKeyBuffer, initialVectorBuffer) => {
   console.log(response, "Response to encrypt");
   // Flip the initialization vector
   const flipped_iv = [];
@@ -206,7 +203,7 @@ const encryptResponse = (
   const cipher = crypto.createCipheriv(
     "aes-128-gcm",
     aesKeyBuffer,
-    Buffer.from(flipped_iv),
+    Buffer.from(flipped_iv)
   );
 
   return Buffer.concat([
