@@ -51,40 +51,15 @@ const getNextScreen = async (decryptedBody) => {
     };
   }
 
-  // if (action === "data_exchange") {
-  //   // handle the request based on the current screen
-  //   switch (screen) {
-  //     case "PROFILE_UPDATE":
-  //       // send success response to complete and close the flow
-  //       return {
-  //         screen: "COMPLETE",
-  //         data: {
-  //           extension_message_response: {
-  //             params: {
-  //               flow_token,
-  //             },
-  //           },
-  //         },
-  //       };
-  //     default:
-  //       break;
-  //   }
-  // }
   if (action === "data_exchange") {
-    Console.log("Flow completed with screen: SCHOOL balajeeeee",Screen);
     // handle the request based on the current screen
     switch (screen) {
-      case "SCHOOL":
+      case "PROFILE_UPDATE":
         // send success response to complete and close the flow
         return {
-          // screen: "COMPLETE",
+          screen: "COMPLETE",
           data: {
-            // school: [
-            //   { id: "abc", title: "Modern School" },
-            //   { id: "xyz", title: "IPS" },
-            //   { id: "pqr", title: "DPS" },
-            // ],
-             extension_message_response: {
+            extension_message_response: {
               params: {
                 flow_token,
               },
@@ -95,6 +70,31 @@ const getNextScreen = async (decryptedBody) => {
         break;
     }
   }
+  // if (action === "data_exchange") {
+  //   Console.log("Flow completed with screen: SCHOOL balajeeeee",Screen);
+  //   // handle the request based on the current screen
+  //   switch (screen) {
+  //     case "SCHOOL":
+  //       // send success response to complete and close the flow
+  //       return {
+  //         // screen: "COMPLETE",
+  //         data: {
+  //           // school: [
+  //           //   { id: "abc", title: "Modern School" },
+  //           //   { id: "xyz", title: "IPS" },
+  //           //   { id: "pqr", title: "DPS" },
+  //           // ],
+  //            extension_message_response: {
+  //             params: {
+  //               flow_token,
+  //             },
+  //           },
+  //         },
+  //       };
+  //     default:
+  //       break;
+  //   }
+  // }
 
 
 
