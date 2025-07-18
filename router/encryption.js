@@ -77,13 +77,13 @@ const getNextScreen = async (decryptedBody) => {
       case "SCHOOL":
         // send success response to complete and close the flow
         return {
-          screen: "COMPLETE",
+          // screen: "COMPLETE",
           data: {
-            school: [
-              { id: "abc", title: "Modern School" },
-              { id: "xyz", title: "IPS" },
-              { id: "pqr", title: "DPS" },
-            ],
+            // school: [
+            //   { id: "abc", title: "Modern School" },
+            //   { id: "xyz", title: "IPS" },
+            //   { id: "pqr", title: "DPS" },
+            // ],
              extension_message_response: {
               params: {
                 flow_token,
