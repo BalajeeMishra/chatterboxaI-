@@ -35,15 +35,39 @@ const getNextScreen = async (decryptedBody) => {
 
   // // handle initial request when opening the flow
   if (action === "INIT") {
-    console.log("Flow initialized with screen:okkkkkkkkkkkkkkkkkkkkkkkkkk");
-    console.log("Flow started with screen:", screen);
-    return {
-      screen: "PROFILE_UPDATE",
-      data: {
-        // custom data for the screen
-        greeting: "Hey there! 👋",
-      },
-    };
+      switch (screen) {
+      case "PROFILE_UPDATE":
+        // send success response to complete and close the flow
+        return {
+          screen: "COMPLETE",
+          data: {
+            extension_message_response: {
+              params: {
+                flow_token,
+              },
+            },
+          },
+        };
+      case "SCHOOL":
+        // send success response to complete and close the flow
+        return {
+          // screen: "COMPLETE",
+          data: {
+            extension_message_response: {
+              params: {
+                flow_token,
+              },
+            },
+            school: [
+              { id: "abc", title: "Modern School" },
+              { id: "xyz", title: "IPS" },
+              { id: "pqr", title: "DPS" },
+            ],
+          },
+        };
+      default:
+        break;
+    }
   }
 
   if (action === "data_exchange") {
