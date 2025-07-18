@@ -22,6 +22,11 @@ const key = crypto.createPrivateKey({
 // 0|chatterb | }  Decrypted Body:
 // 0|chatterb | { data: { status: 'active' } } Response to encrypt
 
+
+
+
+
+
 const getNextScreen = async (decryptedBody) => {
   console.log("balajee mishra", decryptedBody);
   const { screen, data, version, action, flow_token } = decryptedBody;
@@ -78,7 +83,7 @@ const getNextScreen = async (decryptedBody) => {
   //       break;
   //   }
   // }
-
+  console.log("lalajee")
   if (action === "data_exchange") {
     Console.log("Flow completed with screen: SCHOOL balajeeeee");
     // handle the request based on the current screen
@@ -88,7 +93,7 @@ const getNextScreen = async (decryptedBody) => {
 
         // send success response to complete and close the flow
         return {
-          screen: "COMPLETE",
+          
           data: {
             school: [
               { id: "abc", title: "Modern School" },
