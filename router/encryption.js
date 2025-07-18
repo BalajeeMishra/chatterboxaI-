@@ -12,15 +12,7 @@ const key = crypto.createPrivateKey({
   passphrase: 'balajee'// if needed
 });
 
-// 0|chatterb | started
-// 0|chatterb | {
-// 0|chatterb |   data: { full_name: 'Hhh', pickup_address: 'Hhhh' },
-// 0|chatterb |   flow_token: 'unused',
-// 0|chatterb |   screen: 'PROFILE_UPDATE',
-// 0|chatterb |   action: 'data_exchange',
-// 0|chatterb |   version: '3.0'
-// 0|chatterb | }  Decrypted Body:
-// 0|chatterb | { data: { status: 'active' } } Response to encrypt
+
 
 
 
@@ -59,30 +51,25 @@ const getNextScreen = async (decryptedBody) => {
     };
   }
 
-  // if (action === "data_exchange") {
-  //   // handle the request based on the current screen
-  //   switch (screen) {
-  //     case "PROFILE_UPDATE":
-        
-
-  //       // send success response to complete and close the flow
-  //       return {
-  //         screen: "COMPLETE",
-  //         data: {
-  //           extension_message_response: {
-  //             params: {
-  //               flow_token,
-  //             },
-  //           },
-  //         },
-  //       };
-  //     default:
-  //       break;
-  //   }
-  // }
-
-  console.log("Flow started with screen:", screen, action);
-
+  if (action === "data_exchange") {
+    // handle the request based on the current screen
+    switch (screen) {
+      case "PROFILE_UPDATE":
+        // send success response to complete and close the flow
+        return {
+          screen: "COMPLETE",
+          data: {
+            extension_message_response: {
+              params: {
+                flow_token,
+              },
+            },
+          },
+        };
+      default:
+        break;
+    }
+  }
   if (action === "complete") {
     Console.log("Flow completed with screen: SCHOOL balajeeeee",Screen);
     // handle the request based on the current screen
@@ -96,7 +83,12 @@ const getNextScreen = async (decryptedBody) => {
               { id: "abc", title: "Modern School" },
               { id: "xyz", title: "IPS" },
               { id: "pqr", title: "DPS" },
-            ]
+            ],
+             extension_message_response: {
+              params: {
+                flow_token,
+              },
+            },
           },
         };
       default:
