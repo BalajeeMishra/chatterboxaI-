@@ -80,6 +80,7 @@ const getNextScreen = async (decryptedBody) => {
   }
 
   if (action === "complete") {
+    Console.log("Flow completed with screen: SCHOOL");
     // handle the request based on the current screen
     switch (screen) {
       case "SCHOOL":
