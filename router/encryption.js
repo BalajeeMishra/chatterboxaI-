@@ -61,8 +61,7 @@ const getNextScreen = async (decryptedBody) => {
     // handle the request based on the current screen
     switch (screen) {
       case "PROFILE_UPDATE":
-        // TODO: process flow input data
-        console.info("Input name:", data?.name);
+        
 
         // send success response to complete and close the flow
         return {
@@ -79,6 +78,32 @@ const getNextScreen = async (decryptedBody) => {
         break;
     }
   }
+
+  if (action === "complete") {
+    // handle the request based on the current screen
+    switch (screen) {
+      case "SCHOOL":
+        
+
+        // send success response to complete and close the flow
+        return {
+          screen: "COMPLETE",
+          data: {
+            school: [
+              { id: "abc", title: "Modern School" },
+              { id: "xyz", title: "IPS" },
+              { id: "pqr", title: "DPS" },
+            ]
+          },
+        };
+      default:
+        break;
+    }
+  }
+
+
+
+
   throw new Error(
     "Unhandled endpoint request. Make sure you handle the request action & screen logged above."
   );
@@ -102,8 +127,29 @@ router.post("/data", async ({ body }, res) => {
   res.send(encryptResponse(screenResponse, aesKeyBuffer, initialVectorBuffer));
 });
 
+
+router.post("/school", async ({ body }, res) => {
+  console.log("hello world")
+  const { decryptedBody, aesKeyBuffer, initialVectorBuffer } = decryptRequest(
+    body,
+    key
+  );
+
+  console.log(decryptedBody," Decrypted Body:");
+
+  // const { screen, data, version, action } = decryptedBody;
+
+  const screenResponse = await getNextScreen(decryptedBody);
+
+  // Return the response as plaintext
+  res.send(encryptResponse(screenResponse, aesKeyBuffer, initialVectorBuffer));
+});
+
+
+
+
+
 const decryptRequest = (body, privatePem) => {
- 
   try{
   const { encrypted_aes_key, encrypted_flow_data, initial_vector } = body;
 
