@@ -132,7 +132,7 @@ router.post("/data", async ({ body }, res) => {
 });
 
 router.post("/school", async ({ body }, res) => {
-  console.log("hello world");
+  console.log("hello world mrityunjay");
   const { decryptedBody, aesKeyBuffer, initialVectorBuffer } = decryptRequest(
     body,
     key
