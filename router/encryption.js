@@ -77,7 +77,7 @@ const getNextScreen = async (decryptedBody) => {
       case "SCHOOL":
         // send success response to complete and close the flow
         return {
-          screen: "COMPLETE",
+          // screen: "COMPLETE",
           data: {
             school: [
               { id: "abc", title: "Modern School" },
